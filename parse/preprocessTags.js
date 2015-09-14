@@ -151,10 +151,11 @@ function processTag(tag) {
 
   const [value, type] = findValueAndType(tag);
 
-  const newTag = { ...tag, value };
+  const { start, end } = tag;
+  const newTag = { start, end, value };
 
   const fn = processTagElement[type] || processTagElement.default;
-  return fn(newTag);
+  return fn.call(this, newTag);
 }
 
 const parseTags = flow(

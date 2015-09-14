@@ -1,5 +1,6 @@
-import { map, flow, pick, matches, pluck, sum, sortBy, reduce, reject, isNull, first, transform, pairs, curry } from 'lodash-fp';
+import { map, flow, pick, matches, pluck, sum, sortBy, reduce, reject, isNull, first, transform, pairs, curry, all, negate, startsWith } from 'lodash-fp';
 import { bindOwn } from './util';
+import assert from 'assert';
 
 import parseText from './parse/parseText';
 import preprocessTags from './parse/preprocessTags';
@@ -50,10 +51,18 @@ const parseTags = flow(
   first
 );
 
+const noTextElementInTags = flow(
+  pluck('type'),
+  all(negate(startsWith('TEXT_')))
+);
+
 export default function parse(text) {
   const tagsWithHints = parseText.call(this, text);
   const { tags: tagsWithoutHints, hints } = this.getFormattingHints(tagsWithHints);
   const preprocessedTags = preprocessTags.call(this, tagsWithoutHints);
+
+  assert(noTextElementInTags(preprocessedTags));
+
   const output = parseTags.call(this, preprocessedTags);
 
   return output;
