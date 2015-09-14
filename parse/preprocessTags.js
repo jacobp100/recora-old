@@ -1,16 +1,16 @@
-import { flow, reject, isNull, forEach, zip, filter, first, map } from 'lodash-fp';
+import { flow, reject, isNull, zip, filter, first, map } from 'lodash-fp';
 import { bindOwn } from '../util';
 
 const statementParts = [
   null, // full text
-  'tag-open-bracket',
-  'tag-close-bracket',
-  'text-symbol-unit',
+  'TAG_OPEN_BRACKET',
+  'TAG_CLOSE_BRACKET',
+  'TEXT_SYMBOL_UNIT',
   null, // symbol-unit exponent
-  'text-number',
-  'text-colour',
-  'text-operator',
-  'tag-comma',
+  'TEXT_NUMBER',
+  'TEXT_COLOR',
+  'TEXT_OPERATOR',
+  'TAG_COMMA',
 ];
 
 const operators = {
@@ -29,19 +29,9 @@ const findValueAndType = flow(
   first
 );
 
-function processTag(tag) {
-  if (tag.type) {
-    return tag;
-  }
-
-  const [value, type] = findValueAndType(tag);
-
-  const { start, end } = tag;
-
-  const out = { type, value, start, end };
-
-  switch (type) {
-  case 'text-symbol-unit':
+const processTagElement = {
+  TEXT_SYMBOL_UNIT(tag) {
+    const { value, start, end } = tag;
     let canNoop = false;
     const options = [];
 
@@ -50,7 +40,7 @@ function processTag(tag) {
     // if (functions.hasOwnProperty(value)) {
     //   options.push({
     //     ...out,
-    //     type: 'tag-function',
+    //     type: 'TAG_FUNCTION',
     //     value,
     //     power,
     //   });
@@ -62,7 +52,7 @@ function processTag(tag) {
     //   if (colour !== null) {
     //     options.push({
     //       ...out,
-    //       type: 'tag-colour',
+    //       type: 'TAG_COLOR',
     //       value: colour,
     //     });
     //   }
@@ -72,8 +62,8 @@ function processTag(tag) {
 
     if (unit !== null) {
       options.push({
-        ...out,
-        type: 'tag-unit',
+        ...tag,
+        type: 'TAG_UNIT',
         value: unit,
         power,
       });
@@ -81,8 +71,8 @@ function processTag(tag) {
 
     if (options.length === 0) {
       options.push({
-        ...out,
-        type: 'tag-symbol',
+        ...tag,
+        type: 'TAG_SYMBOL',
         value,
         power,
       });
@@ -94,14 +84,14 @@ function processTag(tag) {
     if (constant) {
       if (constant.type === 'statement') {
         options.push({
-          ...out,
-          type: 'tag-statement',
+          ...tag,
+          type: 'TAG_STATEMENT',
           value: constant.exponent(power),
         });
       } else {
         options.push({
-          ...out,
-          type: 'tag-constant',
+          ...tag,
+          type: 'TAG_CONSTANT',
           value: Math.pow(this.constants[value], power),
         });
       }
@@ -109,14 +99,14 @@ function processTag(tag) {
 
     if (canNoop) {
       options.push({
-        ...out,
-        type: 'noop',
+        ...tag,
+        type: 'NOOP',
       });
     }
 
     if (options.length > 1) {
       return {
-        type: 'parse-options',
+        type: 'PARSE_OPTIONS',
         value: options,
       };
     } else if (options.length === 1) {
@@ -124,30 +114,47 @@ function processTag(tag) {
     }
 
     return {
-      type: 'noop',
+      type: 'NOOP',
       start,
       end,
     };
-  // case 'text-colour':
-  //   out.type = 'tag-colour';
-  //   out.value = colorForge.hex(value);
-  //   break;
-  case 'text-operator':
+  },
+  // TEXT_COLOR(tag) {
+  //   return {
+  //     ...tag,
+  //     value: colorForce.hex(value);
+  //   }
+  // }
+  TEXT_OPERATOR(tag) {
     return {
-      ...out,
-      type: 'tag-operator',
-      value: operators[value],
+      ...tag,
+      type: 'TAG_OPERATOR',
+      value: operators[tag.value],
     };
-  case 'text-number':
+  },
+  TEXT_NUMBER(tag) {
     return {
-      ...out,
-      type: 'tag-number',
-      value: Number(out.value),
+      ...tag,
+      type: 'TAG_NUMBER',
+      value: Number(tag.value),
     };
-  default:
-    // Not null, could be currency (unit), number...
-    return out;
+  },
+  default(tag) {
+    return tag;
+  },
+};
+
+function processTag(tag) {
+  if (tag.type) {
+    return tag;
   }
+
+  const [value, type] = findValueAndType(tag);
+
+  const newTag = { ...tag, value };
+
+  const fn = processTagElement[type] || processTagElement.default;
+  return fn(newTag);
 }
 
 const parseTags = flow(
