@@ -41,23 +41,29 @@ const resolveUnitPowerType = curry((type, power, tag) => {
   return [1, tag];
 });
 
-const resolveUnitPowerPrefixes = pipe(
-  mapAccum(resolveUnitPowerType('TAG_UNIT_POWER_PREFIX'), 1),
+const cleanUpMapAccum = pipe(
   last,
   reject(isNil),
+);
+
+const resolveUnitPowerPrefixes = pipe(
+  mapAccum(resolveUnitPowerType('TAG_UNIT_POWER_PREFIX'), 1),
+  cleanUpMapAccum,
 );
 
 const resolveUnitPowerSuffixes = pipe(
-  mapAccum(resolveUnitPowerType('TAG_UNIT_POWER_PREFIX'), 1),
-  last,
-  reject(isNil),
+  mapAccum(resolveUnitPowerType('TAG_UNIT_POWER_SUFFIX'), 1),
+  cleanUpMapAccum,
 );
 
 const resolveUnitPowers = pipe(
+  // Resolve 3 meters squared, 3 square meters, 3 meters per second etc.
+  // Also resolves 1 meter / second when used in combination with fixNaturalMathNotation
   resolveUnitPowerPrefixes,
   resolveUnitPowerSuffixes,
 );
 
+// FIXME: Lens stuff
 const postprocessTags = pipe(
   untailTags,
   fixNaturalMathNotation,
