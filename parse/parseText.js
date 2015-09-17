@@ -1,6 +1,5 @@
-import { pipe, toLower, evolve, prop } from 'ramda';
+import { pipe, toLower, evolve, prop, lens, assoc, over } from 'ramda';
 import { getNumberFormat } from '../locale';
-import { mergeVia } from '../util';
 
 const regexpToArray = (exp, text) => {
   const regexp = new RegExp(exp, 'g');
@@ -17,16 +16,18 @@ const regexpToArray = (exp, text) => {
   return tags;
 };
 
-function getTags({ text }) {
+function getTags(text) {
   const numberFormat = getNumberFormat(text);
   // Refer to ./preprocessTags for the capture groups
   const tags = regexpToArray(`(?:(\\()|(\\))|(log2|log10|[\\£\\$\\€\\%]|[a-z]+)(?:\\^(\\d+))?|(0x[0-9a-f]+(?:\\.[0-9a-f]+)?|0o[0-7]+(?:.[0-7]+)?|0b[01]+(?:\\.[01]+)?|${numberFormat})|(#[0-9a-f]{3}(?:[0-9a-f]{5}|[0-9a-f]{3}|[0-9a-f])?)|(\\*\\*|[=+\\-*\\/^])|(,))`, text);
 
-  return { tags };
+  return tags;
 }
+
+const textToTags = lens(prop('text'), assoc('tags'));
 
 const parseText = pipe(
   evolve({ text: toLower }),
-  mergeVia(getTags)
+  over(textToTags, getTags),
 );
 export default parseText;

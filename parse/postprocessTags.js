@@ -1,23 +1,23 @@
-import { pipe, map, reduce, prop } from 'ramda';
+import { pipe, map, mapAccum, last, isNil, reject, curry } from 'ramda';
 import { fullAperture } from '../util';
 import { untailTags, trimNoop } from '../utils/tagUtils';
 
-function fixNotationWithPreviousNext([previous, tag, next]) {
-  const nextIsTagUnit = next && next.type === 'tag-unit';
+function fixNaturalNotationWithPreviousNext([previous, tag, next]) {
+  const nextIsTagUnit = next && next.type === 'TAG_UNIT';
 
-  if (tag.type === 'tag-operator' && next) {
+  if (tag.type === 'TAG_OPERATOR' && next) {
     if (tag.value === 'divide' && nextIsTagUnit) {
-      // Fix 1 meter / second
+      // Fix 1 meter / second, where / is shorthand for 'per'
       return {
         ...tag,
-        type: 'tag-unit-power',
+        type: 'TAG_UNIT_POWER_PREFIX',
         value: -1,
       };
-    } else if (tag.value === 'subtract' && (!previous || previous.type === 'tag-operator' || nextIsTagUnit)) {
-      // Fix -1 meters, 3 * -1 meters
+    } else if (tag.value === 'subtract' && (!previous || previous.type === 'TAG_OPERATOR' || nextIsTagUnit)) {
+      // Fix -1 meters, 3 * -1 meters, or -seconds (not sure on the last one)
       return {
         ...tag,
-        type: 'tag-negative',
+        type: 'TAG_NEGATIVE',
         value: null,
       };
     }
@@ -26,37 +26,36 @@ function fixNotationWithPreviousNext([previous, tag, next]) {
   return tag;
 }
 
-function resolveUnitPower({ unitPower, tags }, tag) {
-  if (tag.type === 'tag-unit-power') {
-    return {
-      tags,
-      unitPower: tag.value,
-    };
-  }
-
-  const newTag = { ...tag };
-
-  if (tag.type === 'tag-unit') {
-    newTag.unitPower = unitPower;
-  }
-
-  return {
-    tags: [...tags, newTag],
-    unitPower: 1,
-  };
-}
-
 const fixNaturalMathNotation = pipe(
   fullAperture(1),
-  map(fixNotationWithPreviousNext)
+  map(fixNaturalNotationWithPreviousNext)
+);
+
+const resolveUnitPowerType = curry((type, power, tag) => {
+  if (tag.type === type) {
+    return [tag.value, null];
+  } else if (tag.type === 'TAG_UNIT') {
+    return [1, { ...tag, power }];
+  }
+
+  return [1, tag];
+});
+
+const resolveUnitPowerPrefixes = pipe(
+  mapAccum(resolveUnitPowerType('TAG_UNIT_POWER_PREFIX'), 1),
+  last,
+  reject(isNil),
+);
+
+const resolveUnitPowerSuffixes = pipe(
+  mapAccum(resolveUnitPowerType('TAG_UNIT_POWER_PREFIX'), 1),
+  last,
+  reject(isNil),
 );
 
 const resolveUnitPowers = pipe(
-  reduce(resolveUnitPower, {
-    unitPower: 1,
-    tags: [],
-  }),
-  prop('tags')
+  resolveUnitPowerPrefixes,
+  resolveUnitPowerSuffixes,
 );
 
 const postprocessTags = pipe(

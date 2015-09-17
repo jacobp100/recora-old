@@ -1,4 +1,4 @@
-import { compose, reject, isNull, zip, filter, first, map, prop, pipe } from 'ramda';
+import { compose, reject, isNil, zip, filter, first, map, prop, pipe, tap } from 'ramda';
 import { mergeProp } from '../util';
 import * as locale from '../locale';
 
@@ -161,13 +161,18 @@ function processTag(tag) {
 
 const processTags = pipe(
   prop('tags'),
-  processTags
+  map(processTags),
 );
 
-const preprocessTags = compose(
+const removeNullTags = pipe(
+  prop('tags'),
+  reject(isNil),
+);
+
+const preprocessTags = pipe(
   locale.preprocessTags,
-  reject(isNull),
+  mergeProp('tags', removeNullTags),
+  tap(console.log.bind(console)),
   mergeProp('tags', processTags),
-  map(processTag)
 );
 export default preprocessTags;
