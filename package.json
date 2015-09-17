@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "lodash-fp": "^0.10.2"
+    "ramda": "^0.17.1"
   },
   "devDependencies": {
     "babel-core": "^5.8.24",

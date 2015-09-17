@@ -1,39 +1,21 @@
-import { curry, map } from 'lodash-fp';
+import { __, curry, pipe, merge, repeat, aperture, concat, mapObj, set } from 'ramda';
 
-export function callOwn(key, args = []) {
-  return function doCallOwn(...extraArgs) {
-    return this[key](...args, ...extraArgs);
-  };
-}
+const callWith = curry((obj, fn) => fn(obj));
 
-export function bindOwn(lodashFn, ...args) {
-  return function doBindOwn(...data) {
-    const boundArgs = map(arg => (
-      (typeof arg === 'function') ? arg.bind(this) : arg
-    ))(args);
-    return lodashFn(...boundArgs)(...data);
-  };
-}
+export const mergeVia = curry((fn, obj) => merge(obj, fn(obj)));
+export const mergeOver = curry((fnObj, obj) => merge(obj, mapObj(callWith(obj), fnObj)));
+export const mergeProp = curry((prop, fn, obj) => set(obj, prop, fn(obj)));
 
 /**
 Transforms an array into an array of equal length where each element is an array consisting of `left` elements to the left, the current element, and `right` elements to the right
 
-withPreviousNextElements(1, 1) will transform the array [a, b, c] into [[undefined, a, b], [a, b, c], [b, c, undefined]]
+fullAperture(1, 1) will transform the array [a, b, c] into [[undefined, a, b], [a, b, c], [b, c, undefined]]
 */
-const withPreviousNextElements = curry((left, right, array) => {
-  const length = left + right + 1;
-  const out = [];
-
-  for (let i = 0, len = array.length; i < len; i++) {
-    const value = new Array(length);
-
-    for (let j = i - left, k = 0; k < length; j++, k++) {
-      value[k] = array[j];
-    }
-
-    out[i] = value;
-  }
-
-  return out;
+export const fullAperture = curry((n, array) => {
+  const padding = repeat(undefined, Math.floor(n / 2));
+  const paddedArray = pipe(
+    concat(padding),
+    concat(__, padding)
+  )(array);
+  return aperture(n, paddedArray);
 });
-export { withPreviousNextElements };

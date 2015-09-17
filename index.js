@@ -4,28 +4,18 @@ import units from './data/environment/units';
 
 export default class Recora {
   constructor(locale) {
-    this.locale = {
-      numberFormat: '\\d+',
-    };
+    this.locale = locale || 'en';
     this.constants = {};
   }
 
   parse(text) {
-    return parse.call(this, text);
-  }
-
-  getUnit(name) {
-    if (units[name]) {
-      return name;
-    }
-    return null;
-  }
-
-  preprocessTags(tags) {
-    return tags;
-  }
-
-  getFormattingHints(tags) {
-    return { tags, hints: [] };
+    const { locale, constants } = this;
+    const context = {
+      locale,
+      text,
+      constants,
+      hints: null,
+    };
+    return parse(context);
   }
 }

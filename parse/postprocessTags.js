@@ -1,5 +1,5 @@
-import { flow, map, reduce, get } from 'lodash-fp';
-import { withPreviousNextElements } from '../util';
+import { pipe, map, reduce, prop } from 'ramda';
+import { fullAperture } from '../util';
 import { untailTags, trimNoop } from '../utils/tagUtils';
 
 function fixNotationWithPreviousNext([previous, tag, next]) {
@@ -46,20 +46,20 @@ function resolveUnitPower({ unitPower, tags }, tag) {
   };
 }
 
-const fixNaturalMathNotation = flow(
-  withPreviousNextElements(1, 1),
+const fixNaturalMathNotation = pipe(
+  fullAperture(1),
   map(fixNotationWithPreviousNext)
 );
 
-const resolveUnitPowers = flow(
+const resolveUnitPowers = pipe(
   reduce(resolveUnitPower, {
     unitPower: 1,
     tags: [],
   }),
-  get('tags')
+  prop('tags')
 );
 
-const postprocessTags = flow(
+const postprocessTags = pipe(
   untailTags,
   fixNaturalMathNotation,
   resolveUnitPowers,

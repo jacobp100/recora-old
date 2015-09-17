@@ -1,5 +1,6 @@
-import { flow } from 'lodash-fp';
-import { callOwn } from '../util';
+import { pipe, toLower, evolve, prop } from 'ramda';
+import { getNumberFormat } from '../locale';
+import { mergeVia } from '../util';
 
 const regexpToArray = (exp, text) => {
   const regexp = new RegExp(exp, 'g');
@@ -16,19 +17,16 @@ const regexpToArray = (exp, text) => {
   return tags;
 };
 
-function toLowerCase(text) {
-  return text.toLowerCase();
-}
-
-function getTags(input) {
-  const { numberFormat } = this.locale;
+function getTags({ text }) {
+  const numberFormat = getNumberFormat(text);
   // Refer to ./preprocessTags for the capture groups
-  return regexpToArray(`(?:(\\()|(\\))|(log2|log10|[\\£\\$\\€\\%]|[a-z]+)(?:\\^(\\d+))?|(0x[0-9a-f]+(?:\\.[0-9a-f]+)?|0o[0-7]+(?:.[0-7]+)?|0b[01]+(?:\\.[01]+)?|${numberFormat})|(#[0-9a-f]{3}(?:[0-9a-f]{5}|[0-9a-f]{3}|[0-9a-f])?)|(\\*\\*|[=+\\-*\\/^])|(,))`, input);
+  const tags = regexpToArray(`(?:(\\()|(\\))|(log2|log10|[\\£\\$\\€\\%]|[a-z]+)(?:\\^(\\d+))?|(0x[0-9a-f]+(?:\\.[0-9a-f]+)?|0o[0-7]+(?:.[0-7]+)?|0b[01]+(?:\\.[01]+)?|${numberFormat})|(#[0-9a-f]{3}(?:[0-9a-f]{5}|[0-9a-f]{3}|[0-9a-f])?)|(\\*\\*|[=+\\-*\\/^])|(,))`, text);
+
+  return { tags };
 }
 
-const parseText = flow(
-  toLowerCase,
-  getTags,
-  callOwn('preprocessTags')
+const parseText = pipe(
+  evolve({ text: toLower }),
+  mergeVia(getTags)
 );
 export default parseText;

@@ -1,4 +1,4 @@
-import { reduce, get, flow } from 'lodash-fp';
+import { reduce, prop, pipe, map } from 'ramda';
 
 function appendToLastArray(array, element) {
   const newArray = array.slice();
@@ -35,7 +35,7 @@ const resolveTagBracket = {
     }
 
     const newElement = {
-      type: 'unsolved-brackets',
+      type: 'INTERMEDIATE_UNRESOLVED_BRACKETS',
       value: bracketGroup,
     };
 
@@ -88,12 +88,45 @@ function resolveBracket({ groups, bracketLevel, bracketGroup }, tag) {
   return fn(groups, bracketLevel, bracketGroup, tag);
 }
 
-const resolveTags = flow(
+function resolveUnresolvedBrackets(tag) {
+  if (tag.type === 'INTERMEDIATE_UNRESOLVED_BRACKETS') {
+    const statements = resolveTagBrackets(tag); // And solve?
+    let value;
+
+    if (statements.length === 1) {
+      value = statements[0];
+    } else {
+      value = {
+        type: 'STATEMENT_MIXED',
+        statements,
+      };
+    }
+
+    return {
+      type: 'TAG_BRACKETS',
+      value,
+    };
+  }
+
+  return tag;
+}
+
+const resolveTagBrackets = pipe(
   reduce(resolveBracket, {
     groups: [],
     bracketLevel: -1,
-    bracketGroup: null, // Array<Array<tags>>
+    bracketGroup: null, // Array<Array<tag>>
   }),
-  get('groups')
+  prop('groups'),
+  map(resolveUnresolvedBrackets)
 );
-export default resolveTags;
+
+const createASTFromTags = pipe(
+  resolveTagBrackets
+);
+
+export default function resolveTags(tags) {
+  const { tags: tagsWithoutConversions, conversion } = { tags }; // get metadata
+  const ast = createASTFromTags(tagsWithoutConversions);
+  return ast.resolve();
+}

@@ -1,5 +1,6 @@
-import { flow, reject, isNull, zip, filter, first, map } from 'lodash-fp';
-import { bindOwn } from '../util';
+import { compose, reject, isNull, zip, filter, first, map, prop, pipe } from 'ramda';
+import { mergeProp } from '../util';
+import * as locale from '../locale';
 
 const statementParts = [
   null, // full text
@@ -23,10 +24,10 @@ const operators = {
   '=': 'equate',
 };
 
-const findValueAndType = flow(
-  zip(statementParts),
+const findValueAndType = compose(
+  first,
   filter(([tag, type]) => (type !== null && tag !== undefined)),
-  first
+  zip(statementParts)
 );
 
 const processTagElement = {
@@ -155,11 +156,18 @@ function processTag(tag) {
   const newTag = { start, end, value };
 
   const fn = processTagElement[type] || processTagElement.default;
-  return fn.call(this, newTag);
+  return fn(newTag);
 }
 
-const parseTags = flow(
-  bindOwn(map, processTag),
-  reject(isNull)
+const processTags = pipe(
+  prop('tags'),
+  processTags
 );
-export default parseTags;
+
+const preprocessTags = compose(
+  locale.preprocessTags,
+  reject(isNull),
+  mergeProp('tags', processTags),
+  map(processTag)
+);
+export default preprocessTags;

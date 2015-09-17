@@ -1,28 +1,28 @@
-import { map, flow, pick, matches, pluck, sum, sortBy, reduce, reject, isNull, first, transform, pairs, curry, all, negate, startsWith } from 'lodash-fp';
-import { bindOwn } from './util';
+import { map, pipe, pickBy, whereEq, pluck, sum, sortBy, reduce, reject, isNil, first, transform, pairs, curry, none, test, prop, tap, append, concat } from 'ramda';
+import { getFormattingHints } from './locale';
 import assert from 'assert';
 
 import parseText from './parse/parseText';
 import preprocessTags from './parse/preprocessTags';
 import postprocessTags from './parse/postprocessTags';
 
-function cartesian(array) {
-  // https://gist.github.com/FestivalBobcats/1323387
-  return reduce((mtrx, vals) => (
-    reduce((out, val) => (
-      out.concat(map(row => row.concat(val))(mtrx))
-    ), [])(vals)
-  ), [[]])(array);
-}
+const cartesian = reduce((matrix, options) => (
+  reduce((out, option) => (
+    concat(
+      out,
+      map(append(option), matrix)
+    )
+  ), [], options)
+), [[]]);
 
-const getDistance = flow(
+const getDistance = pipe(
   pluck('index'),
   map(x => x ** 2),
   sum()
 );
 
-const getParseOptions = flow(
-  pick(matches({ type: 'parse-options' })),
+const getParseOptions = pipe(
+  pickBy(whereEq({ type: 'parse-options' })),
   pairs,
   map(([index, parseOption]) => (
     map(value => ({ index, value }), parseOption.value))
@@ -44,31 +44,28 @@ function getTagOptions(tags) {
   return map(transformParseOptions(tags))(parseOptions);
 }
 
-const parseTags = flow(
+const parseTagsWithOptions = pipe(
   getTagOptions,
-  bindOwn(map, postprocessTags),
-  reject(isNull()),
+  postprocessTags,
+  reject(isNil),
   first
 );
 
-const noTextElementInTags = flow(
-  pluck('type'),
-  all(negate(startsWith('TEXT_')))
+const assertNoTextElementInTags = tap(
+  pipe(
+    prop('tags'),
+    pluck('type'),
+    none(test(/^TEXT_/)),
+    assert
+  )
 );
 
-export default function parse(text) {
-  const tagsWithHints = parseText.call(this, text);
-  const { tags: tagsWithoutHints, hints } = this.getFormattingHints(tagsWithHints);
-  const preprocessedTags = preprocessTags.call(this, tagsWithoutHints);
-
-  assert(noTextElementInTags(preprocessedTags));
-
-  const output = parseTags.call(this, preprocessedTags);
-
-  return output;
-
-  // if (output !== null) {
-  //   return output.toString(hints);
-  // }
-  // return null;
-}
+const parse = pipe(
+  parseText,
+  getFormattingHints,
+  preprocessTags,
+  tap(console.log.bind(console)),
+  assertNoTextElementInTags,
+  parseTagsWithOptions
+);
+export default parse;

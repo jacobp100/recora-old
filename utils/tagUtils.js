@@ -1,4 +1,4 @@
-import { reduce, flow, dropRightWhile, dropWhile } from 'lodash-fp';
+import { reduce, compose, dropLastWhile, dropWhile } from 'ramda';
 
 export const untailTags = reduce((out, tag) => {
   const { tail, ...tagWithoutTail } = tag;
@@ -14,7 +14,7 @@ export const untailTags = reduce((out, tag) => {
   return out.concat(tagWithoutTail);
 }, []);
 
-export const trimNoop = flow(
-  dropRightWhile({ type: 'noop' }),
-  dropWhile({ type: 'noop' })
+export const trimNoop = compose(
+  dropWhile({ type: 'noop' }),
+  dropLastWhile({ type: 'noop' })
 );
