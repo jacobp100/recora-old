@@ -35,7 +35,7 @@ const resolveUnitPowerType = curry((type, power, tag) => {
   if (tag.type === type) {
     return [tag.value, null];
   } else if (tag.type === 'TAG_UNIT') {
-    return [1, { ...tag, power }];
+    return [1, { ...tag, power: tag.power * power }];
   }
 
   return [1, tag];
