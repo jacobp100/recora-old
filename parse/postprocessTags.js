@@ -1,16 +1,8 @@
 import { pipe, mapAccum, mapAccumRight, last, isNil, reject, curry } from 'ramda';
 import { untailTags, trimNoop } from '../utils/tagUtils';
 
-const mapWithAccum = pipe(
-  mapAccum,
-  last
-);
-
-const mapWithAccumRight = pipe(
-  mapAccumRight,
-  last
-);
-
+const mapWithAccum = pipe(mapAccum, last);
+const mapWithAccumRight = pipe(mapAccumRight, last);
 const rejectNil = reject(isNil);
 
 const tagUnitPowerReciprocal = {
@@ -83,6 +75,7 @@ const resolveUnitPowers = pipe(
 );
 
 const postprocessTags = pipe(
+  // FIXME: Lens
   untailTags,
   fixNaturalMathNotation,
   resolveUnitPowers,
