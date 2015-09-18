@@ -1,34 +1,58 @@
-import { pipe, map, mapAccum, last, isNil, reject, curry } from 'ramda';
-import { fullAperture } from '../util';
+import { pipe, mapAccum, mapAccumRight, last, isNil, reject, curry } from 'ramda';
 import { untailTags, trimNoop } from '../utils/tagUtils';
 
-function fixNaturalNotationWithPreviousNext([previous, tag, next]) {
-  const nextIsTagUnit = next && next.type === 'TAG_UNIT';
+const mapWithAccum = pipe(
+  mapAccum,
+  last
+);
 
-  if (tag.type === 'TAG_OPERATOR' && next) {
-    if (tag.value === 'divide' && nextIsTagUnit) {
+const mapWithAccumRight = pipe(
+  mapAccumRight,
+  last
+);
+
+const rejectNil = reject(isNil);
+
+const tagUnitPowerPrefix = {
+  type: 'TAG_UNIT_POWER_PREFIX',
+  value: -1,
+};
+
+const tagNegative = {
+  type: 'TAG_NEGATIVE',
+  value: null,
+};
+
+function fixNotationWithNext(next, tag) {
+  let newTag;
+
+  if (tag.type === 'TAG_OPERATOR' && next && next.type === 'TAG_UNIT') {
+    if (tag.value === 'divide') {
       // Fix 1 meter / second, where / is shorthand for 'per'
-      return {
-        ...tag,
-        type: 'TAG_UNIT_POWER_PREFIX',
-        value: -1,
-      };
-    } else if (tag.value === 'subtract' && (!previous || previous.type === 'TAG_OPERATOR' || nextIsTagUnit)) {
-      // Fix -1 meters, 3 * -1 meters, or -seconds (not sure on the last one)
-      return {
-        ...tag,
-        type: 'TAG_NEGATIVE',
-        value: null,
-      };
+      newTag = { ...tag, ...tagUnitPowerPrefix };
+    } else if (tag.value === 'subtract') {
+      // Fix -seconds (can't remember why)
+      newTag = { ...tag, ...tagNegative };
     }
   }
 
-  return tag;
+  return [tag, newTag];
+}
+
+function fixNaturalNotationWithPrevious(previous, tag) {
+  let newTag = tag;
+
+  if (tag.value === 'subtract' && (!previous || previous.type === 'TAG_OPERATOR')) {
+    // Fix -1 meters, 3 * -1 meters
+    newTag = { ...tag, ...tagNegative };
+  }
+
+  return [tag, newTag];
 }
 
 const fixNaturalMathNotation = pipe(
-  fullAperture(1),
-  map(fixNaturalNotationWithPreviousNext)
+  mapWithAccum(fixNaturalNotationWithPrevious, null),
+  mapWithAccumRight(fixNotationWithNext, null),
 );
 
 const resolveUnitPowerType = curry((type, power, tag) => {
@@ -41,19 +65,14 @@ const resolveUnitPowerType = curry((type, power, tag) => {
   return [1, tag];
 });
 
-const cleanUpMapAccum = pipe(
-  last,
-  reject(isNil),
-);
-
 const resolveUnitPowerPrefixes = pipe(
-  mapAccum(resolveUnitPowerType('TAG_UNIT_POWER_PREFIX'), 1),
-  cleanUpMapAccum,
+  mapWithAccum(resolveUnitPowerType('TAG_UNIT_POWER_PREFIX'), 1),
+  rejectNil,
 );
 
 const resolveUnitPowerSuffixes = pipe(
-  mapAccum(resolveUnitPowerType('TAG_UNIT_POWER_SUFFIX'), 1),
-  cleanUpMapAccum,
+  mapWithAccum(resolveUnitPowerType('TAG_UNIT_POWER_SUFFIX'), 1),
+  rejectNil,
 );
 
 const resolveUnitPowers = pipe(
@@ -63,7 +82,6 @@ const resolveUnitPowers = pipe(
   resolveUnitPowerSuffixes,
 );
 
-// FIXME: Lens stuff
 const postprocessTags = pipe(
   untailTags,
   fixNaturalMathNotation,
