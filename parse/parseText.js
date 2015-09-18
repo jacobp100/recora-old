@@ -1,4 +1,4 @@
-import { pipe, toLower, evolve, prop, lens, assoc, over } from 'ramda';
+import { pipe, toLower, evolve, lens, assoc, over, identity } from 'ramda';
 import { getNumberFormat } from '../locale';
 
 const regexpToArray = (exp, text) => {
@@ -16,18 +16,19 @@ const regexpToArray = (exp, text) => {
   return tags;
 };
 
-function getTags(text) {
-  const numberFormat = getNumberFormat(text);
-  // Refer to ./preprocessTags for the capture groups
-  const tags = regexpToArray(`(?:(\\()|(\\))|(log2|log10|[\\£\\$\\€\\%]|[a-z]+)(?:\\^(\\d+))?|(0x[0-9a-f]+(?:\\.[0-9a-f]+)?|0o[0-7]+(?:.[0-7]+)?|0b[01]+(?:\\.[01]+)?|${numberFormat})|(#[0-9a-f]{3}(?:[0-9a-f]{5}|[0-9a-f]{3}|[0-9a-f])?)|(\\*\\*|[=+\\-*\\/^])|(,))`, text);
+const getTags = over(
+  lens(identity, assoc('tags')),
+  function getTags({ locale, text }) {
+    const numberFormat = getNumberFormat(locale);
+    // Refer to ./preprocessTags for the capture groups
+    const rawTags = regexpToArray(`(?:(\\()|(\\))|(log2|log10|[\\£\\$\\€\\%]|[a-z]+)(?:\\^(\\d+))?|(0x[0-9a-f]+(?:\\.[0-9a-f]+)?|0o[0-7]+(?:.[0-7]+)?|0b[01]+(?:\\.[01]+)?|${numberFormat})|(#[0-9a-f]{3}(?:[0-9a-f]{5}|[0-9a-f]{3}|[0-9a-f])?)|(\\*\\*|[=+\\-*\\/^])|(,))`, text);
 
-  return tags;
-}
-
-const textToTags = lens(prop('text'), assoc('tags'));
+    return rawTags;
+  }
+);
 
 const parseText = pipe(
   evolve({ text: toLower }),
-  over(textToTags, getTags),
+  getTags,
 );
 export default parseText;
