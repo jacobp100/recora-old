@@ -13,7 +13,7 @@ const mapWithAccumRight = pipe(
 
 const rejectNil = reject(isNil);
 
-const tagUnitPowerPrefix = {
+const tagUnitPowerReciprocal = {
   type: 'TAG_UNIT_POWER_PREFIX',
   value: -1,
 };
@@ -28,10 +28,10 @@ function fixNotationWithNext(next, tag) {
 
   if (tag.type === 'TAG_OPERATOR' && next && next.type === 'TAG_UNIT') {
     if (tag.value === 'divide') {
-      // Fix 1 meter / second, where / is shorthand for 'per'
-      newTag = { ...tag, ...tagUnitPowerPrefix };
+      // Fix using / as an alias for 'per' (1 meter / second)
+      newTag = { ...tag, ...tagUnitPowerReciprocal };
     } else if (tag.value === 'subtract') {
-      // Fix -€5, or any prefixed unit with a negative sign
+      // Fix any prefixed unit with a negative sign (-€5)
       newTag = { ...tag, ...tagNegative };
     }
   }
@@ -43,7 +43,7 @@ function fixNaturalNotationWithPrevious(previous, tag) {
   let newTag = tag;
 
   if (tag.value === 'subtract' && (!previous || previous.type === 'TAG_OPERATOR')) {
-    // Fix -1 meters, 3 * -1 meters
+    // Fix negative signs at start of input (-1 meters) and after operators (3 * -1 meters)
     newTag = { ...tag, ...tagNegative };
   }
 
@@ -77,7 +77,7 @@ const resolveUnitPowerSuffixes = pipe(
 
 const resolveUnitPowers = pipe(
   // Resolve 3 meters squared, 3 square meters, 3 meters per second etc.
-  // Also resolves 1 meter / second when used in combination with fixNaturalMathNotation
+  // Also resolves 1 meter / second when used in after fixNaturalMathNotation
   resolveUnitPowerPrefixes,
   resolveUnitPowerSuffixes,
 );
