@@ -31,7 +31,7 @@ function fixNotationWithNext(next, tag) {
       // Fix 1 meter / second, where / is shorthand for 'per'
       newTag = { ...tag, ...tagUnitPowerPrefix };
     } else if (tag.value === 'subtract') {
-      // Fix -seconds (can't remember why)
+      // Fix -€5, or any prefixed unit with a negative sign
       newTag = { ...tag, ...tagNegative };
     }
   }
