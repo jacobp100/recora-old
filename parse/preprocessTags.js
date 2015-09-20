@@ -1,5 +1,4 @@
-import { compose, reject, isNil, zip, filter, first, map, prop, pipe, tap } from 'ramda';
-import { mergeProp } from '../util';
+import { pipe, reject, isNil, zip, filter, head, map, lensProp, over, lens, identity, assoc, curry } from 'ramda';
 import * as locale from '../locale';
 
 const statementParts = [
@@ -24,14 +23,8 @@ const operators = {
   '=': 'equate',
 };
 
-const findValueAndType = compose(
-  first,
-  filter(([tag, type]) => (type !== null && tag !== undefined)),
-  zip(statementParts)
-);
-
 const processTagElement = {
-  TEXT_SYMBOL_UNIT(tag) {
+  TEXT_SYMBOL_UNIT(context, tag) {
     const { value, start, end } = tag;
     let canNoop = false;
     const options = [];
@@ -59,7 +52,7 @@ const processTagElement = {
     //   }
     // }
 
-    const unit = this.getUnit(value);
+    const unit = locale.getUnit(context, value);
 
     if (unit !== null) {
       options.push({
@@ -71,6 +64,10 @@ const processTagElement = {
     }
 
     if (options.length === 0) {
+      // Why is this above getting constants?
+      // If we move this below, it makes the code easier
+      // Maybe it's in the flow that you define a constant, x = 3, then when you try to redefine it, it might fail?
+      // But shouldn't the = operator return null if that was the case?
       options.push({
         ...tag,
         type: 'TAG_SYMBOL',
@@ -81,21 +78,13 @@ const processTagElement = {
       canNoop = true;
     }
 
-    const constant = this.constants[value];
+    const constant = context.constants[value];
     if (constant) {
-      if (constant.type === 'statement') {
-        options.push({
-          ...tag,
-          type: 'TAG_STATEMENT',
-          value: constant.exponent(power),
-        });
-      } else {
-        options.push({
-          ...tag,
-          type: 'TAG_CONSTANT',
-          value: Math.pow(this.constants[value], power),
-        });
-      }
+      options.push({
+        ...tag,
+        type: 'TAG_STATEMENT',
+        value: constant.exponent(power),
+      });
     }
 
     if (canNoop) {
@@ -123,56 +112,60 @@ const processTagElement = {
   // TEXT_COLOR(tag) {
   //   return {
   //     ...tag,
+  //     type: 'TAG_COLOR',
   //     value: colorForce.hex(value);
   //   }
   // }
-  TEXT_OPERATOR(tag) {
+  TEXT_OPERATOR(context, tag) {
     return {
       ...tag,
       type: 'TAG_OPERATOR',
       value: operators[tag.value],
     };
   },
-  TEXT_NUMBER(tag) {
+  TEXT_NUMBER(context, tag) {
     return {
       ...tag,
       type: 'TAG_NUMBER',
-      value: Number(tag.value),
+      value: locale.parseNumber(context, tag.value),
     };
   },
-  default(tag) {
+  default(context, tag) {
     return tag;
   },
 };
 
-function processTag(tag) {
+const findValueAndType = pipe(
+  zip(statementParts),
+  filter(([type, tag]) => (type !== null && tag !== undefined)),
+  head,
+);
+
+const processTag = curry((context, tag) => {
   if (tag.type) {
     return tag;
   }
 
-  const [value, type] = findValueAndType(tag);
-
+  const [type, value] = findValueAndType(tag);
   const { start, end } = tag;
-  const newTag = { start, end, value };
+
+  const newTag = { start, end, value, type };
 
   const fn = processTagElement[type] || processTagElement.default;
-  return fn(newTag);
-}
-
-const processTags = pipe(
-  prop('tags'),
-  map(processTags),
-);
-
-const removeNullTags = pipe(
-  prop('tags'),
-  reject(isNil),
-);
+  return fn(context, newTag);
+});
 
 const preprocessTags = pipe(
   locale.preprocessTags,
-  mergeProp('tags', removeNullTags),
-  tap(console.log.bind(console)),
-  mergeProp('tags', processTags),
+  over(
+    lensProp('tags'),
+    reject(isNil),
+  ),
+  over(
+    lens(identity, assoc('tags')),
+    (context) => (
+      map(processTag(context), context.tags)
+    ),
+  ),
 );
 export default preprocessTags;

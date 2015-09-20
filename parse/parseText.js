@@ -18,7 +18,7 @@ const regexpToArray = (exp, text) => {
 
 const parseText = over(
   lens(identity, assoc('tags')),
-  function getTags({ locale, text }) {
+  ({ locale, text }) => {
     const numberFormat = getNumberFormat(locale);
     const lowerText = text.toLowerCase();
     // Refer to ./preprocessTags for the capture groups

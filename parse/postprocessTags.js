@@ -1,4 +1,4 @@
-import { pipe, mapAccum, mapAccumRight, last, isNil, reject, curry } from 'ramda';
+import { pipe, mapAccum, mapAccumRight, last, isNil, reject, curry, lensProp, over } from 'ramda';
 import { untailTags, trimNoop } from '../utils/tagUtils';
 
 const mapWithAccum = pipe(mapAccum, last);
@@ -74,11 +74,13 @@ const resolveUnitPowers = pipe(
   resolveUnitPowerSuffixes,
 );
 
-const postprocessTags = pipe(
-  // FIXME: Lens
-  untailTags,
-  fixNaturalMathNotation,
-  resolveUnitPowers,
-  trimNoop
+const postprocessTags = over(
+  lensProp('tags'),
+  pipe(
+    untailTags,
+    fixNaturalMathNotation,
+    resolveUnitPowers,
+    trimNoop,
+  ),
 );
 export default postprocessTags;

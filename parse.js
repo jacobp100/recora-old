@@ -22,7 +22,7 @@ const getDistance = pipe(
 );
 
 const getParseOptions = pipe(
-  pickBy(whereEq({ type: 'parse-options' })),
+  pickBy(whereEq({ type: 'PARSE_OPTIONS' })),
   pairs,
   map(([index, parseOption]) => (
     map(value => ({ index, value }), parseOption.value))
@@ -39,14 +39,19 @@ const transformParseOptions = curry((tags, parseOptions) => (
   transform(assignValueToTags, [...tags], parseOptions)
 ));
 
-function getTagOptions(tags) {
-  const parseOptions = getParseOptions.call(this, tags);
-  return map(transformParseOptions(tags))(parseOptions);
+function getTagOptions(context) {
+  const { tags } = context;
+
+  return pipe(
+    getParseOptions,
+    map(transformParseOptions(tags)),
+    map(resolvedTags => ({ ...context, tags: resolvedTags })),
+  )(context.tags);
 }
 
 const parseTagsWithOptions = pipe(
   getTagOptions,
-  postprocessTags,
+  map(postprocessTags),
   reject(isNil),
   first
 );
@@ -64,8 +69,8 @@ const parse = pipe(
   parseText,
   getFormattingHints,
   preprocessTags,
-  tap(console.log.bind(console)),
   assertNoTextElementInTags,
-  parseTagsWithOptions
+  console.log.bind(console, 1),
+  parseTagsWithOptions,
 );
 export default parse;

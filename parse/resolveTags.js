@@ -88,6 +88,16 @@ function resolveBracket({ groups, bracketLevel, bracketGroup }, tag) {
   return fn(groups, bracketLevel, bracketGroup, tag);
 }
 
+const resolveTagBrackets = pipe(
+  reduce(resolveBracket, {
+    groups: [],
+    bracketLevel: -1,
+    bracketGroup: null, // Array<Array<tag>>
+  }),
+  prop('groups'),
+  map(resolveUnresolvedBrackets)
+);
+
 function resolveUnresolvedBrackets(tag) {
   if (tag.type === 'INTERMEDIATE_UNRESOLVED_BRACKETS') {
     const statements = resolveTagBrackets(tag); // And solve?
@@ -111,18 +121,8 @@ function resolveUnresolvedBrackets(tag) {
   return tag;
 }
 
-const resolveTagBrackets = pipe(
-  reduce(resolveBracket, {
-    groups: [],
-    bracketLevel: -1,
-    bracketGroup: null, // Array<Array<tag>>
-  }),
-  prop('groups'),
-  map(resolveUnresolvedBrackets)
-);
-
 const createASTFromTags = pipe(
-  resolveTagBrackets
+  resolveTagBrackets,
 );
 
 export default function resolveTags(tags) {

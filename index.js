@@ -1,7 +1,5 @@
 import parse from './parse';
 
-import units from './data/environment/units';
-
 export default class Recora {
   constructor(locale) {
     this.locale = locale || 'en';
