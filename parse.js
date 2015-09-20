@@ -1,4 +1,3 @@
-import { map, pipe, pickBy, whereEq, pluck, sum, sortBy, reduce, reject, isNil, first, transform, pairs, curry, none, test, prop, tap, append, concat } from 'ramda';
 import { getFormattingHints } from './locale';
 import assert from 'assert';
 
@@ -23,29 +22,25 @@ const getDistance = pipe(
 
 const getParseOptions = pipe(
   pickBy(whereEq({ type: 'PARSE_OPTIONS' })),
-  pairs,
+  toPairs,
   map(([index, parseOption]) => (
     map(value => ({ index, value }), parseOption.value))
   ),
   cartesian,
-  sortBy(getDistance)
+  sortBy(getDistance),
 );
 
-function assignValueToTags(tags, { index, value }) {
-  tags[index] = value;
-}
+const updateTagsWithParseoptions = (tags, { index, value }) => update(index, value, tags);
 
 const transformParseOptions = curry((tags, parseOptions) => (
-  transform(assignValueToTags, [...tags], parseOptions)
+  reduce(updateTagsWithParseoptions, tags, parseOptions)
 ));
 
 function getTagOptions(context) {
-  const { tags } = context;
-
   return pipe(
     getParseOptions,
-    map(transformParseOptions(tags)),
-    map(resolvedTags => ({ ...context, tags: resolvedTags })),
+    map(transformParseOptions(context.tags)),
+    map(tags => ({ ...context, tags })),
   )(context.tags);
 }
 
@@ -53,7 +48,7 @@ const parseTagsWithOptions = pipe(
   getTagOptions,
   map(postprocessTags),
   reject(isNil),
-  first
+  head,
 );
 
 const assertNoTextElementInTags = tap(
@@ -70,7 +65,6 @@ const parse = pipe(
   getFormattingHints,
   preprocessTags,
   assertNoTextElementInTags,
-  console.log.bind(console, 1),
   parseTagsWithOptions,
 );
 export default parse;

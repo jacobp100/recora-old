@@ -1,6 +1,5 @@
 import units from './data/environment/units';
 import abbreviations from './data/en/abbreviations';
-import { merge, always, identity, invert, last, init } from 'ramda';
 
 // TODO: JSON
 const pluralMap = {

@@ -1,5 +1,3 @@
-import { reduce, prop, pipe, map } from 'ramda';
-
 function appendToLastArray(array, element) {
   const newArray = array.slice();
   const lastGroup = [newArray.length - 1];

@@ -1,4 +1,3 @@
-import { pipe, mapAccum, mapAccumRight, last, isNil, reject, curry, lensProp, over } from 'ramda';
 import { untailTags, trimNoop } from '../utils/tagUtils';
 
 const mapWithAccum = pipe(mapAccum, last);

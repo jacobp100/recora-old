@@ -1,4 +1,11 @@
+const webpack = require('webpack');
 const path = require('path');
+const ramda = require('ramda');
+
+const ramdaPlugins = Object.keys(ramda).reduce(function transform(out, key) {
+  out[key] = `ramda/src/${key}`;
+  return out;
+}, {});
 
 module.exports = {
   context: __dirname,
@@ -23,4 +30,7 @@ module.exports = {
       },
     ],
   },
+  plugins: [
+    new webpack.ProvidePlugin(ramdaPlugins),
+  ],
 };

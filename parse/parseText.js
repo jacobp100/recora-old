@@ -1,4 +1,3 @@
-import { lens, assoc, over, identity } from 'ramda';
 import { getNumberFormat } from '../locale';
 
 const regexpToArray = (exp, text) => {

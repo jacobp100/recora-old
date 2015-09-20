@@ -1,4 +1,3 @@
-import { pipe, reject, isNil, zip, filter, head, map, lensProp, over, lens, identity, assoc, curry } from 'ramda';
 import * as locale from '../locale';
 
 const statementParts = [
