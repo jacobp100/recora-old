@@ -1,10 +1,12 @@
 import { reduce, compose, dropLastWhile, dropWhile } from 'ramda';
 
+export const isNoop = whereEq({ type: 'NOOP' });
+
 export const untailTags = reduce((out, tag) => {
   const { tail, ...tagWithoutTail } = tag;
 
   if (tail) {
-    if (tag.type !== 'noop') {
+    if (isNoop(tag)) {
       return out.concat(tagWithoutTail, tail);
     }
 
@@ -14,7 +16,7 @@ export const untailTags = reduce((out, tag) => {
   return out.concat(tagWithoutTail);
 }, []);
 
-export const trimNoop = compose(
-  dropWhile({ type: 'noop' }),
-  dropLastWhile({ type: 'noop' })
+export const trimNoop = pipe(
+  dropWhile(isNoop),
+  dropLastWhile(isNoop),
 );

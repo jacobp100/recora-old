@@ -4,6 +4,7 @@ import assert from 'assert';
 import parseText from './parse/parseText';
 import preprocessTags from './parse/preprocessTags';
 import postprocessTags from './parse/postprocessTags';
+import resolveTags from './parse/resolveTags';
 
 const cartesian = reduce((matrix, options) => (
   reduce((out, option) => (
@@ -30,7 +31,8 @@ const getParseOptions = pipe(
   sortBy(getDistance),
 );
 
-const updateTagsWithParseoptions = (tags, { index, value }) => update(index, value, tags);
+const updateTagsWithParseoptions = (tags, { index, value }) =>
+  update(Number(index), value, tags);
 
 const transformParseOptions = curry((tags, parseOptions) => (
   reduce(updateTagsWithParseoptions, tags, parseOptions)
@@ -44,9 +46,14 @@ function getTagOptions(context) {
   )(context.tags);
 }
 
+const resolveTagOptions = pipe(
+  postprocessTags,
+  resolveTags,
+);
+
 const parseTagsWithOptions = pipe(
   getTagOptions,
-  map(postprocessTags),
+  map(resolveTagOptions),
   reject(isNil),
   head,
 );

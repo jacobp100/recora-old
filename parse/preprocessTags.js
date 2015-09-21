@@ -150,9 +150,17 @@ const processTag = curry((context, tag) => {
 
   const newTag = { start, end, value, type };
 
-  const fn = processTagElement[type] || processTagElement.default;
-  return fn(context, newTag);
+  return (processTagElement[type] || processTagElement.default)(context, newTag);
 });
+
+function resolveTagBracket(bracketLevel, tag) {
+  if (tag.type === 'TAG_OPEN_BRACKET') {
+    return [bracketLevel + 1, { ...tag, value: bracketLevel }];
+  } else if (tag.type === 'TAG_CLOSE_BRACKET') {
+    return [bracketLevel - 1, { ...tag, value: bracketLevel - 1 }];
+  }
+  return [bracketLevel, tag];
+}
 
 const preprocessTags = pipe(
   locale.preprocessTags,
@@ -166,5 +174,12 @@ const preprocessTags = pipe(
       map(processTag(context), context.tags)
     ),
   ),
+  over(
+    lensProp('tags'),
+    pipe( // FIXME: mapWithAccum
+      mapAccum(resolveTagBracket, 0),
+      last,
+    )
+  )
 );
 export default preprocessTags;

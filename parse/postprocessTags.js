@@ -14,8 +14,19 @@ const tagNegative = {
   value: null,
 };
 
+function fixNaturalNotationWithPrevious(previous, tag) {
+  let newTag = tag;
+
+  if (tag.value === 'subtract' && (!previous || previous.type === 'TAG_OPERATOR')) {
+    // Fix negative signs at start of input (-1 meters) and after operators (3 * -1 meters)
+    newTag = { ...tag, ...tagNegative };
+  }
+
+  return [tag, newTag];
+}
+
 function fixNotationWithNext(next, tag) {
-  let newTag;
+  let newTag = tag;
 
   if (tag.type === 'TAG_OPERATOR' && next && next.type === 'TAG_UNIT') {
     if (tag.value === 'divide') {
@@ -25,17 +36,6 @@ function fixNotationWithNext(next, tag) {
       // Fix any prefixed unit with a negative sign (-€5)
       newTag = { ...tag, ...tagNegative };
     }
-  }
-
-  return [tag, newTag];
-}
-
-function fixNaturalNotationWithPrevious(previous, tag) {
-  let newTag = tag;
-
-  if (tag.value === 'subtract' && (!previous || previous.type === 'TAG_OPERATOR')) {
-    // Fix negative signs at start of input (-1 meters) and after operators (3 * -1 meters)
-    newTag = { ...tag, ...tagNegative };
   }
 
   return [tag, newTag];
