@@ -7,6 +7,8 @@ const ramdaPlugins = Object.keys(ramda).reduce(function transform(out, key) {
   return out;
 }, {});
 
+ramdaPlugins.pipe = path.join(__dirname, 'debug/pipe');
+
 module.exports = {
   context: __dirname,
   entry: './index',
