@@ -13,13 +13,13 @@ const statementParts = [
 ];
 
 const operators = {
-  '+': 'add',
-  '-': 'subtract',
-  '*': 'multiply',
-  '/': 'divide',
-  '**': 'exponent',
-  '^': 'exponent',
-  '=': 'equate',
+  '+': 'ADD',
+  '-': 'SUBTRACT',
+  '*': 'MULTIPLY',
+  '/': 'DIVIDE',
+  '**': 'EXPONENT',
+  '^': 'EXPONENT',
+  '=': 'EQUATE',
 };
 
 const processTagElement = {
@@ -180,6 +180,7 @@ const preprocessTags = pipe(
       mapAccum(resolveTagBracket, 0),
       last,
     )
-  )
+  ),
+  tap(arg=>(console.log(arg),arg))
 );
 export default preprocessTags;

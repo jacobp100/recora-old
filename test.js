@@ -3,4 +3,4 @@ const Recora = require('./dist/recora');
 
 const recora = new Recora();
 
-console.log(recora.parse('1 meter to yard'));
+console.log(recora.parse('1 meter * (1 yard + 1 mile) + 1 foot 7 inch'));

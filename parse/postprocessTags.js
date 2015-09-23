@@ -41,6 +41,7 @@ function fixNotationWithNext(next, tag) {
   return [tag, newTag];
 }
 
+// Can the two tag negatives be found by looking at all subtractions, and converting to a negative iff there are only unit tags between the subtract and the next number
 const fixNaturalMathNotation = pipe(
   mapWithAccum(fixNaturalNotationWithPrevious, null),
   mapWithAccumRight(fixNotationWithNext, null),

@@ -1,62 +1,50 @@
-import { mathOperations, orderOperations, operationsOrder } from '../constants';
+import { orderOperations, operationsOrder } from '../constants';
 import assert from 'assert';
 
 // FIXME
-const statementBase = {
+const valueBase = {
   type: 'VALUE',
   value: null,
   units: {},
   symbols: {},
 };
 
+const valueGroupBase = {
+  type: 'VALUE_GROUP',
+  groups: null,
+};
+
 const tagResolvers = {
-  TAG_NUMBER(out, { value }) {
+  TAG_NUMBER(values, { value }) {
     assert(typeof value === 'number');
-    const lastItem = last(out.group);
-    const multiplier = out.isNegative ? -1 : 1;
+    const lastItem = last(values);
 
     if (lastItem.type === 'VALUE' && lastItem.value === null) {
-      return evolve({
-        group: adjust(assoc('value', value * multiplier), -1),
-      }, out);
+      return adjust(assoc('value', value), -1, values);
     }
 
-    return evolve({
-      group: append({ ...statementBase, value: value * multiplier }),
-    }, out);
+    return append({ ...valueBase, value }, values);
   },
-  TAG_UNIT(out, { value, power }) {
-    const lastItem = last(out.group);
+  TAG_UNIT(values, { value, power }) {
+    // This code is almost identical for symbols (s/unit/symbol/g)
+    const lastItem = last(values);
 
     if (lastItem.type === 'VALUE') {
-      console.log('running evolve', value);
-      const adjustUnits = evolve({
+      return adjust(evolve({
         units: over(
           lensProp(value),
           pipe(
-            tap(x => console.log(x)),
-            // FIXME: broken here!
             defaultTo(0),
             add(power),
           ),
         ),
-      }, out);
-
-      return evolve({
-        group: adjust(adjustUnits, -1),
-      }, out);
+      }), -1, values);
     }
 
-    return evolve({
-      group: append({ ...statementBase, units: { [value]: power } }),
-    }, out);
+    return append(assocPath(['units', value], power, valueBase), values);
   },
-  TAG_NEGATIVE: evolve({
-    isNegative: not,
-  }),
-  NOOP: evolve({
-    group: append(statementBase),
-  }),
+  NOOP: append(valueBase),
+  BRACKETS_GROUP: flip(append),
   default: identity,
 };
 
@@ -72,73 +60,65 @@ const valueTypeIsEmpty = where({
 const valueTypeHasNilValueButHasSymbols = where({
   type: equals('VALUE'),
   value: isNil,
-  symbols: pipe(objectIsEmpty, not),
+  symbols: complement(objectIsEmpty),
 });
 
 const resolveTagsWithoutOperations = pipe(
-  tap(tags => console.log(tags)),
-  reduce((out, tag) => (
-    console.log(tag)||
-    (tagResolvers[tag.type] || tagResolvers.default)(out, tag)
-  ), {
-    group: [statementBase],
-    isNegative: false,
-  }),
-  ifElse(prop('isNegative'), evolve({ group: append({ ...statementBase, value: -1 }) }), identity),
-  prop('group'),
+  reduce((values, tag) => (
+    (tagResolvers[tag.type] || tagResolvers.default)(values, tag)
+  ), [valueBase]),
   map(ifElse(valueTypeHasNilValueButHasSymbols, assoc('value', 1), identity)),
   reject(valueTypeIsEmpty),
+  // assoc('groups', __, valueGroupBase), // Always wrap in value group
+  ifElse(pipe(length, equals(1)), head, assoc('groups', __, valueGroupBase)), // Only wrap in value group iff groups.length > 1
 );
 
-const groupOperations = reduce((out, tag) => {
-  if (tag.type === 'TAG_OPERATOR' && out.level === orderOperations[tag.value]) {
+const groupOperations = reduce((operationGroup, tag) => {
+  if (tag.type === 'TAG_OPERATOR' && operationGroup.level === orderOperations[tag.value]) {
     return evolve({
-      operations: append(tag),
+      operations: append(tag.value),
       groups: append([]),
-    }, out);
+    }, operationGroup);
   }
 
   return evolve({
     groups: adjust(append(tag), -1),
-  }, out);
+  }, operationGroup);
 });
 
-function resolveOperations(tags, startLevel = 0) {
-  function tagsContainOperation(value) {
-    return any(whereEq({ type: 'TAG_OPERATOR', value }), tags);
-  }
+const tagOperatorMatchesValue = pipe(
+  assoc('value', __, { type: 'TAG_OPERATOR' }),
+  whereEq,
+);
+
+const resolveOperations = curry((startLevel, tags) => {
+  const tagsContainOperation = pipe(
+    tagOperatorMatchesValue,
+    any(__, tags),
+  );
 
   const operations = pipe(
     drop(startLevel),
     find(any(tagsContainOperation)),
   )(operationsOrder);
 
-  if (operations) {
-    const level = findIndex(operations, operationsOrder);
-
-    return pipe(
-      groupOperations({
-        type: 'OPERATIONS_GROUP',
-        groups: [[]],
-        operations: [],
-        level,
-      }),
-      evolve({
-        groups: resolveOperations(__, level + 1),
-      }),
-      (operationsGroup) => {
-        if (none(isNil, operationsGroup.groups)) {
-          return operationsGroup;
-        }
-
-        return null;
-      },
-      resolveTagsWithoutOperations,
-    )(tags);
+  if (!operations) {
+    return resolveTagsWithoutOperations(tags);
   }
 
-  return resolveTagsWithoutOperations(tags);
-}
+  const level = indexOf(operations, operationsOrder);
+
+  return pipe(
+    groupOperations({
+      type: 'OPERATIONS_GROUP',
+      groups: [[]],
+      operations: [],
+      level,
+    }),
+    evolve({ groups: map(resolveOperations(level + 1)) }),
+    // ifElse(propSatisfies(none(isNil), 'groups'), identity, null),
+  )(tags);
+});
 
 const splitTags = reduce((tags, tag) => {
   if (tag.type === 'TAG_COMMA') {
@@ -147,9 +127,14 @@ const splitTags = reduce((tags, tag) => {
   return adjust(append(tag), -1, tags);
 }, [[]]);
 
+const resolveTagsWithoutBrackets = pipe(
+  splitTags,
+  map(resolveOperations(0)),
+);
+
 const isOpenBracket = propEq('type', 'TAG_OPEN_BRACKET');
 
-function resolveBrackets(context, tags) {
+function resolveBrackets(tags) {
   let resolvedTags = tags;
   const openBracketIndex = findIndex(isOpenBracket, tags);
 
@@ -167,31 +152,30 @@ function resolveBrackets(context, tags) {
     }
 
     const tagsBefore = slice(0, openBracketIndex, tags);
-    const tagsInBracket = slice(openBracketIndex, closeBracketIndex, tags);
-    const tagsAfter = slice(closeBracketIndex, Infinity, tags);
+    const tagsInBracket = slice(openBracketIndex + 1, closeBracketIndex, tags);
+    const tagsAfter = slice(closeBracketIndex + 1, Infinity, tags);
 
     const bracketGroup = {
-      type: 'TAG_BRACKETS',
-      tags: resolveBrackets(tagsInBracket),
+      type: 'BRACKETS_GROUP',
+      groups: resolveBrackets(tagsInBracket),
     };
 
     resolvedTags = [...tagsBefore, bracketGroup, ...tagsAfter];
   }
 
-  return pipe(
-    splitTags,
-    map(resolveOperations)
-  )(resolvedTags); // FIXME: hoist
+  return resolveTagsWithoutBrackets(resolvedTags);
 }
 
-function createASTFromTags(context, tags) {
-  return resolveBrackets(context, tags);
-}
+const createASTFromTags = pipe(
+  resolveBrackets,
+  ifElse(pipe(length, equals(1)), head, always(null)),
+);
 
 export default function resolveTags(context) {
   const { tags } = context;
-  const { tags: tagsWithoutConversions, conversion } = { tags }; // get metadata
-  const ast = createASTFromTags(context, tagsWithoutConversions);
-  console.log(ast);
+  const { tags: tagsWithoutConversions } = { tags }; // get metadata
+  // FIXME: return conversion
+  const ast = createASTFromTags(tagsWithoutConversions);
+  console.log('AST\n', JSON.stringify(ast));
   return null;
 }
