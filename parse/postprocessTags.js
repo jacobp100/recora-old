@@ -1,25 +1,22 @@
 import { untailTags, trimNoop } from '../utils/tagUtils';
-
-const mapWithAccum = pipe(mapAccum, last);
-const mapWithAccumRight = pipe(mapAccumRight, last);
-const rejectNil = reject(isNil);
+import { mapWithAccum, mapWithAccumRight, rejectNil } from '../util';
 
 const tagUnitPowerReciprocal = {
   type: 'TAG_UNIT_POWER_PREFIX',
   value: -1,
 };
 
-const tagNegative = {
-  type: 'TAG_NEGATIVE',
-  value: null,
+const tagNegate = {
+  type: 'TAG_OPERATOR',
+  value: 'NEGATE',
 };
 
 function fixNaturalNotationWithPrevious(previous, tag) {
   let newTag = tag;
 
-  if (tag.value === 'subtract' && (!previous || previous.type === 'TAG_OPERATOR')) {
+  if (tag.value === 'SUBTRACT' && (!previous || previous.type === 'TAG_OPERATOR')) {
     // Fix negative signs at start of input (-1 meters) and after operators (3 * -1 meters)
-    newTag = { ...tag, ...tagNegative };
+    newTag = { ...tag, ...tagNegate };
   }
 
   return [tag, newTag];
@@ -32,9 +29,9 @@ function fixNotationWithNext(next, tag) {
     if (tag.value === 'divide') {
       // Fix using / as an alias for 'per' (1 meter / second)
       newTag = { ...tag, ...tagUnitPowerReciprocal };
-    } else if (tag.value === 'subtract') {
+    } else if (tag.value === 'SUBTRACT') {
       // Fix any prefixed unit with a negative sign (-€5)
-      newTag = { ...tag, ...tagNegative };
+      newTag = { ...tag, ...tagNegate };
     }
   }
 

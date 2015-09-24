@@ -1,4 +1,5 @@
 import parse from './parse';
+import value from './types/value';
 
 export default class Recora {
   constructor(locale) {

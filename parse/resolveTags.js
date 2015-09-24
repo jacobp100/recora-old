@@ -1,4 +1,5 @@
 import { orderOperations, operationsOrder } from '../constants';
+import { lengthIsOne } from '../util';
 import assert from 'assert';
 
 // FIXME
@@ -12,6 +13,11 @@ const valueBase = {
 const valueGroupBase = {
   type: 'VALUE_GROUP',
   groups: null,
+};
+
+const empty = {
+  type: 'EMPTY',
+  value: null,
 };
 
 const tagResolvers = {
@@ -69,8 +75,11 @@ const resolveTagsWithoutOperations = pipe(
   ), [valueBase]),
   map(ifElse(valueTypeHasNilValueButHasSymbols, assoc('value', 1), identity)),
   reject(valueTypeIsEmpty),
-  // assoc('groups', __, valueGroupBase), // Always wrap in value group
-  ifElse(pipe(length, equals(1)), head, assoc('groups', __, valueGroupBase)), // Only wrap in value group iff groups.length > 1
+  cond([
+    [isEmpty, always(empty)],
+    [lengthIsOne, head],
+    [T, assoc('groups', __, valueGroupBase)], // Only wrap in value group iff groups.length > 1
+  ]),
 );
 
 const groupOperations = reduce((operationGroup, tag) => {
@@ -171,11 +180,11 @@ const createASTFromTags = pipe(
   ifElse(pipe(length, equals(1)), head, always(null)),
 );
 
-export default function resolveTags(context) {
-  const { tags } = context;
-  const { tags: tagsWithoutConversions } = { tags }; // get metadata
-  // FIXME: return conversion
-  const ast = createASTFromTags(tagsWithoutConversions);
-  console.log('AST\n', JSON.stringify(ast));
-  return null;
-}
+const resolveTags = pipe(
+  // FIXME: get conversion and remove conversion tags
+  over(
+    lens(prop('tags'), assoc('ast')),
+    createASTFromTags,
+  ),
+);
+export default resolveTags;

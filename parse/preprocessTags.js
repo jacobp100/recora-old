@@ -1,4 +1,5 @@
 import * as locale from '../locale';
+import { mapWithAccum } from '../util';
 
 const statementParts = [
   null, // full text
@@ -176,11 +177,7 @@ const preprocessTags = pipe(
   ),
   over(
     lensProp('tags'),
-    pipe( // FIXME: mapWithAccum
-      mapAccum(resolveTagBracket, 0),
-      last,
-    )
+    mapWithAccum(resolveTagBracket, 0),
   ),
-  tap(arg=>(console.log(arg),arg))
 );
 export default preprocessTags;
