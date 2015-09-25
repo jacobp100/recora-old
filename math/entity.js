@@ -1,6 +1,5 @@
 import entity, { baseDimensions, toSi } from '../types/entity';
 
-// FIXME: should perform[Add|Multiply|Exponent]Math take a context in the same parameter, and we can converge the a/b lhs/rhs?
 
 const notNil = complement(isNil);
 const sumLastElementsInPairs = pipe(map(last), sum);
