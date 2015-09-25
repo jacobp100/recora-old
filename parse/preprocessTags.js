@@ -82,7 +82,7 @@ const processTagElement = {
     if (constant) {
       options.push({
         ...tag,
-        type: 'TAG_STATEMENT',
+        type: 'ENTITY',
         value: constant.exponent(power),
       });
     }
@@ -171,9 +171,7 @@ const preprocessTags = pipe(
   ),
   over(
     lens(identity, assoc('tags')),
-    (context) => (
-      map(processTag(context), context.tags)
-    ),
+    context => map(processTag(context), context.tags),
   ),
   over(
     lensProp('tags'),

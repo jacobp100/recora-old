@@ -1,17 +1,10 @@
 import { orderOperations, operationsOrder } from '../constants';
 import { lengthIsOne } from '../util';
+import entityBase from '../types/entity';
 import assert from 'assert';
 
-// FIXME
-const valueBase = {
-  type: 'VALUE',
-  value: null,
-  units: {},
-  symbols: {},
-};
-
 const valueGroupBase = {
-  type: 'VALUE_GROUP',
+  type: 'MISC_GROUP',
   groups: null,
 };
 
@@ -25,17 +18,17 @@ const tagResolvers = {
     assert(typeof value === 'number');
     const lastItem = last(values);
 
-    if (lastItem.type === 'VALUE' && lastItem.value === null) {
+    if (lastItem.type === 'ENTITY' && lastItem.value === null) {
       return adjust(assoc('value', value), -1, values);
     }
 
-    return append({ ...valueBase, value }, values);
+    return append({ ...entityBase, value }, values);
   },
   TAG_UNIT(values, { value, power }) {
     // This code is almost identical for symbols (s/unit/symbol/g)
     const lastItem = last(values);
 
-    if (lastItem.type === 'VALUE') {
+    if (lastItem.type === 'ENTITY') {
       return adjust(evolve({
         units: over(
           lensProp(value),
@@ -47,9 +40,9 @@ const tagResolvers = {
       }), -1, values);
     }
 
-    return append(assocPath(['units', value], power, valueBase), values);
+    return append(assocPath(['units', value], power, entityBase), values);
   },
-  NOOP: append(valueBase),
+  NOOP: append(entityBase),
   BRACKETS_GROUP: flip(append),
   default: identity,
 };
@@ -57,14 +50,14 @@ const tagResolvers = {
 const objectIsEmpty = pipe(keys, isEmpty);
 
 const valueTypeIsEmpty = where({
-  type: equals('VALUE'),
+  type: equals('ENTITY'),
   value: isNil,
   units: objectIsEmpty,
   symbols: objectIsEmpty,
 });
 
 const valueTypeHasNilValueButHasSymbols = where({
-  type: equals('VALUE'),
+  type: equals('ENTITY'),
   value: isNil,
   symbols: complement(objectIsEmpty),
 });
@@ -72,7 +65,7 @@ const valueTypeHasNilValueButHasSymbols = where({
 const resolveTagsWithoutOperations = pipe(
   reduce((values, tag) => (
     (tagResolvers[tag.type] || tagResolvers.default)(values, tag)
-  ), [valueBase]),
+  ), [entityBase]),
   map(ifElse(valueTypeHasNilValueButHasSymbols, assoc('value', 1), identity)),
   reject(valueTypeIsEmpty),
   cond([
