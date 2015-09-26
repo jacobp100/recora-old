@@ -29,11 +29,12 @@ describe('entity math', function() {
     });
 
     it('should add two entities of equal units without conversion', function() {
+      assert.notEqual(locale.getSiUnit(normalContext, 'length'), 'inch');
+
       const lhs = { ...entity, value: 1, units: { inch: 1 } };
       const rhs = { ...entity, value: 2, units: { inch: 1 } };
       const result = add(normalContext, lhs, rhs);
 
-      assert.notEqual(locale.getSiUnit(normalContext, 'length'), 'inch');
       assert.equal(result.type, 'ENTITY');
       assert.equal(result.value, 3);
       assert.deepEqual(result.units, { inch: 1 });
@@ -41,11 +42,12 @@ describe('entity math', function() {
     });
 
     it('should convert to si units when adding two entities of differing units', function() {
+      assert.equal(locale.getSiUnit(normalContext, 'length'), 'meter');
+
       const lhs = { ...entity, value: 1, units: { inch: 1 } };
       const rhs = { ...entity, value: 2, units: { yard: 1 } };
       const result = add(normalContext, lhs, rhs);
 
-      assert.equal(locale.getSiUnit(normalContext, 'length'), 'meter');
       assert.equal(result.type, 'ENTITY');
       assert.deepEqual(result.units, { meter: 1 });
       assert.deepEqual(result.symbols, {});
@@ -144,11 +146,12 @@ describe('entity math', function() {
     });
 
     it('should multiply without conversion', function() {
+      assert.notEqual(locale.getSiUnit(normalContext, 'length'), 'inch');
+
       const lhs = { ...entity, value: 1, units: { inch: 1 } };
       const rhs = { ...entity, value: 3, units: { inch: 1 } };
       const result = multiply(normalContext, lhs, rhs);
 
-      assert.notEqual(locale.getSiUnit(normalContext, 'length'), 'inch');
       assert.equal(result.type, 'ENTITY');
       assert.equal(result.value, 3);
       assert.deepEqual(result.units, { inch: 2 });
@@ -181,11 +184,12 @@ describe('entity math', function() {
 
   describe('divide', function() {
     it('should divide without conversion', function() {
+      assert.notEqual(locale.getSiUnit(normalContext, 'length'), 'inch');
+
       const lhs = { ...entity, value: 4, units: { inch: 1 } };
       const rhs = { ...entity, value: 2, units: { inch: -1 } };
       const result = divide(normalContext, lhs, rhs);
 
-      assert.notEqual(locale.getSiUnit(normalContext, 'length'), 'inch');
       assert.equal(result.type, 'ENTITY');
       assert.equal(result.value, 2);
       assert.deepEqual(result.units, { inch: 2 });
