@@ -1,19 +1,21 @@
 import entity, { baseDimensions, toSi } from '../types/entity';
 
 
-const notNil = complement(isNil);
+const notEmpty = complement(isEmpty);
+const notZero = complement(equals(0));
 const sumLastElementsInPairs = pipe(map(last), sum);
 
-const isZero = propEq('value', 0);
-const valueNil = propEq(isNil, 'value');
 const toNil = always(null);
 const toZeroEntity = always({ ...entity, value: 0 });
+
+const valueZero = propEq('value', 0);
+const valueNil = propSatisfies(isNil, 'value');
 
 const sign = nthArg(0);
 const context = nthArg(1);
 
 const lhs = nthArg(2);
-const lhsIsZero = pipe(lhs, isZero);
+const lhsValueZero = pipe(lhs, valueZero);
 const lhsValueNil = pipe(lhs, valueNil);
 const lhsUnits = pipe(lhs, prop('units'));
 const lhsUnitKeys = pipe(lhsUnits, keys);
@@ -23,7 +25,7 @@ const lhsBaseDimensions = converge(baseDimensions, context, lhs);
 const lhsToSi = converge(toSi, context, lhs);
 
 const rhs = nthArg(3);
-const rhsIsZero = pipe(rhs, isZero);
+const rhsValueZero = pipe(rhs, valueZero);
 const rhsValueNil = pipe(rhs, valueNil);
 const rhsUnits = pipe(rhs, prop('units'));
 const rhsUnitKeys = pipe(rhsUnits, keys);
@@ -31,11 +33,10 @@ const rhsUnitKeysLength = pipe(rhsUnitKeys, length);
 const rhsSymbols = pipe(rhs, prop('symbols'));
 const rhsBaseDimensions = converge(baseDimensions, context, rhs);
 const rhsToSi = converge(toSi, context, rhs);
-const rhsHasUnits = pipe(rhsUnitKeys, isEmpty);
-const rhsHasSymbols = pipe(rhsSymbols, keys, length);
-const rhsNotPureNumericEntity = complement(either(rhsHasUnits, rhsHasSymbols));
+const rhsHasUnits = pipe(rhsUnitKeys, notEmpty);
+const rhsHasSymbols = pipe(rhsSymbols, keys, notEmpty);
+const rhsNotPureNumericEntity = either(rhsHasUnits, rhsHasSymbols);
 
-const eitherIsZero = either(lhsIsZero, rhsIsZero);
 const eitherValueNil = either(lhsValueNil, rhsValueNil);
 
 const symbolsMatch = converge(equals, lhsSymbols, rhsSymbols);
@@ -49,8 +50,8 @@ const performAddMath = (direction, ctx, left, right) => ({ ...left, value: left.
 // (sign: (1, -1), context: Context, lhs: Entity, rhs: Entity) => Entity
 const abstractMathAdd = cond([
   [eitherValueNil, toNil],
-  [rhsIsZero, lhs],
-  [lhsIsZero, flipRhsBySign],
+  [rhsValueZero, lhs],
+  [lhsValueZero, flipRhsBySign],
   [symbolsDiffer, toNil],
   [unitsMatch, performAddMath],
   [baseDimensionsMatch, converge(performAddMath, sign, context, lhsToSi, rhsToSi)],
@@ -58,19 +59,22 @@ const abstractMathAdd = cond([
 ]);
 
 
-const lhsRhsUnitsOverlapLength = pipe(
+const rhsIsZeroAndNotDivision = both(rhsValueZero, pipe(sign, equals(1)));
+const overlapUnitKeysLength = pipe(
   converge(intersection, rhsUnitKeys, lhsUnitKeys),
   length
 );
-const allArgsEqual = pipe(
-  unapply(identity), // Args to array
-  uniq,
-  length,
-  equals(1),
+// const lhsRhsKeysSetsContainNoSubOrSuperset = converge( // This code might be faster
+//   either(
+//     converge(equals, nthArg(0), nthArg(1)),
+//     converge(equals, nthArg(0), nthArg(2)),
+//   ),
+//   overlapUnitKeysLength, lhsUnitKeysLength, rhsUnitKeysLength);
+const lhsRhsKeysSetsContainNoSubOrSuperset = either(
+  converge(equals, overlapUnitKeysLength, lhsUnitKeysLength),
+  converge(equals, overlapUnitKeysLength, rhsUnitKeysLength),
 );
-const lhsKeysLengthEqRhsKeysLengthEqOverlapKeysLength = converge(allArgsEqual,
-  lhsRhsUnitsOverlapLength, lhsUnitKeysLength, rhsUnitKeysLength);
-const needConversion = complement(lhsKeysLengthEqRhsKeysLengthEqOverlapKeysLength);
+const needConversion = complement(lhsRhsKeysSetsContainNoSubOrSuperset);
 
 const mergeMultiplicationLhsUnitPairs = pipe(nthArg(0), toPairs);
 const mergeMultiplicationRhsUnitPairs = pipe(nthArg(1), toPairs);
@@ -79,19 +83,24 @@ const mergeMultiplicationUnitSymbols = pipe(
   converge(concat, mergeMultiplicationLhsUnitPairs, mergeMultiplicationRhsUnitPairs),
   groupBy(head),
   mapObj(sumLastElementsInPairs),
-  pickBy(notNil),
+  pickBy(notZero),
 );
 
-const performMultiplyMath = (direction, ctx, left, right) => ({
-  ...entity,
-  value: left.value * (right.value ** direction),
-  units: mergeMultiplicationUnitSymbols(left.units, right.units),
-  symbols: mergeMultiplicationUnitSymbols(left.symbols, right.symbols),
-}); // FIXME 'All unitless properties shouldn't carry after multiplication'
+const performMultiplyMath = (direction, ctx, left, right) => {
+  const byDirection = mapObj(multiply(direction));
 
-const abstractMathMultply = cond([
+  return {
+    ...entity,
+    value: left.value * (right.value ** direction),
+    units: mergeMultiplicationUnitSymbols(left.units, byDirection(right.units)),
+    symbols: mergeMultiplicationUnitSymbols(left.symbols, byDirection(right.symbols)),
+  };
+}; // FIXME 'All unitless properties shouldn't carry after multiplication'
+
+const abstractMathMultiply = cond([
   [eitherValueNil, toNil],
-  [eitherIsZero, toZeroEntity],
+  [lhsValueZero, toZeroEntity],
+  [rhsIsZeroAndNotDivision, toZeroEntity],
   [T, ifElse(needConversion,
     converge(performMultiplyMath, sign, context, lhsToSi, rhsToSi),
     performMultiplyMath,
@@ -99,12 +108,16 @@ const abstractMathMultply = cond([
 ]);
 
 
-const performExponentMath = (direction, ctx, left, right) => ({
-  ...entity,
-  value: left.value ** (right.value * direction),
-  units: mapObj(multiply(right.value), left.units),
-  symbols: mapObj(multiply(right.value), left.symbols),
-});
+const performExponentMath = (direction, ctx, left, right) => {
+  const byExponent = mapObj(multiply(right.value));
+
+  return {
+    ...entity,
+    value: left.value ** (right.value * direction),
+    units: byExponent(left.units),
+    symbols: byExponent(left.symbols),
+  };
+};
 
 const abstractMathExponent = cond([
   [eitherValueNil, toNil],
@@ -114,8 +127,8 @@ const abstractMathExponent = cond([
 
 const valueAdd = partial(abstractMathAdd, 1);
 const valueSubtract = partial(abstractMathAdd, -1);
-const valueMultiply = partial(abstractMathMultply, 1);
-const valueDivide = partial(abstractMathMultply, -1);
+const valueMultiply = partial(abstractMathMultiply, 1);
+const valueDivide = partial(abstractMathMultiply, -1);
 const valueExponent = partial(abstractMathExponent, 1);
 // No inverse exponent
 

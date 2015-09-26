@@ -12,28 +12,31 @@ export default base;
 const notNil = complement(isNil);
 const sumLastElementsInPairs = pipe(map(last), sum);
 
-export function dimensions(context, value) {
-  return pipe(
-    prop('units'),
-    toPairs,
-    groupBy(([unit]) => {
-      const unitValue = getUnitValue(context, unit);
-      return unitValue ? String(unitValue.type) : unit;
-    }),
-    omit(['undefined']),
-    mapObj(sumLastElementsInPairs),
-    pickBy(notNil),
-  )(value);
-}
+export const dimensions = (context, value) => pipe(
+  prop('units'),
+  toPairs,
+  groupBy(([unit]) => {
+    const unitValue = getUnitValue(context, unit);
+    return unitValue ? String(unitValue.type) : unit;
+  }),
+  omit(['undefined']),
+  mapObj(sumLastElementsInPairs),
+  pickBy(notNil),
+)(value);
 
-function derivedUnitsForType(type) {
-  const derivedUnit = unitsDerived[type];
-
-  if (derivedUnit) {
-    return toPairs(derivedUnit);
-  }
-  return [[type, 1]];
-}
+const derivedUnitsForType = ifElse(
+  has(__, unitsDerived),
+  pipe(prop(__, unitsDerived), toPairs),
+  (type) => ([[type, 1]])
+); // FIXME: Test
+// function derivedUnitsForType(type) {
+//   const derivedUnit = unitsDerived[type];
+//
+//   if (derivedUnit) {
+//     return toPairs(derivedUnit);
+//   }
+//   return [[type, 1]];
+// }
 
 export const baseDimensions = pipe(
   dimensions,

@@ -1,3 +1,5 @@
+// import { map, reduce, pipe, concat, append, whereEq, update, sortBy, pickBy, toPairs, pluck, sum, curry, reject, isNil, head, prop, none, test, tap } from 'ramda';
+
 import { getFormattingHints } from './locale';
 import assert from 'assert';
 
@@ -18,7 +20,7 @@ const cartesian = reduce((matrix, options) => (
 const getDistance = pipe(
   pluck('index'),
   map(x => x ** 2),
-  sum()
+  sum
 );
 
 const getParseOptions = pipe(
