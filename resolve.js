@@ -1,37 +1,53 @@
 /* eslint no-use-before-define: [1, "no-func"] */
-import * as math from './math';
+import * as math from './math/math';
 import combineValues from './combineValues';
 
 const containsNil = any(isNil);
+const finalNil = pipe(print('got nill'), always(reduced(null)));
 
 const resolveBreakNil = fn => pipe(
   fn,
   ifElse(isNil,
-    always(reduced(null)),
-    identity)
+    finalNil,
+    identity
+  )
 );
 
 
-const groupsReducer = (fn) => (context, locals, group) => (
+const groupsResolver = (reducer) => (context, locals, group) => (
   pipe(
     prop('groups'),
+    reject(whereEq({ type: 'EMPTY' })),
     map(partial(resolve, context, locals)),
     ifElse(containsNil,
       always(null),
-      reduce(partial(fn, context), head(resolvedGroups), zip(group.operations, tail(resolvedGroups)))
+      partial(reducer, context, group),
     ),
   )(group)
 );
 
 
 // FIXME: Exponentiation should happen backwards
-const resolveOperationsGroupReducer = resolveBreakNil((context, a, [operation, b]) => math[operation](context, a, b));
-const resolveOperationsGroup = groupsReducer(resolveOperationsGroupReducer);
+const resolveOperationsGroupReduceFn = resolveBreakNil((context, a, [operation, b]) => math[operation](context, a, b));
+const resolveOperationsGroupReducer = (context, group, groups) =>
+  reduce(
+    partial(resolveOperationsGroupReduceFn, context),
+    head(groups),
+    zip(group.operations, tail(groups))
+  );
+const resolveOperationsGroup = groupsResolver(resolveOperationsGroupReducer);
 
-const resolveMiscGroupReducer = resolveBreakNil(combineValues);
-const resolveMiscGroup = groupsReducer(resolveMiscGroupReducer);
+const resolveMiscGroupReduceFn = resolveBreakNil(combineValues);
+const resolveMiscGroupReducer = (context, group, groups) =>
+  reduce(
+    partial(resolveMiscGroupReduceFn, context),
+    head(groups),
+    tail(groups)
+  );
+const resolveMiscGroup = groupsResolver(resolveMiscGroupReducer);
 
-const resolveBracketGroup = ifElse(pipe(arg(2), prop('groups'), length, equals(1)),
+const resolveBracketGroupHasOneGroup = pipe(nthArg(2), prop('groups'), length, equals(1));
+const resolveBracketGroup = ifElse(resolveBracketGroupHasOneGroup,
   resolveMiscGroup,
   always(null),
 );
@@ -52,7 +68,7 @@ const resolveEntity = (context, locals, entity) => {
   })(entity);
 };
 
-export function resolve(context, locals, value) {
+function resolve(context, locals, value) {
   switch (value.type) {
   case 'OPERATIONS_GROUP':
     return resolveOperationsGroup(context, locals, value);
@@ -65,4 +81,9 @@ export function resolve(context, locals, value) {
   default:
     return null;
   }
+}
+
+export default function(context) {
+  // TODO: This is a bit shitty
+  return resolve(context, {}, context.ast);
 }

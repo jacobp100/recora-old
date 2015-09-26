@@ -1,4 +1,4 @@
-import entityMath from './entity';
+import * as entityMath from './entity';
 
 
 const addValueMap = {
@@ -28,12 +28,12 @@ const exponentValueMap = {
 };
 
 const createOperation = (valueMap) => (context, lhs, rhs) => {
-  const fn = path([lhs.value, rhs.value], valueMap);
+  const fn = path([lhs.type, rhs.type], valueMap);
   return fn ? fn(context, lhs, rhs) : null;
 };
 
-export const add = createOperation(addValueMap);
-export const subtract = createOperation(subtractValueMap);
-export const multiply = createOperation(multiplyValueMap);
-export const divide = createOperation(divideValueMap);
-export const exponent = createOperation(exponentValueMap);
+export const ADD = createOperation(addValueMap);
+export const SUBTRACT = createOperation(subtractValueMap);
+export const MULTIPLY = createOperation(multiplyValueMap);
+export const DIVIDE = createOperation(divideValueMap);
+export const EXPONENT = createOperation(exponentValueMap);

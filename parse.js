@@ -7,6 +7,7 @@ import parseText from './parse/parseText';
 import preprocessTags from './parse/preprocessTags';
 import postprocessTags from './parse/postprocessTags';
 import resolveTags from './parse/resolveTags';
+import resolve from './resolve';
 
 const cartesian = reduce((matrix, options) => (
   reduce((out, option) => (
@@ -51,6 +52,7 @@ function getTagOptions(context) {
 const resolveTagOptions = pipe(
   postprocessTags,
   resolveTags,
+  resolve,
 );
 
 const parseTagsWithOptions = pipe(

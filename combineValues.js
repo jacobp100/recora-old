@@ -1,5 +1,5 @@
 import { dimensions, baseDimensions } from './types/entity';
-import entityMath from './math/entity';
+import * as entityMath from './math/entity';
 
 
 function shouldDivideDimensions(lhsDimensions, rhsDimensions) {
