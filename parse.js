@@ -9,14 +9,7 @@ import postprocessTags from './parse/postprocessTags';
 import resolveTags from './parse/resolveTags';
 import resolve from './resolve';
 
-const cartesian = reduce((matrix, options) => (
-  reduce((out, option) => (
-    concat(
-      out,
-      map(append(option), matrix)
-    )
-  ), [], options)
-), [[]]);
+const cartesian = commute(of);
 
 const getDistance = pipe(
   pluck('index'),
