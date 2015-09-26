@@ -18,7 +18,7 @@ const groupsResolver = (reducer) => (context, locals, group) => (
   pipe(
     prop('groups'),
     reject(whereEq({ type: 'EMPTY' })),
-    map(partial(resolve, context, locals)),
+    map(partial(resolveWithLocals, context, locals)),
     ifElse(containsNil,
       always(null),
       partial(reducer, context, group),
@@ -68,7 +68,7 @@ const resolveEntity = (context, locals, entity) => {
   })(entity);
 };
 
-function resolve(context, locals, value) {
+export function resolveWithLocals(context, locals, value) {
   switch (value.type) {
   case 'OPERATIONS_GROUP':
     return resolveOperationsGroup(context, locals, value);
@@ -83,7 +83,8 @@ function resolve(context, locals, value) {
   }
 }
 
-export default function(context) {
-  // TODO: This is a bit shitty
-  return resolve(context, {}, context.ast);
-}
+const resolve = over(
+  lens(identity, assoc('result')),
+  converge(resolveWithLocals, identity, always({}), prop('ast')),
+);
+export default resolve;
