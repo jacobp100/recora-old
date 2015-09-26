@@ -3,7 +3,7 @@ import { lengthIsOne } from '../util';
 import entityBase from '../types/entity';
 import assert from 'assert';
 
-const valueGroupBase = {
+const miscGroupBase = {
   type: 'MISC_GROUP',
   groups: null,
 };
@@ -71,7 +71,7 @@ const resolveTagsWithoutOperations = pipe(
   cond([
     [isEmpty, always(empty)],
     [lengthIsOne, head],
-    [T, assoc('groups', __, valueGroupBase)], // Only wrap in value group iff groups.length > 1
+    [T, assoc('groups', __, miscGroupBase)], // Only wrap in value group iff groups.length > 1
   ]),
 );
 
