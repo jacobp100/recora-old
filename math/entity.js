@@ -1,4 +1,4 @@
-import entity, { baseDimensions, toSi } from '../types/entity';
+import entity, { baseDimensions, toSi, resolveDimensionlessUnits } from '../types/entity';
 
 
 const notEmpty = complement(isEmpty);
@@ -89,13 +89,16 @@ const mergeMultiplicationUnitSymbols = pipe(
 const performMultiplyMath = (direction, ctx, left, right) => {
   const byDirection = mapObj(multiply(direction));
 
-  return {
+  const value = {
     ...entity,
     value: left.value * (right.value ** direction),
     units: mergeMultiplicationUnitSymbols(left.units, byDirection(right.units)),
     symbols: mergeMultiplicationUnitSymbols(left.symbols, byDirection(right.symbols)),
   };
-}; // FIXME 'All unitless properties shouldn't carry after multiplication'
+
+  // Remove all units without a type
+  return resolveDimensionlessUnits(ctx, value);
+};
 
 const abstractMathMultiply = cond([
   [eitherValueNil, toNil],

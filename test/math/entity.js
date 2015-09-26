@@ -180,6 +180,16 @@ describe('entity math', function() {
       assert.deepEqual(result.units, {});
       assert.deepEqual(result.symbols, { a: 1, b: -1 });
     });
+
+    it('should remove units without type after multiplication', function() {
+      const lhs = { ...entity, value: 1, units: { degree: 1 } };
+      const rhs = { ...entity, value: 1, units: { degree: 1 } };
+      const result = multiply(normalContext, lhs, rhs);
+
+      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.value.toFixed(5), '0.00030');
+      assert.deepEqual(result.units, {});
+    });
   });
 
   describe('divide', function() {

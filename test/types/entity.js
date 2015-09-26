@@ -53,9 +53,9 @@ describe('entity type', function() {
       assert.equal(locale.getSiUnit(normalContext, 'time'), 'second');
 
       const value = { ...entity, units: { yard: 1, minute: -2 } };
-      const valueDimensions = toSi(normalContext, value);
+      const siValue = toSi(normalContext, value);
 
-      assert.deepEqual(valueDimensions.units, {
+      assert.deepEqual(siValue.units, {
         meter: 1,
         second: -2,
       });
@@ -63,11 +63,19 @@ describe('entity type', function() {
 
     it('should keep derived dimensions in their form', function() {
       const value = { ...entity, units: { quart: 1 } };
-      const valueDimensions = toSi(normalContext, value);
+      const siValue = toSi(normalContext, value);
 
-      assert.deepEqual(valueDimensions.units, {
+      assert.deepEqual(siValue.units, {
         liter: 1,
       });
+    });
+
+    it('removes dimensionless units', function() {
+      const value = { ...entity, value: 1, units: { degree: 1 } };
+      const siValue = toSi(normalContext, value);
+
+      assert.equal(siValue.value.toFixed(5), '0.01745');
+      assert.deepEqual(siValue.units, {});
     });
   });
 });

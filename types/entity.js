@@ -12,6 +12,27 @@ export default base;
 const notNil = complement(isNil);
 const sumLastElementsInPairs = pipe(map(last), sum);
 
+
+const getUnitType = pipe(
+  getUnitValue,
+  ifElse(isNil, always(null), prop('type')),
+);
+
+export const resolveDimensionlessUnits = (ctx, value) => pipe(
+  prop('units'),
+  pickBy((power, unit) => !getUnitType(ctx, unit)),
+  toPairs,
+  reduce((out, [unit, power]) => {
+    const unitValue = getUnitValue(ctx, unit).base ** power;
+
+    return evolve({
+      value: multiply(unitValue),
+      units: omit([unit]),
+    }, out);
+  }, value),
+)(value);
+
+
 export const dimensions = (context, value) => pipe(
   prop('units'),
   toPairs,
@@ -61,5 +82,6 @@ function getSiUnits(ctx, value) {
 export const convert = (ctx, units, value) => assoc('units', units, value); // FIXME!
 
 export function toSi(ctx, value) {
-  return convert(ctx, getSiUnits(ctx, value), value);
+  const resolvedValue = resolveDimensionlessUnits(ctx, value);
+  return convert(ctx, getSiUnits(ctx, resolvedValue), resolvedValue);
 }
