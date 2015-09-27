@@ -10,7 +10,7 @@ const output = recora.parse(text);
 console.log(text);
 
 if (output.result) {
-  console.log('->', output.result);
+  console.log('->', output.resultToString);
 } else {
   console.log('Failed to solve query');
 }

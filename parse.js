@@ -1,6 +1,6 @@
 // import { map, reduce, pipe, concat, append, whereEq, update, sortBy, pickBy, toPairs, pluck, sum, curry, reject, isNil, head, prop, none, test, tap } from 'ramda';
 
-import { getFormattingHints } from './locale';
+import { getFormattingHints, entityToString } from './locale';
 import assert from 'assert';
 
 import parseText from './parse/parseText';
@@ -52,7 +52,8 @@ const parseTagsWithOptions = pipe(
   getTagOptions,
   map(resolveTagOptions),
   reject(isNil),
-  head,
+  reject(propSatisfies(isNil, 'result')),
+  head
 );
 
 const assertNoTextElementInTags = tap(
@@ -70,5 +71,9 @@ const parse = pipe(
   preprocessTags,
   assertNoTextElementInTags,
   parseTagsWithOptions,
+  over(
+    lens(prop('result'), assoc('resultToString')),
+    entityToString,
+  ),
 );
 export default parse;

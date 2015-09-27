@@ -18,22 +18,22 @@ const getUnitType = pipe(
   ifElse(isNil, always(null), prop('type')),
 );
 
-export const resolveDimensionlessUnits = (ctx, value) => pipe(
+export const resolveDimensionlessUnits = (context, entity) => pipe(
   prop('units'),
-  pickBy((power, unit) => !getUnitType(ctx, unit)),
+  pickBy((power, unit) => !getUnitType(context, unit)),
   toPairs,
   reduce((out, [unit, power]) => {
-    const unitValue = getUnitValue(ctx, unit).base ** power;
+    const unitValue = getUnitValue(context, unit).base ** power;
 
     return evolve({
       value: multiply(unitValue),
       units: omit([unit]),
     }, out);
-  }, value),
-)(value);
+  }, entity),
+)(entity);
 
 
-export const dimensions = (context, value) => pipe(
+export const dimensions = (context, entity) => pipe(
   prop('units'),
   toPairs,
   groupBy(([unit]) => {
@@ -43,21 +43,12 @@ export const dimensions = (context, value) => pipe(
   omit(['undefined']),
   mapObj(sumLastElementsInPairs),
   pickBy(notNil),
-)(value);
+)(entity);
 
-const derivedUnitsForType = ifElse(
-  has(__, unitsDerived),
+const derivedUnitsForType = ifElse(has(__, unitsDerived),
   pipe(prop(__, unitsDerived), toPairs),
   (type) => ([[type, 1]])
-); // FIXME: Test
-// function derivedUnitsForType(type) {
-//   const derivedUnit = unitsDerived[type];
-//
-//   if (derivedUnit) {
-//     return toPairs(derivedUnit);
-//   }
-//   return [[type, 1]];
-// }
+);
 
 export const baseDimensions = pipe(
   dimensions,
@@ -70,18 +61,73 @@ export const baseDimensions = pipe(
   pickBy(notNil),
 );
 
-function getSiUnits(ctx, value) {
+function getSiUnits(context, entity) {
   return pipe(
     dimensions,
     toPairs,
-    map(adjust(partial(getSiUnit, ctx), 0)),
+    map(adjust(partial(getSiUnit, context), 0)),
     fromPairs,
-  )(ctx, value);
+  )(context, entity);
 }
 
-export const convert = (ctx, units, value) => assoc('units', units, value); // FIXME!
+function convertValueReducerFn(context, direction, value, [name, power]) {
+  const unit = getUnitValue(context, name);
 
-export function toSi(ctx, value) {
-  const resolvedValue = resolveDimensionlessUnits(ctx, value);
-  return convert(ctx, getSiUnits(ctx, resolvedValue), resolvedValue);
+  if (unit) {
+    return value * (unit.base) ** (-direction * power);
+  }
+  return value;
+}
+function convertValue(context, direction, units, value) {
+  const nonLinearUnits = pipe(
+    values,
+    filter((name) => {
+      const unit = getUnitValue(context, name);
+      return unit && unit.forwardFn;
+    }),
+  )(units);
+  const nonLinearUnitsSize = length(nonLinearUnits);
+
+  if (nonLinearUnitsSize !== 0) {
+    const toUnitsSize = pipe(keys, length)(units);
+    const nonLinearUnit = head(nonLinearUnits);
+
+    if (nonLinearUnitsSize > 1 || toUnitsSize > nonLinearUnitsSize || nonLinearUnit !== 1) {
+      return null;
+    }
+
+    const fn = {
+      '1': 'forwardFn',
+      '-1': 'backwardFn',
+    }[direction];
+
+    const unit = context.getUnitValue(context, nonLinearUnit);
+    return unit[fn](value);
+  }
+
+  return reduce(
+    partial(convertValueReducerFn, context, direction),
+    value,
+    toPairs(units),
+  );
+}
+
+export const convert = (context, units, entity) => {
+  const entityBaseDimensions = baseDimensions(context, entity);
+  const unitBaseDimensions = baseDimensions(context, { ...base, units });
+
+  if (!equals(entityBaseDimensions, unitBaseDimensions)) {
+    return null;
+  }
+
+  const value = pipe(
+    partial(convertValue, context, -1, entity.units),
+    partial(convertValue, context, 1, units),
+  )(entity.value);
+  return { ...entity, value, units };
+};
+
+export function toSi(context, entity) {
+  const resolvedEntity = resolveDimensionlessUnits(context, entity);
+  return convert(context, getSiUnits(context, resolvedEntity), resolvedEntity);
 }

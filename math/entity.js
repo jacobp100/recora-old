@@ -14,6 +14,7 @@ const valueNil = propSatisfies(isNil, 'value');
 const sign = nthArg(0);
 const context = nthArg(1);
 
+// FIXME: All shitty. Just pipe(lhs, valueZero) etc. See combineValues
 const lhs = nthArg(2);
 const lhsValueZero = pipe(lhs, valueZero);
 const lhsValueNil = pipe(lhs, valueNil);
