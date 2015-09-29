@@ -1,6 +1,7 @@
 import { orderOperations, operationsOrder } from '../constants';
 import { lengthIsOne } from '../util';
-import entityBase from '../types/entity';
+import { trimNoop } from '../utils/tagUtils';
+import entityBase, { baseDimensions } from '../types/entity';
 import assert from 'assert';
 
 const miscGroupBase = {
@@ -172,8 +173,106 @@ const createASTFromTags = pipe(
   ifElse(pipe(length, equals(1)), head, always(null)),
 );
 
+const conversionStatements = [
+  { type: 'NOOP' },
+  { type: 'TAG_UNIT' },
+  { type: 'TAG_UNIT_POWER_PREFIX' },
+  { type: 'TAG_UNIT_POWER_SUFFIX' },
+  { type: 'TAG_OPERATOR', value: 'NEGATE' },
+  { type: 'TAG_COMMA' },
+];
+const isConversionStatement = tag => any(whereEq(__, tag), conversionStatements);
+const isNoop = whereEq({ type: 'NOOP' }); // FIXME: it's in tagutils
+const notNoop = complement(isNoop);
+const isComma = whereEq({ type: 'TAG_COMMA' });
+const dropLastNonNoop = dropLastWhile(notNoop);
+const getNooplessTags = pipe(
+  reject(isNoop),
+  reject(isComma),
+);
+
+const addConversionToContext = (context, conversionTagsWithNoop, tags) => {
+  const nooplessTags = getNooplessTags(tags);
+
+  if (length(nooplessTags) === 0) {
+    return context;
+  }
+
+  const conversionTags = trimNoop(conversionTagsWithNoop);
+
+  const conversionEntities = pipe(
+    map(pipe(
+      props(['value', 'power']),
+      of,
+      fromPairs,
+    )),
+    map(assoc('units', __, entityBase)),
+  )(conversionTags);
+  const allEqualDimensions = pipe(
+    map(partial(baseDimensions, context)),
+    uniq,
+    length,
+    equals(1),
+  )(conversionEntities);
+
+  if (!allEqualDimensions) {
+    const conversion = pluck('units', conversionEntities);
+    return { ...context, tags, conversion };
+  }
+
+  const conversionEntity = resolveTagsWithoutOperations(conversionTags);
+
+  if (conversionEntity.type === 'ENTITY') {
+    const conversion = conversionEntity.units;
+    return { ...context, tags, conversion };
+  }
+
+  return context;
+};
+
+const findLeftConversion = (context) => {
+  if (context.conversion) {
+    return context;
+  }
+
+  const conversionTags = pipe(
+    takeWhile(isConversionStatement),
+    dropLastNonNoop,
+  )(context.tags);
+  const remainingTags = drop(length(conversionTags), context.tags);
+
+  if (isEmpty(remainingTags) || last(remainingTags).type !== 'NOOP') {
+    return context;
+  }
+
+  return addConversionToContext(context, conversionTags, remainingTags);
+};
+
+const findRightConversion = (context) => {
+  if (context.conversion) {
+    return context;
+  }
+
+  let conversionTags = takeLastWhile(isConversionStatement, context.tags);
+
+  const precedingTag = context.tags[length(context.tags) - length(conversionTags) - 1];
+
+  if (precedingTag && (precedingTag.type === 'TAG_NUMBER' || precedingTag.type === 'DATE_TIME')) {
+    // Gathered too many tags and went into tags that would form an entity, drop some tags
+    conversionTags = dropWhile(notNoop, conversionTags);
+  }
+
+  if (length(conversionTags) === 0) {
+    return context;
+  }
+
+  const remainingTags = dropLast(length(conversionTags), context.tags);
+  return addConversionToContext(context, conversionTags, remainingTags);
+};
+
 const resolveTags = pipe(
-  // FIXME: get conversion and remove conversion tags
+  findLeftConversion,
+  findRightConversion,
   over(
     lens(prop('tags'), assoc('ast')),
     createASTFromTags,

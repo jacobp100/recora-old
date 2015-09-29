@@ -8,6 +8,7 @@ import preprocessTags from './parse/preprocessTags';
 import postprocessTags from './parse/postprocessTags';
 import resolveTags from './parse/resolveTags';
 import resolve from './resolve';
+import { convert } from './types/entity';
 
 const cartesian = commute(of);
 
@@ -48,14 +49,24 @@ const resolveTagOptions = pipe(
   resolve,
 );
 
+const convertResult = (context) => {
+  if (context.conversion) {
+    // FIXME: convert composite
+    const result = convert(context, context.conversion, context.result);
+    return { ...context, result };
+  }
+  return context;
+};
+
 const parseTagsWithOptions = pipe(
   getTagOptions,
   map(resolveTagOptions),
   reject(isNil),
   reject(propSatisfies(isNil, 'result')),
+  map(convertResult),
   map(over(
     lens(prop('result'), assoc('resultToString')),
-    ifElse(isNil, always(null), entityToString), // FIXME
+    entityToString, // FIXME
   )),
   head,
 );

@@ -15,6 +15,7 @@ export default class Recora {
       hints: null,
       tags: null,
       ast: null,
+      conversion: null,
       result: null,
       resultToString: '',
     };

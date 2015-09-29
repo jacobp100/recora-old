@@ -85,6 +85,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      hints: null,
 	      tags: null,
 	      ast: null,
+	      conversion: null,
 	      result: null,
 	      resultToString: ''
 	    };
@@ -101,7 +102,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(commute, of, pipe, pluck, map, sum, pickBy, whereEq, toPairs, sortBy, update, curry, reduce, reject, isNil, propSatisfies, over, lens, prop, assoc, ifElse, always, head, tap, none, test) {// import { map, reduce, pipe, concat, append, whereEq, update, sortBy, pickBy, toPairs, pluck, sum, curry, reject, isNil, head, prop, none, test, tap } from 'ramda';
+	/* WEBPACK VAR INJECTION */(function(commute, of, pipe, pluck, map, sum, pickBy, whereEq, toPairs, sortBy, update, curry, reduce, reject, isNil, propSatisfies, over, lens, prop, assoc, head, tap, none, test) {// import { map, reduce, pipe, concat, append, whereEq, update, sortBy, pickBy, toPairs, pluck, sum, curry, reject, isNil, head, prop, none, test, tap } from 'ramda';
 	
 	'use strict';
 	
@@ -137,6 +138,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _resolve2 = _interopRequireDefault(_resolve);
 	
+	var _typesEntity = __webpack_require__(129);
+	
 	var cartesian = commute(of);
 	
 	var getDistance = pipe(pluck('index'), map(function (x) {
@@ -169,7 +172,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var resolveTagOptions = pipe(_parsePostprocessTags2['default'], _parseResolveTags2['default'], _resolve2['default']);
 	
-	var parseTagsWithOptions = pipe(getTagOptions, map(resolveTagOptions), reject(isNil), reject(propSatisfies(isNil, 'result')), map(over(lens(prop('result'), assoc('resultToString')), ifElse(isNil, always(null), _locale.entityToString))), // FIXME
+	var convertResult = function convertResult(context) {
+	  if (context.conversion) {
+	    // FIXME: convert composite
+	    var result = _typesEntity.convert(context, context.conversion, context.result);
+	    return _extends({}, context, { result: result });
+	  }
+	  return context;
+	};
+	
+	var parseTagsWithOptions = pipe(getTagOptions, map(resolveTagOptions), reject(isNil), reject(propSatisfies(isNil, 'result')), map(convertResult), map(over(lens(prop('result'), assoc('resultToString')), _locale.entityToString)), // FIXME
 	head);
 	
 	var assertNoTextElementInTags = tap(pipe(prop('tags'), pluck('type'), none(test(/^TEXT_/)), _assert2['default']));
@@ -177,7 +189,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var parse = pipe(_parseParseText2['default'], _locale.getFormattingHints, _parsePreprocessTags2['default'], assertNoTextElementInTags, parseTagsWithOptions);
 	exports['default'] = parse;
 	module.exports = exports['default'];
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(26), __webpack_require__(27), __webpack_require__(35), __webpack_require__(16), __webpack_require__(37), __webpack_require__(39), __webpack_require__(40), __webpack_require__(49), __webpack_require__(50), __webpack_require__(51), __webpack_require__(54), __webpack_require__(31), __webpack_require__(55), __webpack_require__(60), __webpack_require__(61), __webpack_require__(72), __webpack_require__(73), __webpack_require__(36), __webpack_require__(74), __webpack_require__(112), __webpack_require__(53), __webpack_require__(62), __webpack_require__(65), __webpack_require__(66), __webpack_require__(70)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(26), __webpack_require__(27), __webpack_require__(35), __webpack_require__(16), __webpack_require__(37), __webpack_require__(39), __webpack_require__(40), __webpack_require__(49), __webpack_require__(50), __webpack_require__(51), __webpack_require__(54), __webpack_require__(31), __webpack_require__(55), __webpack_require__(60), __webpack_require__(61), __webpack_require__(72), __webpack_require__(73), __webpack_require__(36), __webpack_require__(74), __webpack_require__(62), __webpack_require__(65), __webpack_require__(66), __webpack_require__(70)))
 
 /***/ },
 /* 2 */
@@ -5651,7 +5663,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 107 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(last, adjust, assoc, append, evolve, over, lensProp, pipe, defaultTo, add, assocPath, flip, identity, keys, isEmpty, where, equals, isNil, complement, reduce, map, ifElse, reject, cond, always, head, T, __, whereEq, curry, any, drop, find, indexOf, propEq, findIndex, slice, length, lens, prop) {'use strict';
+	/* WEBPACK VAR INJECTION */(function(last, adjust, assoc, append, evolve, over, lensProp, pipe, defaultTo, add, assocPath, flip, identity, keys, isEmpty, where, equals, isNil, complement, reduce, map, ifElse, reject, cond, always, head, T, __, whereEq, curry, any, drop, find, indexOf, propEq, findIndex, slice, length, dropLastWhile, props, of, fromPairs, partial, uniq, pluck, takeWhile, takeLastWhile, dropWhile, dropLast, lens, prop) {'use strict';
 	
 	exports.__esModule = true;
 	
@@ -5662,6 +5674,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _constants = __webpack_require__(125);
 	
 	var _util = __webpack_require__(96);
+	
+	var _utilsTagUtils = __webpack_require__(103);
 	
 	var _typesEntity = __webpack_require__(129);
 	
@@ -5813,12 +5827,84 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var createASTFromTags = pipe(resolveBrackets, ifElse(pipe(length, equals(1)), head, always(null)));
 	
-	var resolveTags = pipe(
-	// FIXME: get conversion and remove conversion tags
-	over(lens(prop('tags'), assoc('ast')), createASTFromTags));
+	var conversionStatements = [{ type: 'NOOP' }, { type: 'TAG_UNIT' }, { type: 'TAG_UNIT_POWER_PREFIX' }, { type: 'TAG_UNIT_POWER_SUFFIX' }, { type: 'TAG_OPERATOR', value: 'NEGATE' }, { type: 'TAG_COMMA' }];
+	var isConversionStatement = function isConversionStatement(tag) {
+	  return any(whereEq(__, tag), conversionStatements);
+	};
+	var isNoop = whereEq({ type: 'NOOP' }); // FIXME: it's in tagutils
+	var notNoop = complement(isNoop);
+	var isComma = whereEq({ type: 'TAG_COMMA' });
+	var dropLastNonNoop = dropLastWhile(notNoop);
+	var getNooplessTags = pipe(reject(isNoop), reject(isComma));
+	
+	var addConversionToContext = function addConversionToContext(context, conversionTagsWithNoop, tags) {
+	  var nooplessTags = getNooplessTags(tags);
+	
+	  if (length(nooplessTags) === 0) {
+	    return context;
+	  }
+	
+	  var conversionTags = _utilsTagUtils.trimNoop(conversionTagsWithNoop);
+	
+	  var conversionEntities = pipe(map(pipe(props(['value', 'power']), of, fromPairs)), map(assoc('units', __, _typesEntity2['default'])))(conversionTags);
+	  var allEqualDimensions = pipe(map(partial(_typesEntity.baseDimensions, context)), uniq, length, equals(1))(conversionEntities);
+	
+	  if (!allEqualDimensions) {
+	    var conversion = pluck('units', conversionEntities);
+	    return _extends({}, context, { tags: tags, conversion: conversion });
+	  }
+	
+	  var conversionEntity = resolveTagsWithoutOperations(conversionTags);
+	
+	  if (conversionEntity.type === 'ENTITY') {
+	    var conversion = conversionEntity.units;
+	    return _extends({}, context, { tags: tags, conversion: conversion });
+	  }
+	
+	  return context;
+	};
+	
+	var findLeftConversion = function findLeftConversion(context) {
+	  if (context.conversion) {
+	    return context;
+	  }
+	
+	  var conversionTags = pipe(takeWhile(isConversionStatement), dropLastNonNoop)(context.tags);
+	  var remainingTags = drop(length(conversionTags), context.tags);
+	
+	  if (isEmpty(remainingTags) || last(remainingTags).type !== 'NOOP') {
+	    return context;
+	  }
+	
+	  return addConversionToContext(context, conversionTags, remainingTags);
+	};
+	
+	var findRightConversion = function findRightConversion(context) {
+	  if (context.conversion) {
+	    return context;
+	  }
+	
+	  var conversionTags = takeLastWhile(isConversionStatement, context.tags);
+	
+	  var precedingTag = context.tags[length(context.tags) - length(conversionTags) - 1];
+	
+	  if (precedingTag && (precedingTag.type === 'TAG_NUMBER' || precedingTag.type === 'DATE_TIME')) {
+	    // Gathered too many tags and went into tags that would form an entity, drop some tags
+	    conversionTags = dropWhile(notNoop, conversionTags);
+	  }
+	
+	  if (length(conversionTags) === 0) {
+	    return context;
+	  }
+	
+	  var remainingTags = dropLast(length(conversionTags), context.tags);
+	  return addConversionToContext(context, conversionTags, remainingTags);
+	};
+	
+	var resolveTags = pipe(findLeftConversion, findRightConversion, over(lens(prop('tags'), assoc('ast')), createASTFromTags));
 	exports['default'] = resolveTags;
 	module.exports = exports['default'];
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(77), __webpack_require__(52), __webpack_require__(74), __webpack_require__(23), __webpack_require__(108), __webpack_require__(72), __webpack_require__(95), __webpack_require__(27), __webpack_require__(109), __webpack_require__(38), __webpack_require__(110), __webpack_require__(111), __webpack_require__(24), __webpack_require__(45), __webpack_require__(80), __webpack_require__(48), __webpack_require__(41), __webpack_require__(60), __webpack_require__(101), __webpack_require__(31), __webpack_require__(16), __webpack_require__(112), __webpack_require__(55), __webpack_require__(113), __webpack_require__(53), __webpack_require__(62), __webpack_require__(114), __webpack_require__(115), __webpack_require__(40), __webpack_require__(54), __webpack_require__(69), __webpack_require__(116), __webpack_require__(118), __webpack_require__(120), __webpack_require__(122), __webpack_require__(123), __webpack_require__(34), __webpack_require__(99), __webpack_require__(73), __webpack_require__(36)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(77), __webpack_require__(52), __webpack_require__(74), __webpack_require__(23), __webpack_require__(108), __webpack_require__(72), __webpack_require__(95), __webpack_require__(27), __webpack_require__(109), __webpack_require__(38), __webpack_require__(110), __webpack_require__(111), __webpack_require__(24), __webpack_require__(45), __webpack_require__(80), __webpack_require__(48), __webpack_require__(41), __webpack_require__(60), __webpack_require__(101), __webpack_require__(31), __webpack_require__(16), __webpack_require__(112), __webpack_require__(55), __webpack_require__(113), __webpack_require__(53), __webpack_require__(62), __webpack_require__(114), __webpack_require__(115), __webpack_require__(40), __webpack_require__(54), __webpack_require__(69), __webpack_require__(116), __webpack_require__(118), __webpack_require__(120), __webpack_require__(122), __webpack_require__(123), __webpack_require__(34), __webpack_require__(99), __webpack_require__(106), __webpack_require__(168), __webpack_require__(26), __webpack_require__(140), __webpack_require__(81), __webpack_require__(155), __webpack_require__(35), __webpack_require__(162), __webpack_require__(164), __webpack_require__(104), __webpack_require__(165), __webpack_require__(73), __webpack_require__(36)))
 
 /***/ },
 /* 108 */
@@ -7922,6 +8008,263 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *      R.lt('z', 'a'); //=> false
 	 */
 	module.exports = _curry2(function lt(a, b) { return a < b; });
+
+
+/***/ },
+/* 162 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var _curry2 = __webpack_require__(6);
+	var _dispatchable = __webpack_require__(17);
+	var _slice = __webpack_require__(19);
+	var _xtakeWhile = __webpack_require__(163);
+	
+	
+	/**
+	 * Returns a new list containing the first `n` elements of a given list, passing each value
+	 * to the supplied predicate function, and terminating when the predicate function returns
+	 * `false`. Excludes the element that caused the predicate function to fail. The predicate
+	 * function is passed one argument: *(value)*.
+	 *
+	 * Acts as a transducer if a transformer is given in list position.
+	 * @see R.transduce
+	 *
+	 * @func
+	 * @memberOf R
+	 * @category List
+	 * @sig (a -> Boolean) -> [a] -> [a]
+	 * @param {Function} fn The function called per iteration.
+	 * @param {Array} list The collection to iterate over.
+	 * @return {Array} A new array.
+	 * @see R.dropWhile
+	 * @example
+	 *
+	 *      var isNotFour = function(x) {
+	 *        return !(x === 4);
+	 *      };
+	 *
+	 *      R.takeWhile(isNotFour, [1, 2, 3, 4]); //=> [1, 2, 3]
+	 */
+	module.exports = _curry2(_dispatchable('takeWhile', _xtakeWhile, function takeWhile(fn, list) {
+	  var idx = 0, len = list.length;
+	  while (idx < len && fn(list[idx])) {
+	    idx += 1;
+	  }
+	  return _slice(list, 0, idx);
+	}));
+
+
+/***/ },
+/* 163 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var _curry2 = __webpack_require__(6);
+	var _reduced = __webpack_require__(68);
+	var _xfBase = __webpack_require__(22);
+	
+	
+	module.exports = (function() {
+	  function XTakeWhile(f, xf) {
+	    this.xf = xf;
+	    this.f = f;
+	  }
+	  XTakeWhile.prototype['@@transducer/init'] = _xfBase.init;
+	  XTakeWhile.prototype['@@transducer/result'] = _xfBase.result;
+	  XTakeWhile.prototype['@@transducer/step'] = function(result, input) {
+	    return this.f(input) ? this.xf['@@transducer/step'](result, input) : _reduced(result);
+	  };
+	
+	  return _curry2(function _xtakeWhile(f, xf) { return new XTakeWhile(f, xf); });
+	})();
+
+
+/***/ },
+/* 164 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var _curry2 = __webpack_require__(6);
+	var _slice = __webpack_require__(19);
+	
+	/**
+	 * Returns a new list containing the last `n` elements of a given list, passing each value
+	 * to the supplied predicate function, and terminating when the predicate function returns
+	 * `false`. Excludes the element that caused the predicate function to fail. The predicate
+	 * function is passed one argument: *(value)*.
+	 *
+	 * @func
+	 * @memberOf R
+	 * @category List
+	 * @sig (a -> Boolean) -> [a] -> [a]
+	 * @param {Function} fn The function called per iteration.
+	 * @param {Array} list The collection to iterate over.
+	 * @return {Array} A new array.
+	 * @see R.dropLastWhile
+	 * @example
+	 *
+	 *      var isNotOne = function(x) {
+	 *        return !(x === 1);
+	 *      };
+	 *
+	 *      R.takeLastWhile(isNotOne, [1, 2, 3, 4]); //=> [2, 3, 4]
+	 */
+	module.exports = _curry2(function takeLastWhile(fn, list) {
+	  var idx = list.length - 1;
+	  while (idx >= 0 && fn(list[idx])) {
+	    idx -= 1;
+	  }
+	  return _slice(list, idx + 1, Infinity);
+	});
+
+
+/***/ },
+/* 165 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var _curry2 = __webpack_require__(6);
+	var take = __webpack_require__(166);
+	
+	/**
+	 * Returns a list containing all but the last `n` elements of the given `list`.
+	 *
+	 * @func
+	 * @memberOf R
+	 * @category List
+	 * @sig Number -> [a] -> [a]
+	 * @sig Number -> String -> String
+	 * @param {Number} n The number of elements of `xs` to skip.
+	 * @param {Array} xs The collection to consider.
+	 * @return {Array}
+	 * @see R.takeLast
+	 * @example
+	 *
+	 *      R.dropLast(1, ['foo', 'bar', 'baz']); //=> ['foo', 'bar']
+	 *      R.dropLast(2, ['foo', 'bar', 'baz']); //=> ['foo']
+	 *      R.dropLast(3, ['foo', 'bar', 'baz']); //=> []
+	 *      R.dropLast(4, ['foo', 'bar', 'baz']); //=> []
+	 *      R.dropLast(3, 'ramda');               //=> 'ra'
+	 */
+	module.exports = _curry2(function dropLast(n, xs) {
+	  return take(n < xs.length ? xs.length - n : 0, xs);
+	});
+
+
+/***/ },
+/* 166 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var _curry2 = __webpack_require__(6);
+	var _dispatchable = __webpack_require__(17);
+	var _xtake = __webpack_require__(167);
+	var slice = __webpack_require__(34);
+	
+	
+	/**
+	 * Returns the first `n` elements of the given list, string, or
+	 * transducer/transformer (or object with a `take` method).
+	 *
+	 * @func
+	 * @memberOf R
+	 * @category List
+	 * @sig Number -> [a] -> [a]
+	 * @sig Number -> String -> String
+	 * @param {Number} n
+	 * @param {*} list
+	 * @return {*}
+	 * @see R.drop
+	 * @example
+	 *
+	 *      R.take(1, ['foo', 'bar', 'baz']); //=> ['foo']
+	 *      R.take(2, ['foo', 'bar', 'baz']); //=> ['foo', 'bar']
+	 *      R.take(3, ['foo', 'bar', 'baz']); //=> ['foo', 'bar', 'baz']
+	 *      R.take(4, ['foo', 'bar', 'baz']); //=> ['foo', 'bar', 'baz']
+	 *      R.take(3, 'ramda');               //=> 'ram'
+	 *
+	 *      var personnel = [
+	 *        'Dave Brubeck',
+	 *        'Paul Desmond',
+	 *        'Eugene Wright',
+	 *        'Joe Morello',
+	 *        'Gerry Mulligan',
+	 *        'Bob Bates',
+	 *        'Joe Dodge',
+	 *        'Ron Crotty'
+	 *      ];
+	 *
+	 *      var takeFive = R.take(5);
+	 *      takeFive(personnel);
+	 *      //=> ['Dave Brubeck', 'Paul Desmond', 'Eugene Wright', 'Joe Morello', 'Gerry Mulligan']
+	 */
+	module.exports = _curry2(_dispatchable('take', _xtake, function take(n, xs) {
+	  return slice(0, n < 0 ? Infinity : n, xs);
+	}));
+
+
+/***/ },
+/* 167 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var _curry2 = __webpack_require__(6);
+	var _reduced = __webpack_require__(68);
+	var _xfBase = __webpack_require__(22);
+	
+	
+	module.exports = (function() {
+	  function XTake(n, xf) {
+	    this.xf = xf;
+	    this.n = n;
+	  }
+	  XTake.prototype['@@transducer/init'] = _xfBase.init;
+	  XTake.prototype['@@transducer/result'] = _xfBase.result;
+	  XTake.prototype['@@transducer/step'] = function(result, input) {
+	    if (this.n === 0) {
+	      return _reduced(result);
+	    } else {
+	      this.n -= 1;
+	      return this.xf['@@transducer/step'](result, input);
+	    }
+	  };
+	
+	  return _curry2(function _xtake(n, xf) { return new XTake(n, xf); });
+	})();
+
+
+/***/ },
+/* 168 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var _curry2 = __webpack_require__(6);
+	
+	
+	/**
+	 * Acts as multiple `prop`: array of keys in, array of values out. Preserves order.
+	 *
+	 * @func
+	 * @memberOf R
+	 * @category Object
+	 * @sig [k] -> {k: v} -> [v]
+	 * @param {Array} ps The property names to fetch
+	 * @param {Object} obj The object to query
+	 * @return {Array} The corresponding values or partially applied function.
+	 * @example
+	 *
+	 *      R.props(['x', 'y'], {x: 1, y: 2}); //=> [1, 2]
+	 *      R.props(['c', 'a', 'b'], {b: 2, a: 1}); //=> [undefined, 1, 2]
+	 *
+	 *      var fullName = R.compose(R.join(' '), R.props(['first', 'last']));
+	 *      fullName({last: 'Bullet-Tooth', age: 33, first: 'Tony'}); //=> 'Tony Bullet-Tooth'
+	 */
+	module.exports = _curry2(function props(ps, obj) {
+	  var len = ps.length;
+	  var out = [];
+	  var idx = 0;
+	
+	  while (idx < len) {
+	    out[idx] = obj[ps[idx]];
+	    idx += 1;
+	  }
+	
+	  return out;
+	});
 
 
 /***/ }
