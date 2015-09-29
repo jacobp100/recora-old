@@ -1,4 +1,4 @@
-import entity, { dimensions, baseDimensions, toSi } from '../../types/entity';
+import entity, { dimensions, baseDimensions, toSi, convert, convertComposite } from '../../types/entity';
 import * as locale from '../../locale';
 import assert from 'assert';
 
@@ -87,6 +87,51 @@ describe('entity type', function() {
       const siValue = toSi(normalContext, value);
 
       assert.deepEqual(siValue.units, { meter: 1 });
+    });
+  });
+
+  describe('convert', function() {
+    it('should convert between units', function() {
+      const value = { ...entity, value: 1, units: { meter: 1 } };
+      const units = { yard: 1 };
+      const result = convert(normalContext, units, value);
+
+      assert.equal(result.value.toFixed(2), 1.09);
+      assert.deepEqual(result.units, units);
+    });
+
+    it('should convert between units of different powers', function() {
+      const value = { ...entity, value: 1, units: { meter: 2 } };
+      const units = { centimeter: 2 };
+      const result = convert(normalContext, units, value);
+
+      assert.equal(result.value, 10000);
+      assert.deepEqual(result.units, units);
+    });
+
+    it('should convert between non-linear units', function() {
+      const value = { ...entity, value: 1, units: { Celsius: 100 } };
+      const units = { Fahrenheit: 1 };
+      const result = convert(normalContext, units, value);
+
+      assert.equal(result.value.toFixed(0), 212);
+      assert.deepEqual(result.units, units);
+    });
+  });
+
+  describe.only('convert composite', function() {
+    it('should convert to multiple units', function() {
+      const value = { ...entity, value: 1, units: { meter: 1 } };
+      const units = [{ foot: 1 }, { inch: 1 }];
+      const result = convertComposite(normalContext, units, value);
+      const [feet, inch] = result.value;
+
+      assert.equal(result.type, 'COMPOSITE_ENTITY');
+      assert.equal(result.value.length, 2);
+      assert.equal(feet.value, 3);
+      assert.deepEqual(feet.units, { foot: 1 });
+      assert.equal(inch.value, 3);
+      assert.deepEqual(inch.units, { inch: 1 });
     });
   });
 });

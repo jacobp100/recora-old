@@ -8,7 +8,7 @@ import preprocessTags from './parse/preprocessTags';
 import postprocessTags from './parse/postprocessTags';
 import resolveTags from './parse/resolveTags';
 import resolve from './resolve';
-import { convert } from './types/entity';
+import { convert, convertComposite } from './types/entity';
 
 const cartesian = commute(of);
 
@@ -50,9 +50,17 @@ const resolveTagOptions = pipe(
 );
 
 const convertResult = (context) => {
-  if (context.conversion) {
-    // FIXME: convert composite
-    const result = convert(context, context.conversion, context.result);
+  const { conversion } = context;
+
+  if (conversion) {
+    let result;
+
+    if (Array.isArray(conversion)) {
+      result = convertComposite(context, context.conversion, context.result);
+    } else {
+      result = convert(context, context.conversion, context.result);
+    }
+
     return { ...context, result };
   }
   return context;

@@ -173,9 +173,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	var resolveTagOptions = pipe(_parsePostprocessTags2['default'], _parseResolveTags2['default'], _resolve2['default']);
 	
 	var convertResult = function convertResult(context) {
-	  if (context.conversion) {
-	    // FIXME: convert composite
-	    var result = _typesEntity.convert(context, context.conversion, context.result);
+	  var conversion = context.conversion;
+	
+	  if (conversion) {
+	    var result = undefined;
+	
+	    if (Array.isArray(conversion)) {
+	      result = _typesEntity.convertComposite(context, context.conversion, context.result);
+	    } else {
+	      result = _typesEntity.convert(context, context.conversion, context.result);
+	    }
+	
 	    return _extends({}, context, { result: result });
 	  }
 	  return context;
@@ -5844,6 +5852,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return context;
 	  }
 	
+	  // Can this all just be done with resolveTagsWithoutOperations?
 	  var conversionTags = _utilsTagUtils.trimNoop(conversionTagsWithNoop);
 	
 	  var conversionEntities = pipe(map(pipe(props(['value', 'power']), of, fromPairs)), map(assoc('units', __, _typesEntity2['default'])))(conversionTags);
@@ -6692,6 +6701,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _locale = __webpack_require__(75);
 	
+	var _util = __webpack_require__(96);
+	
 	var base = {
 	  type: 'ENTITY',
 	  value: null,
@@ -6798,6 +6809,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	exports.convert = convert;
+	var floorEntityAccum = function floorEntityAccum(context, entity, units) {
+	  var exactEntity = convert(context, units, entity);
+	  var compositeEntity = _extends({}, exactEntity, { value: Math.floor(exactEntity.value) });
+	  var remainder = _extends({}, exactEntity, { value: exactEntity.value - compositeEntity.value });
+	
+	  return [remainder, compositeEntity];
+	};
+	
+	var convertComposite = function convertComposite(context, unitArray, entity) {
+	  var value = _util.mapWithAccum(partial(floorEntityAccum, context), entity, unitArray);
+	  return {
+	    type: 'COMPOSITE_ENTITY',
+	    entity: entity,
+	    value: value
+	  };
+	};
+	
+	exports.convertComposite = convertComposite;
 	
 	function toSi(context, entity) {
 	  var resolvedEntity = resolveDimensionlessUnits(context, entity);

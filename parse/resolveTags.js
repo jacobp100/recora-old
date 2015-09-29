@@ -198,6 +198,7 @@ const addConversionToContext = (context, conversionTagsWithNoop, tags) => {
     return context;
   }
 
+  // Can this all just be done with resolveTagsWithoutOperations?
   const conversionTags = trimNoop(conversionTagsWithNoop);
 
   const conversionEntities = pipe(

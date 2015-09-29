@@ -1,5 +1,6 @@
 import unitsDerived from '../data/unitsDerived';
 import { getUnitValue, getSiUnit } from '../locale';
+import { mapWithAccum } from '../util';
 
 const base = {
   type: 'ENTITY',
@@ -125,6 +126,27 @@ export const convert = (context, units, entity) => {
     partial(convertValue, context, 1, units),
   )(entity.value);
   return { ...entity, value, units };
+};
+
+const floorEntityAccum = (context, entity, units) => {
+  const exactEntity = convert(context, units, entity);
+  const compositeEntity = { ...exactEntity, value: Math.floor(exactEntity.value) };
+  const remainder = { ...exactEntity, value: exactEntity.value - compositeEntity.value };
+
+  return [remainder, compositeEntity];
+};
+
+export const convertComposite = (context, unitArray, entity) => {
+  const value = mapWithAccum(
+    partial(floorEntityAccum, context),
+    entity,
+    unitArray
+  );
+  return {
+    type: 'COMPOSITE_ENTITY',
+    entity,
+    value,
+  };
 };
 
 export function toSi(context, entity) {
