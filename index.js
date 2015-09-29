@@ -13,7 +13,11 @@ export default class Recora {
       text,
       constants,
       hints: null,
+      tags: null,
+      ast: null,
+      result: null,
+      resultToString: '',
     };
-    return parse(context);
+    return parse(context) || context;
   }
 }

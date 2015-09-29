@@ -15,7 +15,7 @@ export const orderOperations = {
   [mathOperations.MULTIPLY]: 2,
   [mathOperations.DIVIDE]: 2,
   [mathOperations.NEGATE]: 3,
-  [mathOperations.EXPONENT]: 4,
+  [mathOperations.EXPONENT]: 3,
 };
 
 export const operationsOrder = pipe(
@@ -25,3 +25,10 @@ export const operationsOrder = pipe(
   sortBy(pipe(head, last)),
   map(map(head))
 )(orderOperations);
+
+export const orderDirection = {
+  [orderOperations[mathOperations.EQUATE]]: 'forwards',
+  [orderOperations[mathOperations.ADD]]: 'forwards',
+  [orderOperations[mathOperations.MULTIPLY]]: 'forwards',
+  [orderOperations[mathOperations.EXPONENT]]: 'backwards',
+};

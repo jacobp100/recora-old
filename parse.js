@@ -53,7 +53,11 @@ const parseTagsWithOptions = pipe(
   map(resolveTagOptions),
   reject(isNil),
   reject(propSatisfies(isNil, 'result')),
-  head
+  map(over(
+    lens(prop('result'), assoc('resultToString')),
+    ifElse(isNil, always(null), entityToString), // FIXME
+  )),
+  head,
 );
 
 const assertNoTextElementInTags = tap(
@@ -71,9 +75,5 @@ const parse = pipe(
   preprocessTags,
   assertNoTextElementInTags,
   parseTagsWithOptions,
-  over(
-    lens(prop('result'), assoc('resultToString')),
-    entityToString,
-  ),
 );
 export default parse;

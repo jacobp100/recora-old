@@ -65,12 +65,6 @@ const overlapUnitKeysLength = pipe(
   converge(intersection, rhsUnitKeys, lhsUnitKeys),
   length
 );
-// const lhsRhsKeysSetsContainNoSubOrSuperset = converge( // This code might be faster
-//   either(
-//     converge(equals, nthArg(0), nthArg(1)),
-//     converge(equals, nthArg(0), nthArg(2)),
-//   ),
-//   overlapUnitKeysLength, lhsUnitKeysLength, rhsUnitKeysLength);
 const lhsRhsKeysSetsContainNoSubOrSuperset = either(
   converge(equals, overlapUnitKeysLength, lhsUnitKeysLength),
   converge(equals, overlapUnitKeysLength, rhsUnitKeysLength),
@@ -105,10 +99,8 @@ const abstractMathMultiply = cond([
   [eitherValueNil, toNil],
   [lhsValueZero, toZeroEntity],
   [rhsIsZeroAndNotDivision, toZeroEntity],
-  [T, ifElse(needConversion,
-    converge(performMultiplyMath, sign, context, lhsToSi, rhsToSi),
-    performMultiplyMath,
-  )],
+  [needConversion, converge(performMultiplyMath, sign, context, lhsToSi, rhsToSi)],
+  [T, performMultiplyMath],
 ]);
 
 

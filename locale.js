@@ -38,7 +38,7 @@ function pluralize(word) {
 These functions are all in the locale 'en'. If we add more locales, we'll have to refactor this.
 */
 
-export const getNumberFormat = always('\\d+');
+export const getNumberFormat = always('\\d+(?:\\.\\d+)?');
 export const parseNumber = (context, value) => Number(value.replace(',', ''));
 export const getFormattingHints = merge({ hints: [] });
 export const preprocessTags = identity;
@@ -73,7 +73,7 @@ const isSpecialUnit = pipe(
   equals('_'),
 );
 function formatEntityNumber(entity) {
-  if (entity.value === 1 && !isEmpty(entity.symbols)) {
+  if (entity.value === 1 && !pipe(keys, isEmpty)(entity.symbols)) {
     return '';
   } /*else if (entity.formattingHints.base) {
     return entity.value.toString(entity.formattingHints.base);

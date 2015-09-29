@@ -1,9 +1,10 @@
-/* eslint no-use-before-define: [1, "no-func"] */
+/* eslint no-use-before-define: [1, "nofunc"] */
 import * as math from './math/math';
 import combineValues from './combineValues';
+import { orderDirection } from './constants';
 
 const containsNil = any(isNil);
-const finalNil = pipe(print('got nill'), always(reduced(null)));
+const finalNil = pipe(always(reduced(null)));
 
 const resolveBreakNil = fn => pipe(
   fn,
@@ -13,11 +14,9 @@ const resolveBreakNil = fn => pipe(
   )
 );
 
-
 const groupsResolver = (reducer) => (context, locals, group) => (
   pipe(
     prop('groups'),
-    reject(whereEq({ type: 'EMPTY' })),
     map(partial(resolveWithLocals, context, locals)),
     ifElse(containsNil,
       always(null),
@@ -27,23 +26,38 @@ const groupsResolver = (reducer) => (context, locals, group) => (
 );
 
 
-// FIXME: Exponentiation should happen backwards
-const resolveOperationsGroupReduceFn = resolveBreakNil((context, a, [operation, b]) => math[operation](context, a, b));
-const resolveOperationsGroupReducer = (context, group, groups) =>
-  reduce(
-    partial(resolveOperationsGroupReduceFn, context),
-    head(groups),
-    zip(group.operations, tail(groups))
+const resolveOperationsGroupBackwardsFn = resolveBreakNil((context, b, [operation, a]) => math[operation](context, a, b));
+const resolveOperationsGroupForwardsFn = resolveBreakNil((context, a, [operation, b]) => math[operation](context, a, b));
+const groupIsBackwards = pipe(
+  prop('level'),
+  propEq(__, 'backwards', orderDirection),
+);
+const resolveOperationsGroup = (context, locals, group) => {
+  const { groups: unresolvedGroups, operations } = group;
+  const groups = map(partial(resolveWithLocals, context, locals), unresolvedGroups); // FIXME: This is shitty
+  const isBackwards = groupIsBackwards(group);
+
+  if (containsNil(groups)) {
+    return null;
+  }
+
+  const fixedOperations = isBackwards ? reverse(operations) : operations;
+  const fixedGroups = isBackwards ? reverse(groups) : groups;
+  const resolveFn = isBackwards ? resolveOperationsGroupBackwardsFn : resolveOperationsGroupForwardsFn;
+
+  return reduce(
+    partial(resolveFn, context),
+    head(fixedGroups),
+    zip(fixedOperations, tail(fixedGroups)),
   );
-const resolveOperationsGroup = groupsResolver(resolveOperationsGroupReducer);
+};
 
 const resolveMiscGroupReduceFn = resolveBreakNil(combineValues);
-const resolveMiscGroupReducer = (context, group, groups) =>
-  reduce(
-    partial(resolveMiscGroupReduceFn, context),
-    head(groups),
-    tail(groups)
-  );
+const resolveMiscGroupReducer = (context, locals, group) => reduce(
+  partial(resolveMiscGroupReduceFn, context),
+  head(group),
+  tail(group)
+);
 const resolveMiscGroup = groupsResolver(resolveMiscGroupReducer);
 
 const resolveBracketGroupHasOneGroup = pipe(nthArg(2), prop('groups'), length, equals(1));
@@ -79,7 +93,7 @@ export function resolveWithLocals(context, locals, value) {
   case 'ENTITY':
     return resolveEntity(context, locals, value);
   default:
-    return null;
+    return value;
   }
 }
 

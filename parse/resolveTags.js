@@ -118,7 +118,6 @@ const resolveOperations = curry((startLevel, tags) => {
       level,
     }),
     evolve({ groups: map(resolveOperations(level + 1)) }),
-    // ifElse(propSatisfies(none(isNil), 'groups'), identity, null),
   )(tags);
 });
 
