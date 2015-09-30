@@ -72,18 +72,19 @@ const isSpecialUnit = pipe(
   head,
   equals('_'),
 );
-function formatEntityNumber(entity) {
-  if (entity.value === 1 && !pipe(keys, isEmpty)(entity.symbols)) {
+const noSymbols = pipe(prop('symbols'), keys, isEmpty);
+function formatEntityNumber(entity, formattingHints) {
+  if (entity.value === 1 && !noSymbols(entity)) {
     return '';
-  } /*else if (entity.formattingHints.base) {
+  } else if (formattingHints.base) {
     return entity.value.toString(entity.formattingHints.base);
-  }*/
+  } else if (formattingHints.currency) {
+    return entity.value.toFixed(2);
+  }
 
   const absValue = Math.abs(entity.value);
 
-  /*if (dimensions(entity).currency === 1) {
-    return entity.value.toFixed(2);
-  } else */if (absValue > 1E2 || absValue === 0) {
+  if (absValue > 1E2 || absValue === 0) {
     return entity.value.toFixed(0);
   } else if (absValue > 1E-6) {
     // Note bigger than zero, so no log 0
@@ -97,15 +98,26 @@ function formatEntityNumber(entity) {
   }
   return entity.value.toExponential(3);
 }
-function powerString(value) {
-  if (Number(value) !== 1) {
-    return reduce((out, superscript, value) => (
-      out.replace(new RegExp(value, 'g'), superscript)
-    ), String(value), powerString.superscripts).replace('.', ' ').replace('-', '⁻');
-  }
-  return '';
-}
-powerString.superscripts = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'];
+
+const replaceString
+const powerString = ifElse(pipe(Number, equals(1)),
+  always(''),
+  pipe(
+    // Fuck it
+    replace('0', '⁰'),
+    replace('1', '¹'),
+    replace('2', '²'),
+    replace('3', '³'),
+    replace('4', '⁴'),
+    replace('5', '⁵'),
+    replace('6', '⁶'),
+    replace('7', '⁷'),
+    replace('8', '⁸'),
+    replace('9', '⁹'),
+    replace('.', ' '),
+    replace('-', '⁻'),
+  )
+);
 function formatEntityUnits(entity, str) {
   return reduce((out, [unit, value]) => {
     if (isSpecialUnit(unit)) {
@@ -129,9 +141,9 @@ function formatEntityUnits(entity, str) {
     }
   }, str, toPairs(entity.units));
 }
-export function entityToString(entity) {
+export function entityToString(context, entity, formattingHints) {
   return pipe(
     formatEntityNumber,
     partial(formatEntityUnits, entity),
-  )(entity);
+  )(entity, formattingHints);
 }

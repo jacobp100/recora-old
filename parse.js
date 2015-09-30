@@ -1,4 +1,4 @@
-import { getFormattingHints, entityToString } from './locale';
+import { getFormattingHints } from './locale';
 import assert from 'assert';
 
 import parseText from './parse/parseText';
@@ -6,6 +6,7 @@ import preprocessTags from './parse/preprocessTags';
 import postprocessTags from './parse/postprocessTags';
 import resolveTags from './parse/resolveTags';
 import resolve from './resolve';
+import { toString } from './types/types';
 import { convert, convertComposite } from './types/entity';
 
 const cartesian = commute(of);
@@ -47,22 +48,21 @@ const resolveTagOptions = pipe(
   resolve,
 );
 
-const convertResult = (context) => {
-  const { conversion } = context;
+const hasCompositeConversion = propSatisfies(Array.isArray, 'conversion');
+const hasConversion = has('conversion');
+const convertResult = over(
+  lensProp(identity, assoc('result')),
+  cond([
+    [hasCompositeConversion, (context) => convertComposite(context, context.conversion, context.result)],
+    [hasConversion, (context) => convert(context, context.conversion, context.result)],
+    [T, prop('result')],
+  ])
+);
 
-  if (conversion) {
-    let result;
-
-    if (Array.isArray(conversion)) {
-      result = convertComposite(context, context.conversion, context.result);
-    } else {
-      result = convert(context, context.conversion, context.result);
-    }
-
-    return { ...context, result };
-  }
-  return context;
-};
+const resultToString = over(
+  lens(prop('result'), assoc('resultToString')),
+  toString,
+);
 
 const parseTagsWithOptions = pipe(
   getTagOptions,
@@ -70,10 +70,7 @@ const parseTagsWithOptions = pipe(
   reject(isNil),
   reject(propSatisfies(isNil, 'result')),
   map(convertResult),
-  map(over(
-    lens(prop('result'), assoc('resultToString')),
-    entityToString, // FIXME
-  )),
+  map(resultToString),
   head,
 );
 

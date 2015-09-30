@@ -182,15 +182,13 @@ export function toSi(context, entity) {
 
 const isCurrency = pipe(
   dimensions,
-  equls({ currency: 1 }),
+  equals({ currency: 1 }),
 );
 
 export function toString(context, entity) {
-  const entityIsCurrency = isCurrency(context, entity);
+  const formattingHints = {
+    currency: isCurrency(context, entity),
+  };
 
-  if (entityIsCurrency) {
-    return formatCurrencyEntity(context, entity);
-  }
-
-  return formatEntity(context, entity);
+  return formatEntity(context, entity, formattingHints);
 }
