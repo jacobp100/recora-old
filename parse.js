@@ -1,5 +1,3 @@
-// import { map, reduce, pipe, concat, append, whereEq, update, sortBy, pickBy, toPairs, pluck, sum, curry, reject, isNil, head, prop, none, test, tap } from 'ramda';
-
 import { getFormattingHints, entityToString } from './locale';
 import assert from 'assert';
 

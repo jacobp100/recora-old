@@ -1,4 +1,4 @@
-import entity from '../types/entity';
+import { entity } from '../types/descriptors';
 import * as entityMath from './entity';
 
 

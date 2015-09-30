@@ -1,4 +1,4 @@
-import entity from '../../types/entity';
+import { entity } from '../../types/descriptors';
 import { add, subtract, multiply, divide, exponent } from '../../math/entity';
 import * as locale from '../../locale';
 import assert from 'assert';

@@ -1,6 +1,6 @@
 import { entity as entityDescriptor } from './descriptors';
 import unitsDerived from '../data/unitsDerived';
-import { getUnitValue, getSiUnit } from '../locale';
+import { getUnitValue, getSiUnit, formatCurrencyEntity, formatEntity } from '../locale';
 import { mapWithAccum } from '../util';
 
 
@@ -8,26 +8,34 @@ const notNil = complement(isNil);
 const sumLastElementsInPairs = pipe(map(last), sum);
 
 
+// (context, name: string) -> string?
 const getUnitType = pipe(
   getUnitValue,
-  ifElse(isNil, always(null), prop('type')),
+  ifElse(isNil,
+    always(null),
+    prop('type')
+  ),
 );
 
-const isNonLinearUnit = (context, name) => {
-  const unit = getUnitValue(context, name);
-  return unit && Boolean(unit.forwardFn);
-};
+// (context, name: string) -> bool
+const isNonLinearUnit = pipe(
+  getUnitValue,
+  ifElse(notNil,
+    has('forwardFn'),
+    always(false),
+  ),
+);
 
-const getNonLinearUnitPairs = (context, units) => {
+function getNonLinearUnitPairs(context, units) {
   return pipe(
     toPairs,
     filter(
       pipe(head, partial(isNonLinearUnit, context)),
     ),
   )(units);
-};
+}
 
-export const isResolvable = (context, entity) => {
+export function isResolvable(context, entity) {
   const { units } = entity;
   const nonLinearUnits = getNonLinearUnitPairs(context, units);
   const nonLinearUnitsSize = length(nonLinearUnits);
@@ -43,7 +51,7 @@ export const isResolvable = (context, entity) => {
   }
 
   return true;
-};
+}
 
 export const resolveDimensionlessUnits = (context, entity) => pipe(
   prop('units'),
@@ -77,6 +85,7 @@ const derivedUnitsForType = ifElse(has(__, unitsDerived),
   (type) => ([[type, 1]])
 );
 
+// context, entity
 export const baseDimensions = pipe(
   dimensions,
   toPairs,
@@ -127,7 +136,7 @@ function convertValue(context, direction, units, value) {
   );
 }
 
-export const convert = (context, units, entity) => {
+export function convert(context, units, entity) {
   const entityBaseDimensions = baseDimensions(context, entity);
   const unitBaseDimensions = baseDimensions(context, { ...entityDescriptor, units });
 
@@ -143,17 +152,17 @@ export const convert = (context, units, entity) => {
     partial(convertValue, context, 1, units),
   )(entity.value);
   return { ...entity, value, units };
-};
+}
 
-const floorEntityAccum = (context, entity, units) => {
+function floorEntityAccum(context, entity, units) {
   const exactEntity = convert(context, units, entity);
   const compositeEntity = { ...exactEntity, value: Math.floor(exactEntity.value) };
   const remainder = { ...exactEntity, value: exactEntity.value - compositeEntity.value };
 
   return [remainder, compositeEntity];
-};
+}
 
-export const convertComposite = (context, unitArray, entity) => {
+export function convertComposite(context, unitArray, entity) {
   const value = mapWithAccum(
     partial(floorEntityAccum, context),
     entity,
@@ -164,9 +173,24 @@ export const convertComposite = (context, unitArray, entity) => {
     entity,
     value,
   };
-};
+}
 
 export function toSi(context, entity) {
   const resolvedEntity = resolveDimensionlessUnits(context, entity);
   return convert(context, getSiUnits(context, resolvedEntity), resolvedEntity);
+}
+
+const isCurrency = pipe(
+  dimensions,
+  equls({ currency: 1 }),
+);
+
+export function toString(context, entity) {
+  const entityIsCurrency = isCurrency(context, entity);
+
+  if (entityIsCurrency) {
+    return formatCurrencyEntity(context, entity);
+  }
+
+  return formatEntity(context, entity);
 }

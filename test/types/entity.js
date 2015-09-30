@@ -1,4 +1,5 @@
-import entity, { isResolvable, dimensions, baseDimensions, toSi, convert, convertComposite } from '../../types/entity';
+import { entity } from '../../tyes/descriptors';
+import { isResolvable, dimensions, baseDimensions, toSi, convert, convertComposite } from '../../types/entity';
 import * as locale from '../../locale';
 import assert from 'assert';
 

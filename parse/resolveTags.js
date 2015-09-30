@@ -1,7 +1,8 @@
 import { orderOperations, operationsOrder } from '../constants';
 import { lengthIsOne } from '../util';
 import { trimNoop } from '../utils/tagUtils';
-import entityBase, { baseDimensions } from '../types/entity';
+import { entity as entityDescriptor } from '../types/descriptors';
+import { baseDimensions } from '../types/entity';
 import assert from 'assert';
 
 const miscGroupBase = {
@@ -23,7 +24,7 @@ const tagResolvers = {
       return adjust(assoc('value', value), -1, values);
     }
 
-    return append({ ...entityBase, value }, values);
+    return append({ ...entityDescriptor, value }, values);
   },
   TAG_UNIT(values, { value, power }) {
     // This code is almost identical for symbols (s/unit/symbol/g)
@@ -41,9 +42,9 @@ const tagResolvers = {
       }), -1, values);
     }
 
-    return append(assocPath(['units', value], power, entityBase), values);
+    return append(assocPath(['units', value], power, entityDescriptor), values);
   },
-  NOOP: append(entityBase),
+  NOOP: append(entityDescriptor),
   BRACKETS_GROUP: flip(append),
   default: identity,
 };
@@ -66,7 +67,7 @@ const valueTypeHasNilValueButHasSymbols = where({
 const resolveTagsWithoutOperations = pipe(
   reduce((values, tag) => (
     (tagResolvers[tag.type] || tagResolvers.default)(values, tag)
-  ), [entityBase]),
+  ), [entityDescriptor]),
   map(ifElse(valueTypeHasNilValueButHasSymbols, assoc('value', 1), identity)),
   reject(valueTypeIsEmpty),
   cond([
@@ -207,7 +208,7 @@ const addConversionToContext = (context, conversionTagsWithNoop, tags) => {
       of,
       fromPairs,
     )),
-    map(assoc('units', __, entityBase)),
+    map(assoc('units', __, entityDescriptor)),
   )(conversionTags);
   const allEqualDimensions = pipe(
     map(partial(baseDimensions, context)),

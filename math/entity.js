@@ -1,4 +1,5 @@
-import entity, { baseDimensions, toSi, resolveDimensionlessUnits } from '../types/entity';
+import { entity } from '../types/descriptors';
+import { baseDimensions, toSi, resolveDimensionlessUnits } from '../types/entity';
 
 
 const notEmpty = complement(isEmpty);
