@@ -1,9 +1,33 @@
-import entity, { dimensions, baseDimensions, toSi, convert, convertComposite } from '../../types/entity';
+import entity, { isResolvable, dimensions, baseDimensions, toSi, convert, convertComposite } from '../../types/entity';
 import * as locale from '../../locale';
 import assert from 'assert';
 
-describe('entity type', function() {
+describe.only('entity type', function() {
   const normalContext = {}; // Not implemented yet
+
+  describe('is resolvable', function() {
+    it('returns true if an entity contains only linear units', function() {
+      const value = { ...entity, value: 1, units: { meter: 1, second: -1 } };
+      assert.equal(isResolvable(normalContext, value), true);
+    });
+
+    it('returns true if an entity contains a non-linear unit', function() {
+      const value = { ...entity, value: 1, units: { Celsius: 1 } };
+      assert.equal(isResolvable(normalContext, value), true);
+    });
+
+    it('returns false if an entity contains a both linear and non-linear units', function() {
+      const value = { ...entity, value: 1, units: { meter: 1, Celsius: 1 } };
+      assert.equal(isResolvable(normalContext, value), false);
+    });
+
+    it('returns false if an entity contains a non-linear unit of a power that is not one', function() {
+      const value1 = { ...entity, value: 1, units: { Celsius: 2 } };
+      const value2 = { ...entity, value: 1, units: { Celsius: -1 } };
+      assert.equal(isResolvable(normalContext, value1), false);
+      assert.equal(isResolvable(normalContext, value2), false);
+    });
+  });
 
   describe('resolve dimensionless units', function() {
     it('removes dimensionless units and adjusts the value', function() {
@@ -110,7 +134,7 @@ describe('entity type', function() {
     });
 
     it('should convert between non-linear units', function() {
-      const value = { ...entity, value: 1, units: { Celsius: 100 } };
+      const value = { ...entity, value: 100, units: { Celsius: 1 } };
       const units = { Fahrenheit: 1 };
       const result = convert(normalContext, units, value);
 
@@ -119,7 +143,7 @@ describe('entity type', function() {
     });
   });
 
-  describe.only('convert composite', function() {
+  describe('convert composite', function() {
     it('should convert to multiple units', function() {
       const value = { ...entity, value: 1, units: { meter: 1 } };
       const units = [{ foot: 1 }, { inch: 1 }];

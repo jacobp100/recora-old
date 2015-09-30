@@ -1,14 +1,8 @@
+import { entity as entityDescriptor } from './descriptors';
 import unitsDerived from '../data/unitsDerived';
 import { getUnitValue, getSiUnit } from '../locale';
 import { mapWithAccum } from '../util';
 
-const base = {
-  type: 'ENTITY',
-  value: null,
-  units: {},
-  symbols: {},
-};
-export default base;
 
 const notNil = complement(isNil);
 const sumLastElementsInPairs = pipe(map(last), sum);
@@ -18,6 +12,38 @@ const getUnitType = pipe(
   getUnitValue,
   ifElse(isNil, always(null), prop('type')),
 );
+
+const isNonLinearUnit = (context, name) => {
+  const unit = getUnitValue(context, name);
+  return unit && Boolean(unit.forwardFn);
+};
+
+const getNonLinearUnitPairs = (context, units) => {
+  return pipe(
+    toPairs,
+    filter(
+      pipe(head, partial(isNonLinearUnit, context)),
+    ),
+  )(units);
+};
+
+export const isResolvable = (context, entity) => {
+  const { units } = entity;
+  const nonLinearUnits = getNonLinearUnitPairs(context, units);
+  const nonLinearUnitsSize = length(nonLinearUnits);
+
+  if (nonLinearUnitsSize > 0) {
+    const unitsSize = pipe(keys, length)(units);
+    const linearUnitsSize = unitsSize - nonLinearUnitsSize;
+    const nonLinearUnitPower = pipe(head, last)(nonLinearUnits);
+
+    if (nonLinearUnitsSize > 1 || linearUnitsSize > 0 || nonLinearUnitPower !== 1) {
+      return false;
+    }
+  }
+
+  return true;
+};
 
 export const resolveDimensionlessUnits = (context, entity) => pipe(
   prop('units'),
@@ -79,30 +105,18 @@ function convertValueReducerFn(context, direction, value, [name, power]) {
   }
   return value;
 }
+
 function convertValue(context, direction, units, value) {
-  const nonLinearUnits = pipe(
-    values,
-    filter((name) => {
-      const unit = getUnitValue(context, name);
-      return unit && unit.forwardFn;
-    }),
-  )(units);
-  const nonLinearUnitsSize = length(nonLinearUnits);
+  const nonLinearUnits = getNonLinearUnitPairs(context, units);
+  const nonLinearUnit = pipe(map(head), head)(nonLinearUnits);
 
-  if (nonLinearUnitsSize !== 0) {
-    const toUnitsSize = pipe(keys, length)(units);
-    const nonLinearUnit = head(nonLinearUnits);
-
-    if (nonLinearUnitsSize > 1 || toUnitsSize > nonLinearUnitsSize || nonLinearUnit !== 1) {
-      return null;
-    }
-
+  if (nonLinearUnit) {
     const fn = {
       '1': 'forwardFn',
       '-1': 'backwardFn',
     }[direction];
 
-    const unit = context.getUnitValue(context, nonLinearUnit);
+    const unit = getUnitValue(context, nonLinearUnit);
     return unit[fn](value);
   }
 
@@ -115,9 +129,12 @@ function convertValue(context, direction, units, value) {
 
 export const convert = (context, units, entity) => {
   const entityBaseDimensions = baseDimensions(context, entity);
-  const unitBaseDimensions = baseDimensions(context, { ...base, units });
+  const unitBaseDimensions = baseDimensions(context, { ...entityDescriptor, units });
 
-  if (!equals(entityBaseDimensions, unitBaseDimensions)) {
+  const dimensionsMatch = equals(entityBaseDimensions, unitBaseDimensions);
+  const entityIsResolvable = isResolvable(context, entity);
+
+  if (!dimensionsMatch || !entityIsResolvable) {
     return null;
   }
 
