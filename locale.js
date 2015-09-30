@@ -99,7 +99,6 @@ function formatEntityNumber(entity, formattingHints) {
   return entity.value.toExponential(3);
 }
 
-const replaceString
 const powerString = ifElse(pipe(Number, equals(1)),
   always(''),
   pipe(
@@ -116,7 +115,7 @@ const powerString = ifElse(pipe(Number, equals(1)),
     replace('9', '⁹'),
     replace('.', ' '),
     replace('-', '⁻'),
-  )
+  ),
 );
 function formatEntityUnits(entity, str) {
   return reduce((out, [unit, value]) => {
