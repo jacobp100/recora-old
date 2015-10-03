@@ -51,17 +51,17 @@ const resolveTagOptions = pipe(
 const hasCompositeConversion = propSatisfies(Array.isArray, 'conversion');
 const hasConversion = has('conversion');
 const convertResult = over(
-  lensProp(identity, assoc('result')),
+  lens(identity, assoc('result')),
   cond([
-    [hasCompositeConversion, (context) => convertComposite(context, context.conversion, context.result)],
-    [hasConversion, (context) => convert(context, context.conversion, context.result)],
+    [hasCompositeConversion, converge(convertComposite, identity, prop('conversion'), prop('result'))],
+    [hasConversion, converge(convert, identity, prop('conversion'), prop('result'))],
     [T, prop('result')],
   ])
 );
 
 const resultToString = over(
-  lens(prop('result'), assoc('resultToString')),
-  toString,
+  lens(identity, assoc('resultToString')),
+  converge(toString, identity, prop('result')),
 );
 
 const parseTagsWithOptions = pipe(
@@ -70,6 +70,7 @@ const parseTagsWithOptions = pipe(
   reject(isNil),
   reject(propSatisfies(isNil, 'result')),
   map(convertResult),
+  reject(propSatisfies(isNil, 'result')),
   map(resultToString),
   head,
 );

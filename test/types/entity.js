@@ -1,9 +1,9 @@
-import { entity } from '../../tyes/descriptors';
+import { entity } from '../../types/descriptors';
 import { isResolvable, dimensions, baseDimensions, toSi, convert, convertComposite } from '../../types/entity';
 import * as locale from '../../locale';
 import assert from 'assert';
 
-describe.only('entity type', function() {
+describe('entity type', function() {
   const normalContext = {}; // Not implemented yet
 
   describe('is resolvable', function() {

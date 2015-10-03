@@ -52,7 +52,7 @@ const processTagElement = {
     //   }
     // }
 
-    const unit = locale.getUnit(context, value);
+    const unit = locale.getUnitName(context, value);
 
     if (unit !== null) {
       options.push({

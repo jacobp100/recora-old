@@ -2743,7 +2743,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.__esModule = true;
 	exports.getSiUnit = getSiUnit;
 	exports.getUnitValue = getUnitValue;
-	exports.getUnit = getUnit;
+	exports.getUnitName = getUnitName;
 	exports.entityToString = entityToString;
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -2775,8 +2775,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  'fahrenheit': 'fahrenheit',
 	  'gas': 'gas'
 	};
-	// 'person': 'people',
-	// 'child': 'children',
 	var singularMap = invert(pluralMap);
 	
 	function singularize(word) {
@@ -2819,8 +2817,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return _dataEnvironmentUnits2['default'][name];
 	}
 	
-	function getUnit(context, unit) {
-	  // FIXME: Call it getUnitName
+	function getUnitName(context, unit) {
 	  if (unit === 's') {
 	    return 'second';
 	  }
@@ -2870,7 +2867,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var powerString = ifElse(pipe(Number, equals(1)), always(''), pipe(
 	// Fuck it
-	replace('0', '⁰'), replace('1', '¹'), replace('2', '²'), replace('3', '³'), replace('4', '⁴'), replace('5', '⁵'), replace('6', '⁶'), replace('7', '⁷'), replace('8', '⁸'), replace('9', '⁹'), replace('.', ' '), replace('-', '⁻')));
+	String, replace('0', '⁰'), replace('1', '¹'), replace('2', '²'), replace('3', '³'), replace('4', '⁴'), replace('5', '⁵'), replace('6', '⁶'), replace('7', '⁷'), replace('8', '⁸'), replace('9', '⁹'), replace('.', ' '), replace('-', '⁻')));
 	function formatEntityUnits(entity, str) {
 	  return reduce(function (out, _ref) {
 	    var unit = _ref[0];
@@ -5246,7 +5243,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    //   }
 	    // }
 	
-	    var unit = locale.getUnit(context, value);
+	    var unit = locale.getUnitName(context, value);
 	
 	    if (unit !== null) {
 	      options.push(_extends({}, tag, {

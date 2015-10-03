@@ -13,8 +13,6 @@ const pluralMap = {
   'celsius': 'celsius',
   'fahrenheit': 'fahrenheit',
   'gas': 'gas',
-  // 'person': 'people',
-  // 'child': 'children',
 };
 const singularMap = invert(pluralMap);
 
@@ -49,8 +47,7 @@ export function getUnitValue(context, name) {
   // FIXME: Check context
   return units[name];
 }
-export function getUnit(context, unit) {
-  // FIXME: Call it getUnitName
+export function getUnitName(context, unit) {
   if (unit === 's') {
     return 'second';
   }
@@ -103,6 +100,7 @@ const powerString = ifElse(pipe(Number, equals(1)),
   always(''),
   pipe(
     // Fuck it
+    String,
     replace('0', '⁰'),
     replace('1', '¹'),
     replace('2', '²'),
@@ -140,7 +138,7 @@ function formatEntityUnits(entity, str) {
     }
   }, str, toPairs(entity.units));
 }
-export function entityToString(context, entity, formattingHints) {
+export function formatEntity(context, entity, formattingHints) {
   return pipe(
     formatEntityNumber,
     partial(formatEntityUnits, entity),
