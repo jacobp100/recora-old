@@ -1,6 +1,5 @@
 import { orderOperations, operationsOrder } from '../constants';
 import { lengthIsOne } from '../util';
-import { trimNoop } from '../utils/tagUtils';
 import { entity as entityDescriptor } from '../types/descriptors';
 import { baseDimensions } from '../types/entity';
 import assert from 'assert';
@@ -175,7 +174,7 @@ const createASTFromTags = pipe(
 );
 
 const conversionStatements = [
-  { type: 'NOOP' },
+  { type: 'NOOP' }, // FIXME: should be TAG_NOOP
   { type: 'TAG_UNIT' },
   { type: 'TAG_UNIT_POWER_PREFIX' },
   { type: 'TAG_UNIT_POWER_SUFFIX' },
@@ -186,71 +185,58 @@ const isConversionStatement = tag => any(whereEq(__, tag), conversionStatements)
 const isNoop = whereEq({ type: 'NOOP' }); // FIXME: it's in tagutils
 const notNoop = complement(isNoop);
 const isComma = whereEq({ type: 'TAG_COMMA' });
-const dropLastNonNoop = dropLastWhile(notNoop);
-const getNooplessTags = pipe(
-  reject(isNoop),
-  reject(isComma),
-);
 
 const addConversionToContext = (context, conversionTagsWithNoop, tags) => {
-  const nooplessTags = getNooplessTags(tags);
+  const units = pipe(
+    reject(isNoop),
+    reject(isComma),
+    map(converge(createMapEntry, prop('value'), prop('power'))),
+  )(conversionTagsWithNoop);
 
-  if (length(nooplessTags) === 0) {
+  const unitsLength = length(units);
+
+  if (unitsLength === 0) {
     return context;
+  } else if (unitsLength === 1) {
+    const conversion = head(units);
+    return { ...context, tags, conversion };
   }
 
-  // Can this all just be done with resolveTagsWithoutOperations?
-  const conversionTags = trimNoop(conversionTagsWithNoop);
-
-  const conversionEntities = pipe(
-    map(pipe(
-      props(['value', 'power']),
-      of,
-      fromPairs,
-    )),
-    map(assoc('units', __, entityDescriptor)),
-  )(conversionTags);
   const allEqualDimensions = pipe(
+    map(assoc('units', __, entityDescriptor)), // Get entities
     map(partial(baseDimensions, context)),
     uniq,
     length,
     equals(1),
-  )(conversionEntities);
+  )(units);
 
-  if (!allEqualDimensions) {
-    const conversion = pluck('units', conversionEntities);
-    return { ...context, tags, conversion };
+  if (allEqualDimensions) {
+    return { ...context, tags, conversion: units };
   }
 
-  const conversionEntity = resolveTagsWithoutOperations(conversionTags);
-
-  if (conversionEntity.type === 'ENTITY') {
-    const conversion = conversionEntity.units;
-    return { ...context, tags, conversion };
-  }
-
-  return context;
+  const conversion = mergeAll(units);
+  return { ...context, tags, conversion };
 };
 
-const findLeftConversion = (context) => {
+export function findLeftConversion(context) {
   if (context.conversion) {
     return context;
   }
 
   const conversionTags = pipe(
     takeWhile(isConversionStatement),
-    dropLastNonNoop,
+    dropLastWhile(notNoop),
   )(context.tags);
   const remainingTags = drop(length(conversionTags), context.tags);
 
-  if (isEmpty(remainingTags) || last(remainingTags).type !== 'NOOP') {
+  if (isEmpty(conversionTags) || last(conversionTags).type !== 'NOOP') {
     return context;
   }
 
   return addConversionToContext(context, conversionTags, remainingTags);
-};
+}
 
-const findRightConversion = (context) => {
+export function findRightConversion(context) {
   if (context.conversion) {
     return context;
   }
@@ -270,7 +256,7 @@ const findRightConversion = (context) => {
 
   const remainingTags = dropLast(length(conversionTags), context.tags);
   return addConversionToContext(context, conversionTags, remainingTags);
-};
+}
 
 const resolveTags = pipe(
   findLeftConversion,

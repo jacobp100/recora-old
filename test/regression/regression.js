@@ -1,7 +1,7 @@
 import spec from './spec';
 import Recora from '../../index';
 
-describe.only('regression', function() {
+describe('regression', function() {
   const recora = new Recora();
 
   spec.forEach(({ description = 'resolve', input, output }) => {

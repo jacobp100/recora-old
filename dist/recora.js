@@ -5878,6 +5878,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
+	exports.findLeftConversion = findLeftConversion;
+	exports.findRightConversion = findRightConversion;
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
 	var _constants = __webpack_require__(139);
@@ -6074,7 +6077,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return context;
 	};
 	
-	var findLeftConversion = function findLeftConversion(context) {
+	function findLeftConversion(context) {
 	  if (context.conversion) {
 	    return context;
 	  }
@@ -6087,9 +6090,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  return addConversionToContext(context, conversionTags, remainingTags);
-	};
+	}
 	
-	var findRightConversion = function findRightConversion(context) {
+	function findRightConversion(context) {
 	  if (context.conversion) {
 	    return context;
 	  }
@@ -6109,11 +6112,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var remainingTags = dropLast(length(conversionTags), context.tags);
 	  return addConversionToContext(context, conversionTags, remainingTags);
-	};
+	}
 	
 	var resolveTags = pipe(findLeftConversion, findRightConversion, over(lens(prop('tags'), assoc('ast')), createASTFromTags));
 	exports['default'] = resolveTags;
-	module.exports = exports['default'];
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(81), __webpack_require__(52), __webpack_require__(59), __webpack_require__(23), __webpack_require__(114), __webpack_require__(57), __webpack_require__(101), __webpack_require__(27), __webpack_require__(115), __webpack_require__(38), __webpack_require__(116), __webpack_require__(117), __webpack_require__(24), __webpack_require__(45), __webpack_require__(84), __webpack_require__(48), __webpack_require__(41), __webpack_require__(68), __webpack_require__(107), __webpack_require__(31), __webpack_require__(16), __webpack_require__(85), __webpack_require__(63), __webpack_require__(60), __webpack_require__(53), __webpack_require__(69), __webpack_require__(62), __webpack_require__(118), __webpack_require__(40), __webpack_require__(54), __webpack_require__(76), __webpack_require__(119), __webpack_require__(121), __webpack_require__(123), __webpack_require__(125), __webpack_require__(126), __webpack_require__(34), __webpack_require__(105), __webpack_require__(112), __webpack_require__(128), __webpack_require__(26), __webpack_require__(129), __webpack_require__(87), __webpack_require__(130), __webpack_require__(35), __webpack_require__(133), __webpack_require__(135), __webpack_require__(110), __webpack_require__(136), __webpack_require__(58), __webpack_require__(36)))
 
 /***/ },
