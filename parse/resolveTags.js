@@ -43,6 +43,24 @@ const tagResolvers = {
 
     return append(assocPath(['units', value], power, entityDescriptor), values);
   },
+  TAG_SYMBOL(values, { value, power }) {
+    // This code is almost identical for symbols (s/unit/symbol/g)
+    const lastItem = last(values);
+
+    if (lastItem.type === 'ENTITY') {
+      return adjust(evolve({
+        symbols: over(
+          lensProp(value),
+          pipe(
+            defaultTo(0),
+            add(power),
+          ),
+        ),
+      }), -1, values);
+    }
+
+    return append(assocPath(['symbols', value], power, entityDescriptor), values);
+  },
   NOOP: append(entityDescriptor),
   BRACKETS_GROUP: flip(append),
   default: identity,

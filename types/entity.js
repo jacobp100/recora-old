@@ -156,7 +156,8 @@ export function convert(context, units, entity) {
 
 function floorEntityAccum(context, entity, units) {
   const exactEntity = convert(context, units, entity);
-  const compositeEntity = { ...exactEntity, value: Math.floor(exactEntity.value) };
+  // Add small amount to account for rounding errors
+  const compositeEntity = { ...exactEntity, value: Math.floor(exactEntity.value + 1E-6) };
   const remainder = { ...exactEntity, value: exactEntity.value - compositeEntity.value };
 
   return [remainder, compositeEntity];

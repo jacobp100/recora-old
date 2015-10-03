@@ -14,7 +14,7 @@ const cartesian = commute(of);
 const getDistance = pipe(
   pluck('index'),
   map(x => x ** 2),
-  sum
+  sum,
 );
 
 const getParseOptions = pipe(
@@ -27,8 +27,9 @@ const getParseOptions = pipe(
   sortBy(getDistance),
 );
 
-const updateTagsWithParseoptions = (tags, { index, value }) =>
-  update(Number(index), value, tags);
+const updateTagsWithParseoptions = (tags, { index, value }) => (
+  update(Number(index), value, tags)
+);
 
 const transformParseOptions = curry((tags, parseOptions) => (
   reduce(updateTagsWithParseoptions, tags, parseOptions)
@@ -49,14 +50,19 @@ const resolveTagOptions = pipe(
 );
 
 const hasCompositeConversion = propSatisfies(Array.isArray, 'conversion');
-const hasConversion = has('conversion');
+const hasConversion = propSatisfies(complement(isNil), 'conversion');
 const convertResult = over(
   lens(identity, assoc('result')),
   cond([
     [hasCompositeConversion, converge(convertComposite, identity, prop('conversion'), prop('result'))],
     [hasConversion, converge(convert, identity, prop('conversion'), prop('result'))],
     [T, prop('result')],
-  ])
+  ]),
+);
+
+const entityWithSymbols = both(
+  propEq('type', 'ENTITY'),
+  propSatisfies(pipe(keys, isEmpty, not), 'symbols'),
 );
 
 const resultToString = over(
@@ -68,6 +74,7 @@ const parseTagsWithOptions = pipe(
   getTagOptions,
   map(resolveTagOptions),
   reject(propSatisfies(isNil, 'result')),
+  reject(propSatisfies(entityWithSymbols, 'result')),
   map(convertResult),
   reject(propSatisfies(isNil, 'result')),
   map(resultToString),
