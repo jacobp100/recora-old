@@ -1,4 +1,4 @@
-import units from './data/environment/units';
+import units from './units';
 import si from './data/environment/si';
 import abbreviations from './data/en/abbreviations';
 import unitFormatting from './data/en/unitFormatting';

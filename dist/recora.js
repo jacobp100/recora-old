@@ -66,6 +66,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _parse3 = _interopRequireDefault(_parse2);
 	
+	// TODO: Functions for differentation, sum (sigma), and multiplication (pi)
+	
 	var Recora = (function () {
 	  function Recora(locale) {
 	    _classCallCheck(this, Recora);
@@ -2894,9 +2896,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _dataEnvironmentUnits = __webpack_require__(94);
+	var _units = __webpack_require__(181);
 	
-	var _dataEnvironmentUnits2 = _interopRequireDefault(_dataEnvironmentUnits);
+	var _units2 = _interopRequireDefault(_units);
 	
 	var _dataEnvironmentSi = __webpack_require__(95);
 	
@@ -2960,7 +2962,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function getUnitValue(context, name) {
 	  // FIXME: Check context
-	  return _dataEnvironmentUnits2['default'][name];
+	  return _units2['default'][name];
 	}
 	
 	function getUnitName(context, unit) {
@@ -2973,7 +2975,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  if (abbreviation) {
 	    return abbreviation;
-	  } else if (_dataEnvironmentUnits2['default'][singularUnit]) {
+	  } else if (_units2['default'][singularUnit]) {
 	    return singularUnit;
 	  }
 	  return null;
@@ -3358,651 +3360,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 94 */
-/***/ function(module, exports) {
-
-	module.exports = {
-		"_rgb": {
-			"type": "_colour",
-			"base": 1
-		},
-		"_hsl": {
-			"type": "_colour",
-			"base": 1
-		},
-		"_date": {
-			"type": "_date",
-			"base": 1
-		},
-		"second": {
-			"type": "time",
-			"base": 1
-		},
-		"minute": {
-			"type": "time",
-			"base": 60
-		},
-		"hour": {
-			"type": "time",
-			"base": 3600
-		},
-		"day": {
-			"type": "time",
-			"base": 86400
-		},
-		"weekday": {
-			"type": "time",
-			"base": 120960
-		},
-		"week": {
-			"type": "time",
-			"base": 604800
-		},
-		"fortnight": {
-			"type": "time",
-			"base": 1209600
-		},
-		"month": {
-			"type": "time",
-			"base": 2628000
-		},
-		"year": {
-			"type": "time",
-			"base": 31536000
-		},
-		"decade": {
-			"type": "time",
-			"base": 315360000
-		},
-		"century": {
-			"type": "time",
-			"base": 3155673600
-		},
-		"meter": {
-			"type": "length",
-			"base": 1
-		},
-		"inch": {
-			"type": "length",
-			"base": 0.0254
-		},
-		"foot": {
-			"type": "length",
-			"base": 0.3048
-		},
-		"yard": {
-			"type": "length",
-			"base": 0.9144
-		},
-		"mile": {
-			"type": "length",
-			"base": 1609
-		},
-		"league": {
-			"type": "length",
-			"base": 4827
-		},
-		"fathom": {
-			"type": "length",
-			"base": 1.8288
-		},
-		"furlong": {
-			"type": "length",
-			"base": 201
-		},
-		"light year": {
-			"type": "length",
-			"base": 9460528400000000
-		},
-		"angstrom": {
-			"type": "length",
-			"base": 1e-10
-		},
-		"nautical mile": {
-			"type": "length",
-			"base": 1852
-		},
-		"gram": {
-			"type": "weight",
-			"base": 1
-		},
-		"tonne": {
-			"type": "weight",
-			"base": 1000000
-		},
-		"ounce": {
-			"type": "weight",
-			"base": 28.35
-		},
-		"pound": {
-			"type": "weight",
-			"base": 453.6
-		},
-		"stone": {
-			"type": "weight",
-			"base": 6350
-		},
-		"acre": {
-			"type": "area",
-			"base": 4047
-		},
-		"hectare": {
-			"type": "area",
-			"base": 10000
-		},
-		"liter": {
-			"type": "volume",
-			"base": 0.001
-		},
-		"gallon": {
-			"type": "volume",
-			"base": 0.00454609
-		},
-		"us gallon": {
-			"type": "volume",
-			"base": 0.003785
-		},
-		"quart": {
-			"type": "volume",
-			"base": 0.0009464
-		},
-		"cup": {
-			"type": "volume",
-			"base": 0.00024
-		},
-		"US cup": {
-			"type": "volume",
-			"base": 0.00023559
-		},
-		"teaspoon": {
-			"type": "volume",
-			"base": 0.000004929
-		},
-		"tablespoon": {
-			"type": "volume",
-			"base": 0.00001479
-		},
-		"drop": {
-			"type": "volume",
-			"base": 5e-8
-		},
-		"fluid ounce": {
-			"type": "volume",
-			"base": 0.000028413
-		},
-		"Joule": {
-			"type": "energy",
-			"base": 1
-		},
-		"Calorie": {
-			"type": "energy",
-			"base": 4.184
-		},
-		"electron volt": {
-			"type": "energy",
-			"base": 1.602e-19
-		},
-		"BTU": {
-			"type": "energy",
-			"base": 1055
-		},
-		"therm": {
-			"type": "energy",
-			"base": 1055000000
-		},
-		"Watt": {
-			"type": "power",
-			"base": 1
-		},
-		"bit": {
-			"type": "memory",
-			"base": 1
-		},
-		"byte": {
-			"type": "memory",
-			"base": 8
-		},
-		"percent": {
-			"base": 0.01
-		},
-		"degree": {
-			"base": 0.017453292519943295
-		},
-		"radian": {
-			"base": 1
-		},
-		"arcminute": {
-			"base": 0.0002908882086657216
-		},
-		"arcsecond": {
-			"base": 0.00000484813681109536
-		},
-		"Kelvin": {
-			"type": "temperature",
-			"base": 1
-		},
-		"Celsius": {
-			"type": "temperature",
-			"forwardFn": "celsiusForwardFn",
-			"backwardFn": "celsiusBackwardFn"
-		},
-		"Fahrenheit": {
-			"type": "temperature",
-			"forwardFn": "fahrenheitForwardFn",
-			"backwardFn": "fahrenheitBackwardFn"
-		},
-		"gas mark": {
-			"type": "temperature",
-			"forwardFn": "gasmarkForwardFn",
-			"backwardFn": "gasmarkBackwardFn"
-		},
-		"AUD": {
-			"type": "currency",
-			"base": 1
-		},
-		"BGN": {
-			"type": "currency",
-			"base": 1
-		},
-		"BRL": {
-			"type": "currency",
-			"base": 1
-		},
-		"CAD": {
-			"type": "currency",
-			"base": 1
-		},
-		"CHF": {
-			"type": "currency",
-			"base": 1
-		},
-		"CNY": {
-			"type": "currency",
-			"base": 1
-		},
-		"CZK": {
-			"type": "currency",
-			"base": 1
-		},
-		"DKK": {
-			"type": "currency",
-			"base": 1
-		},
-		"EUR": {
-			"type": "currency",
-			"base": 1
-		},
-		"GBP": {
-			"type": "currency",
-			"base": 1
-		},
-		"HKD": {
-			"type": "currency",
-			"base": 1
-		},
-		"HRK": {
-			"type": "currency",
-			"base": 1
-		},
-		"HUF": {
-			"type": "currency",
-			"base": 1
-		},
-		"IDR": {
-			"type": "currency",
-			"base": 1
-		},
-		"ILS": {
-			"type": "currency",
-			"base": 1
-		},
-		"INR": {
-			"type": "currency",
-			"base": 1
-		},
-		"JPY": {
-			"type": "currency",
-			"base": 1
-		},
-		"KRW": {
-			"type": "currency",
-			"base": 1
-		},
-		"MXN": {
-			"type": "currency",
-			"base": 1
-		},
-		"MYR": {
-			"type": "currency",
-			"base": 1
-		},
-		"NOK": {
-			"type": "currency",
-			"base": 1
-		},
-		"NZD": {
-			"type": "currency",
-			"base": 1
-		},
-		"PHP": {
-			"type": "currency",
-			"base": 1
-		},
-		"PLN": {
-			"type": "currency",
-			"base": 1
-		},
-		"RON": {
-			"type": "currency",
-			"base": 1
-		},
-		"RUB": {
-			"type": "currency",
-			"base": 1
-		},
-		"SEK": {
-			"type": "currency",
-			"base": 1
-		},
-		"SGD": {
-			"type": "currency",
-			"base": 1
-		},
-		"THB": {
-			"type": "currency",
-			"base": 1
-		},
-		"TRY": {
-			"type": "currency",
-			"base": 1
-		},
-		"USD": {
-			"type": "currency",
-			"base": 1
-		},
-		"ZAR": {
-			"type": "currency",
-			"base": 1
-		},
-		"femtosecond": {
-			"type": "time",
-			"base": 1e-15
-		},
-		"picosecond": {
-			"type": "time",
-			"base": 1e-12
-		},
-		"nanosecond": {
-			"type": "time",
-			"base": 1e-9
-		},
-		"microsecond": {
-			"type": "time",
-			"base": 0.000001
-		},
-		"millisecond": {
-			"type": "time",
-			"base": 0.001
-		},
-		"femtometer": {
-			"type": "length",
-			"base": 1e-15
-		},
-		"picometer": {
-			"type": "length",
-			"base": 1e-12
-		},
-		"nanometer": {
-			"type": "length",
-			"base": 1e-9
-		},
-		"micrometer": {
-			"type": "length",
-			"base": 0.000001
-		},
-		"millimeter": {
-			"type": "length",
-			"base": 0.001
-		},
-		"centimeter": {
-			"type": "length",
-			"base": 0.01
-		},
-		"kilometer": {
-			"type": "length",
-			"base": 1000
-		},
-		"megameter": {
-			"type": "length",
-			"base": 1000000
-		},
-		"gigameter": {
-			"type": "length",
-			"base": 1000000000
-		},
-		"terameter": {
-			"type": "length",
-			"base": 1000000000000
-		},
-		"petameter": {
-			"type": "length",
-			"base": 1000000000000000
-		},
-		"femtogram": {
-			"type": "weight",
-			"base": 1e-15
-		},
-		"picogram": {
-			"type": "weight",
-			"base": 1e-12
-		},
-		"nanogram": {
-			"type": "weight",
-			"base": 1e-9
-		},
-		"microgram": {
-			"type": "weight",
-			"base": 0.000001
-		},
-		"milligram": {
-			"type": "weight",
-			"base": 0.001
-		},
-		"kilogram": {
-			"type": "weight",
-			"base": 1000
-		},
-		"megagram": {
-			"type": "weight",
-			"base": 1000000
-		},
-		"gigagram": {
-			"type": "weight",
-			"base": 1000000000
-		},
-		"teragram": {
-			"type": "weight",
-			"base": 1000000000000
-		},
-		"petagram": {
-			"type": "weight",
-			"base": 1000000000000000
-		},
-		"milliliter": {
-			"type": "volume",
-			"base": 0.000001
-		},
-		"centiliter": {
-			"type": "volume",
-			"base": 0.00001
-		},
-		"femtojoule": {
-			"type": "energy",
-			"base": 1e-15
-		},
-		"picojoule": {
-			"type": "energy",
-			"base": 1e-12
-		},
-		"nanojoule": {
-			"type": "energy",
-			"base": 1e-9
-		},
-		"microjoule": {
-			"type": "energy",
-			"base": 0.000001
-		},
-		"millijoule": {
-			"type": "energy",
-			"base": 0.001
-		},
-		"centijoule": {
-			"type": "energy",
-			"base": 0.01
-		},
-		"kilojoule": {
-			"type": "energy",
-			"base": 1000
-		},
-		"megajoule": {
-			"type": "energy",
-			"base": 1000000
-		},
-		"gigajoule": {
-			"type": "energy",
-			"base": 1000000000
-		},
-		"terajoule": {
-			"type": "energy",
-			"base": 1000000000000
-		},
-		"petajoule": {
-			"type": "energy",
-			"base": 1000000000000000
-		},
-		"femtowatt": {
-			"type": "power",
-			"base": 1e-15
-		},
-		"picowatt": {
-			"type": "power",
-			"base": 1e-12
-		},
-		"nanowatt": {
-			"type": "power",
-			"base": 1e-9
-		},
-		"microwatt": {
-			"type": "power",
-			"base": 0.000001
-		},
-		"milliwatt": {
-			"type": "power",
-			"base": 1
-		},
-		"kilowatt": {
-			"type": "power",
-			"base": 1000
-		},
-		"megawatt": {
-			"type": "power",
-			"base": 1000000
-		},
-		"gigawatt": {
-			"type": "power",
-			"base": 1000000000
-		},
-		"terawatt": {
-			"type": "power",
-			"base": 1000000000000
-		},
-		"petawatt": {
-			"type": "power",
-			"base": 1000000000000000
-		},
-		"kilobit": {
-			"type": "memory",
-			"base": 1000
-		},
-		"megabit": {
-			"type": "memory",
-			"base": 1000000
-		},
-		"gigabit": {
-			"type": "memory",
-			"base": 1000000000
-		},
-		"terabit": {
-			"type": "memory",
-			"base": 1000000000000
-		},
-		"petabit": {
-			"type": "memory",
-			"base": 1000000000000000
-		},
-		"kibibit": {
-			"type": "memory",
-			"base": 1024
-		},
-		"mebibit": {
-			"type": "memory",
-			"base": 1048576
-		},
-		"gibibit": {
-			"type": "memory",
-			"base": 1073741824
-		},
-		"tebibit": {
-			"type": "memory",
-			"base": 1099511627776
-		},
-		"pebibit": {
-			"type": "memory",
-			"base": 1125899906842624
-		},
-		"kilobyte": {
-			"type": "memory",
-			"base": 8000
-		},
-		"megabyte": {
-			"type": "memory",
-			"base": 8000000
-		},
-		"gigabyte": {
-			"type": "memory",
-			"base": 8000000000
-		},
-		"terabyte": {
-			"type": "memory",
-			"base": 8000000000000
-		},
-		"petabyte": {
-			"type": "memory",
-			"base": 8000000000000000
-		},
-		"kibibyte": {
-			"type": "memory",
-			"base": 8192
-		},
-		"mebibyte": {
-			"type": "memory",
-			"base": 8388608
-		},
-		"gibibyte": {
-			"type": "memory",
-			"base": 8589934592
-		},
-		"tebibyte": {
-			"type": "memory",
-			"base": 8796093022208
-		},
-		"pebibyte": {
-			"type": "memory",
-			"base": 9007199254740992
-		}
-	}
-
-/***/ },
+/* 94 */,
 /* 95 */
 /***/ function(module, exports) {
 
@@ -8672,6 +8030,704 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return !a;
 	});
 
+
+/***/ },
+/* 181 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(findIndex, last, prop, __, ifElse, has, evolve, identity, mapObj) {'use strict';
+	
+	exports.__esModule = true;
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _dataUnits = __webpack_require__(182);
+	
+	var _dataUnits2 = _interopRequireDefault(_dataUnits);
+	
+	var gasMarkToK = [380.4, 394.3, 408.2, 422.0, 435.9, 453.2, 463.7, 477.6, 491.5, 505.4, 519.3];
+	var kToGasMark = [0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+	
+	var unitFunctions = {
+	  celsiusForwardFn: function celsiusForwardFn(a) {
+	    return a - 273.15;
+	  },
+	  celsiusBackwardFn: function celsiusBackwardFn(a) {
+	    return a + 273.15;
+	  },
+	  fahrenheitForwardFn: function fahrenheitForwardFn(a) {
+	    return (a - 273.15) * 1.8 + 32;
+	  },
+	  fahrenheitBackwardFn: function fahrenheitBackwardFn(a) {
+	    return (a - 32) / 1.8 + 273.15;
+	  },
+	  gasmarkForwardFn: function gasmarkForwardFn(a) {
+	    return kToGasMark[findIndex(gasMarkToK, function (k) {
+	      return k >= a;
+	    })] || last(kToGasMark);
+	  },
+	  gasmarkBackwardFn: function gasmarkBackwardFn(a) {
+	    return gasMarkToK[findIndex(kToGasMark, function (gasMark) {
+	      return gasMark >= a;
+	    })] || last(gasMarkToK);
+	  }
+	};
+	
+	var getUnitFn = prop(__, unitFunctions);
+	var resolveUnitFns = ifElse(has('forwardFn'), evolve({
+	  forwardFn: getUnitFn,
+	  backwardFn: getUnitFn
+	}), identity);
+	
+	var mappedUnits = mapObj(resolveUnitFns, _dataUnits2['default']);
+	exports['default'] = mappedUnits;
+	module.exports = exports['default'];
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(127), __webpack_require__(86), __webpack_require__(36), __webpack_require__(120), __webpack_require__(90), __webpack_require__(151), __webpack_require__(116), __webpack_require__(24), __webpack_require__(47)))
+
+/***/ },
+/* 182 */
+/***/ function(module, exports) {
+
+	module.exports = {
+		"_rgb": {
+			"type": "_colour",
+			"base": 1
+		},
+		"_hsl": {
+			"type": "_colour",
+			"base": 1
+		},
+		"_date": {
+			"type": "_date",
+			"base": 1
+		},
+		"second": {
+			"type": "time",
+			"base": 1
+		},
+		"minute": {
+			"type": "time",
+			"base": 60
+		},
+		"hour": {
+			"type": "time",
+			"base": 3600
+		},
+		"day": {
+			"type": "time",
+			"base": 86400
+		},
+		"weekday": {
+			"type": "time",
+			"base": 120960
+		},
+		"week": {
+			"type": "time",
+			"base": 604800
+		},
+		"fortnight": {
+			"type": "time",
+			"base": 1209600
+		},
+		"month": {
+			"type": "time",
+			"base": 2628000
+		},
+		"year": {
+			"type": "time",
+			"base": 31536000
+		},
+		"decade": {
+			"type": "time",
+			"base": 315360000
+		},
+		"century": {
+			"type": "time",
+			"base": 3155673600
+		},
+		"meter": {
+			"type": "length",
+			"base": 1
+		},
+		"inch": {
+			"type": "length",
+			"base": 0.0254
+		},
+		"foot": {
+			"type": "length",
+			"base": 0.3048
+		},
+		"yard": {
+			"type": "length",
+			"base": 0.9144
+		},
+		"mile": {
+			"type": "length",
+			"base": 1609
+		},
+		"league": {
+			"type": "length",
+			"base": 4827
+		},
+		"fathom": {
+			"type": "length",
+			"base": 1.8288
+		},
+		"furlong": {
+			"type": "length",
+			"base": 201
+		},
+		"light year": {
+			"type": "length",
+			"base": 9460528400000000
+		},
+		"angstrom": {
+			"type": "length",
+			"base": 1e-10
+		},
+		"nautical mile": {
+			"type": "length",
+			"base": 1852
+		},
+		"gram": {
+			"type": "weight",
+			"base": 1
+		},
+		"tonne": {
+			"type": "weight",
+			"base": 1000000
+		},
+		"ounce": {
+			"type": "weight",
+			"base": 28.35
+		},
+		"pound": {
+			"type": "weight",
+			"base": 453.6
+		},
+		"stone": {
+			"type": "weight",
+			"base": 6350
+		},
+		"acre": {
+			"type": "area",
+			"base": 4047
+		},
+		"hectare": {
+			"type": "area",
+			"base": 10000
+		},
+		"liter": {
+			"type": "volume",
+			"base": 0.001
+		},
+		"gallon": {
+			"type": "volume",
+			"base": 0.00454609
+		},
+		"us gallon": {
+			"type": "volume",
+			"base": 0.003785
+		},
+		"quart": {
+			"type": "volume",
+			"base": 0.0009464
+		},
+		"cup": {
+			"type": "volume",
+			"base": 0.00024
+		},
+		"US cup": {
+			"type": "volume",
+			"base": 0.00023559
+		},
+		"teaspoon": {
+			"type": "volume",
+			"base": 0.000004929
+		},
+		"tablespoon": {
+			"type": "volume",
+			"base": 0.00001479
+		},
+		"drop": {
+			"type": "volume",
+			"base": 5e-8
+		},
+		"fluid ounce": {
+			"type": "volume",
+			"base": 0.000028413
+		},
+		"Joule": {
+			"type": "energy",
+			"base": 1
+		},
+		"Calorie": {
+			"type": "energy",
+			"base": 4.184
+		},
+		"electron volt": {
+			"type": "energy",
+			"base": 1.602e-19
+		},
+		"BTU": {
+			"type": "energy",
+			"base": 1055
+		},
+		"therm": {
+			"type": "energy",
+			"base": 1055000000
+		},
+		"Watt": {
+			"type": "power",
+			"base": 1
+		},
+		"bit": {
+			"type": "memory",
+			"base": 1
+		},
+		"byte": {
+			"type": "memory",
+			"base": 8
+		},
+		"percent": {
+			"base": 0.01
+		},
+		"degree": {
+			"base": 0.017453292519943295
+		},
+		"radian": {
+			"base": 1
+		},
+		"arcminute": {
+			"base": 0.0002908882086657216
+		},
+		"arcsecond": {
+			"base": 0.00000484813681109536
+		},
+		"Kelvin": {
+			"type": "temperature",
+			"base": 1
+		},
+		"Celsius": {
+			"type": "temperature",
+			"forwardFn": "celsiusForwardFn",
+			"backwardFn": "celsiusBackwardFn"
+		},
+		"Fahrenheit": {
+			"type": "temperature",
+			"forwardFn": "fahrenheitForwardFn",
+			"backwardFn": "fahrenheitBackwardFn"
+		},
+		"gas mark": {
+			"type": "temperature",
+			"forwardFn": "gasmarkForwardFn",
+			"backwardFn": "gasmarkBackwardFn"
+		},
+		"AUD": {
+			"type": "currency",
+			"base": 1
+		},
+		"BGN": {
+			"type": "currency",
+			"base": 1
+		},
+		"BRL": {
+			"type": "currency",
+			"base": 1
+		},
+		"CAD": {
+			"type": "currency",
+			"base": 1
+		},
+		"CHF": {
+			"type": "currency",
+			"base": 1
+		},
+		"CNY": {
+			"type": "currency",
+			"base": 1
+		},
+		"CZK": {
+			"type": "currency",
+			"base": 1
+		},
+		"DKK": {
+			"type": "currency",
+			"base": 1
+		},
+		"EUR": {
+			"type": "currency",
+			"base": 1
+		},
+		"GBP": {
+			"type": "currency",
+			"base": 1
+		},
+		"HKD": {
+			"type": "currency",
+			"base": 1
+		},
+		"HRK": {
+			"type": "currency",
+			"base": 1
+		},
+		"HUF": {
+			"type": "currency",
+			"base": 1
+		},
+		"IDR": {
+			"type": "currency",
+			"base": 1
+		},
+		"ILS": {
+			"type": "currency",
+			"base": 1
+		},
+		"INR": {
+			"type": "currency",
+			"base": 1
+		},
+		"JPY": {
+			"type": "currency",
+			"base": 1
+		},
+		"KRW": {
+			"type": "currency",
+			"base": 1
+		},
+		"MXN": {
+			"type": "currency",
+			"base": 1
+		},
+		"MYR": {
+			"type": "currency",
+			"base": 1
+		},
+		"NOK": {
+			"type": "currency",
+			"base": 1
+		},
+		"NZD": {
+			"type": "currency",
+			"base": 1
+		},
+		"PHP": {
+			"type": "currency",
+			"base": 1
+		},
+		"PLN": {
+			"type": "currency",
+			"base": 1
+		},
+		"RON": {
+			"type": "currency",
+			"base": 1
+		},
+		"RUB": {
+			"type": "currency",
+			"base": 1
+		},
+		"SEK": {
+			"type": "currency",
+			"base": 1
+		},
+		"SGD": {
+			"type": "currency",
+			"base": 1
+		},
+		"THB": {
+			"type": "currency",
+			"base": 1
+		},
+		"TRY": {
+			"type": "currency",
+			"base": 1
+		},
+		"USD": {
+			"type": "currency",
+			"base": 1
+		},
+		"ZAR": {
+			"type": "currency",
+			"base": 1
+		},
+		"femtosecond": {
+			"type": "time",
+			"base": 1e-15
+		},
+		"picosecond": {
+			"type": "time",
+			"base": 1e-12
+		},
+		"nanosecond": {
+			"type": "time",
+			"base": 1e-9
+		},
+		"microsecond": {
+			"type": "time",
+			"base": 0.000001
+		},
+		"millisecond": {
+			"type": "time",
+			"base": 0.001
+		},
+		"femtometer": {
+			"type": "length",
+			"base": 1e-15
+		},
+		"picometer": {
+			"type": "length",
+			"base": 1e-12
+		},
+		"nanometer": {
+			"type": "length",
+			"base": 1e-9
+		},
+		"micrometer": {
+			"type": "length",
+			"base": 0.000001
+		},
+		"millimeter": {
+			"type": "length",
+			"base": 0.001
+		},
+		"centimeter": {
+			"type": "length",
+			"base": 0.01
+		},
+		"kilometer": {
+			"type": "length",
+			"base": 1000
+		},
+		"megameter": {
+			"type": "length",
+			"base": 1000000
+		},
+		"gigameter": {
+			"type": "length",
+			"base": 1000000000
+		},
+		"terameter": {
+			"type": "length",
+			"base": 1000000000000
+		},
+		"petameter": {
+			"type": "length",
+			"base": 1000000000000000
+		},
+		"femtogram": {
+			"type": "weight",
+			"base": 1e-15
+		},
+		"picogram": {
+			"type": "weight",
+			"base": 1e-12
+		},
+		"nanogram": {
+			"type": "weight",
+			"base": 1e-9
+		},
+		"microgram": {
+			"type": "weight",
+			"base": 0.000001
+		},
+		"milligram": {
+			"type": "weight",
+			"base": 0.001
+		},
+		"kilogram": {
+			"type": "weight",
+			"base": 1000
+		},
+		"megagram": {
+			"type": "weight",
+			"base": 1000000
+		},
+		"gigagram": {
+			"type": "weight",
+			"base": 1000000000
+		},
+		"teragram": {
+			"type": "weight",
+			"base": 1000000000000
+		},
+		"petagram": {
+			"type": "weight",
+			"base": 1000000000000000
+		},
+		"milliliter": {
+			"type": "volume",
+			"base": 0.000001
+		},
+		"centiliter": {
+			"type": "volume",
+			"base": 0.00001
+		},
+		"femtojoule": {
+			"type": "energy",
+			"base": 1e-15
+		},
+		"picojoule": {
+			"type": "energy",
+			"base": 1e-12
+		},
+		"nanojoule": {
+			"type": "energy",
+			"base": 1e-9
+		},
+		"microjoule": {
+			"type": "energy",
+			"base": 0.000001
+		},
+		"millijoule": {
+			"type": "energy",
+			"base": 0.001
+		},
+		"centijoule": {
+			"type": "energy",
+			"base": 0.01
+		},
+		"kilojoule": {
+			"type": "energy",
+			"base": 1000
+		},
+		"megajoule": {
+			"type": "energy",
+			"base": 1000000
+		},
+		"gigajoule": {
+			"type": "energy",
+			"base": 1000000000
+		},
+		"terajoule": {
+			"type": "energy",
+			"base": 1000000000000
+		},
+		"petajoule": {
+			"type": "energy",
+			"base": 1000000000000000
+		},
+		"femtowatt": {
+			"type": "power",
+			"base": 1e-15
+		},
+		"picowatt": {
+			"type": "power",
+			"base": 1e-12
+		},
+		"nanowatt": {
+			"type": "power",
+			"base": 1e-9
+		},
+		"microwatt": {
+			"type": "power",
+			"base": 0.000001
+		},
+		"milliwatt": {
+			"type": "power",
+			"base": 1
+		},
+		"kilowatt": {
+			"type": "power",
+			"base": 1000
+		},
+		"megawatt": {
+			"type": "power",
+			"base": 1000000
+		},
+		"gigawatt": {
+			"type": "power",
+			"base": 1000000000
+		},
+		"terawatt": {
+			"type": "power",
+			"base": 1000000000000
+		},
+		"petawatt": {
+			"type": "power",
+			"base": 1000000000000000
+		},
+		"kilobit": {
+			"type": "memory",
+			"base": 1000
+		},
+		"megabit": {
+			"type": "memory",
+			"base": 1000000
+		},
+		"gigabit": {
+			"type": "memory",
+			"base": 1000000000
+		},
+		"terabit": {
+			"type": "memory",
+			"base": 1000000000000
+		},
+		"petabit": {
+			"type": "memory",
+			"base": 1000000000000000
+		},
+		"kibibit": {
+			"type": "memory",
+			"base": 1024
+		},
+		"mebibit": {
+			"type": "memory",
+			"base": 1048576
+		},
+		"gibibit": {
+			"type": "memory",
+			"base": 1073741824
+		},
+		"tebibit": {
+			"type": "memory",
+			"base": 1099511627776
+		},
+		"pebibit": {
+			"type": "memory",
+			"base": 1125899906842624
+		},
+		"kilobyte": {
+			"type": "memory",
+			"base": 8000
+		},
+		"megabyte": {
+			"type": "memory",
+			"base": 8000000
+		},
+		"gigabyte": {
+			"type": "memory",
+			"base": 8000000000
+		},
+		"terabyte": {
+			"type": "memory",
+			"base": 8000000000000
+		},
+		"petabyte": {
+			"type": "memory",
+			"base": 8000000000000000
+		},
+		"kibibyte": {
+			"type": "memory",
+			"base": 8192
+		},
+		"mebibyte": {
+			"type": "memory",
+			"base": 8388608
+		},
+		"gibibyte": {
+			"type": "memory",
+			"base": 8589934592
+		},
+		"tebibyte": {
+			"type": "memory",
+			"base": 8796093022208
+		},
+		"pebibyte": {
+			"type": "memory",
+			"base": 9007199254740992
+		}
+	}
 
 /***/ }
 /******/ ])

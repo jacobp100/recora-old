@@ -1,5 +1,7 @@
 import parse from './parse';
 
+// TODO: Functions for differentation, sum (sigma), and multiplication (pi)
+
 export default class Recora {
   constructor(locale) {
     this.locale = locale || 'en';
