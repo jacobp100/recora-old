@@ -67,7 +67,6 @@ const resultToString = over(
 const parseTagsWithOptions = pipe(
   getTagOptions,
   map(resolveTagOptions),
-  reject(isNil),
   reject(propSatisfies(isNil, 'result')),
   map(convertResult),
   reject(propSatisfies(isNil, 'result')),

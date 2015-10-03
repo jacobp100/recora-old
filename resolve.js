@@ -56,7 +56,7 @@ const resolveMiscGroupReduceFn = resolveBreakNil(combineValues);
 const resolveMiscGroupReducer = (context, locals, group) => reduce(
   partial(resolveMiscGroupReduceFn, context),
   head(group),
-  tail(group)
+  tail(group),
 );
 const resolveMiscGroup = groupsResolver(resolveMiscGroupReducer);
 

@@ -9,6 +9,7 @@ function shouldDivideDimensions(lhsDimensions, rhsDimensions) {
   return (overlap.length > 0) && equals(onlyOverlap(lhsDimensions), onlyOverlap(rhsDimensions));
 }
 
+const context = nthArg(0);
 const lhs = nthArg(1);
 const rhs = nthArg(2);
 
@@ -16,25 +17,25 @@ const units = prop('units');
 const unitsLength = pipe(units, length);
 const baseDimensionsEmpty = pipe(baseDimensions, keys, isEmpty);
 
-const eitherBaseDimensionsEmpty = either(
-	pipe(lhs, baseDimensionsEmpty),
-	pipe(rhs, baseDimensionsEmpty)
+const eitherBaseDimensionsEmpty = either( // FIXME: No context passed in
+	converge(baseDimensionsEmpty, context, lhs),
+	converge(baseDimensionsEmpty, context, rhs),
 );
 const unitsEqual = converge(equals,
 	pipe(lhs, units),
-	pipe(rhs, units)
+	pipe(rhs, units),
 );
 const baseDimensionsEqual = converge(equals,
-	pipe(lhs, baseDimensions),
-	pipe(rhs, baseDimensions)
+	converge(baseDimensions, context, lhs),
+	converge(baseDimensions, context, rhs),
 );
 const shouldDivide = converge(shouldDivideDimensions,
-	pipe(lhs, dimensions),
-	pipe(rhs, dimensions)
+	pipe(dimensions, context, lhs),
+	pipe(dimensions, context, rhs),
 );
 const lhsUnitsLengthLessThanRhsUnitsLength = converge(lt,
 	pipe(lhs, unitsLength),
-	pipe(rhs, unitsLength)
+	pipe(rhs, unitsLength),
 );
 
 const combineEntities = cond([
@@ -61,7 +62,7 @@ const combineValueMap = {
   },
 };
 
-export default function combineValues(context, a, b) {
+export default function combineValues(ctx, a, b) {
   const fn = path([a.type, b.type], combineValueMap);
-  return fn ? fn(context, a, b) : null;
+  return fn ? fn(ctx, a, b) : null;
 }
