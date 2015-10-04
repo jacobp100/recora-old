@@ -67,6 +67,10 @@ const resolveBracketGroup = ifElse(resolveBracketGroupHasOneGroup,
 );
 
 const resolveEntity = (context, locals, entity) => {
+  if (entity.value === null) {
+    return null;
+  }
+
   const symbolsMultilicationFactor = pipe(
     mapObj((key, value) => (value * propOr(key, 0, entity.symbols))),
     values,

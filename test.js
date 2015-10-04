@@ -3,4 +3,4 @@ const Recora = require('./dist/recora');
 
 const recora = new Recora();
 
-console.log(JSON.stringify(recora.parse('1 acre to meters squared')));
+console.log(JSON.stringify(recora.parse('How many yards are there in 100 meters?')));

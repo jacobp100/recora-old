@@ -17,7 +17,7 @@ const units = prop('units');
 const unitsLength = pipe(units, length);
 const baseDimensionsEmpty = pipe(baseDimensions, keys, isEmpty);
 
-const eitherBaseDimensionsEmpty = either( // FIXME: No context passed in
+const eitherBaseDimensionsEmpty = either(
 	converge(baseDimensionsEmpty, context, lhs),
 	converge(baseDimensionsEmpty, context, rhs),
 );
