@@ -2985,7 +2985,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (value === 'a') {
 	      return {
 	        type: 'PARSE_OPTIONS',
-	        value: [{ type: 'TAG_SYMBOL', value: 'a', power: 1, start: start, end: end }, { type: 'TAG_NUMBER', value: 1, start: start, end: end }, { type: 'NOOP', start: start, end: end }]
+	        value: [{ type: 'TAG_SYMBOL', value: 'a', power: 1, start: start, end: end }, { type: 'TAG_NUMBER', value: 1, start: start, end: end }, { type: 'TAG_NOOP', start: start, end: end }]
 	      };
 	    } else if (unitPowerPrefixes[value]) {
 	      return { type: 'TAG_UNIT_POWER_PREFIX', value: unitPowerPrefixes[value], start: start, end: end };
@@ -6348,7 +6348,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    if (canNoop) {
 	      options.push(_extends({}, tag, {
-	        type: 'NOOP'
+	        type: 'TAG_NOOP'
 	      }));
 	    }
 	
@@ -6362,7 +6362,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    return {
-	      type: 'NOOP',
+	      type: 'TAG_NOOP',
 	      start: start,
 	      end: end
 	    };
@@ -6556,7 +6556,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 	
-	var isNoop = whereEq({ type: 'NOOP' });
+	var isNoop = whereEq({ type: 'TAG_NOOP' });
 	
 	exports.isNoop = isNoop;
 	var untailTags = reduce(function (out, tag) {
@@ -6770,7 +6770,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return append(assocPath(['symbols', value], power, _typesDescriptors.entity), values);
 	  },
-	  NOOP: append(_typesDescriptors.entity),
+	  TAG_NOOP: append(_typesDescriptors.entity),
 	  BRACKETS_GROUP: flip(append),
 	  'default': identity
 	};
@@ -6874,12 +6874,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var createASTFromTags = pipe(resolveBrackets, ifElse(pipe(length, equals(1)), head, always(null)));
 	
-	var conversionStatements = [{ type: 'NOOP' }, // FIXME: should be TAG_NOOP
+	var conversionStatements = [{ type: 'TAG_NOOP' }, // FIXME: should be TAG_TAG_NOOP
 	{ type: 'TAG_UNIT' }, { type: 'TAG_UNIT_POWER_PREFIX' }, { type: 'TAG_UNIT_POWER_SUFFIX' }, { type: 'TAG_OPERATOR', value: 'NEGATE' }, { type: 'TAG_COMMA' }];
 	var isConversionStatement = function isConversionStatement(tag) {
 	  return any(whereEq(__, tag), conversionStatements);
 	};
-	var isNoop = whereEq({ type: 'NOOP' }); // FIXME: it's in tagutils
+	var isNoop = whereEq({ type: 'TAG_NOOP' }); // FIXME: it's in tagutils
 	var notNoop = complement(isNoop);
 	var isComma = whereEq({ type: 'TAG_COMMA' });
 	
@@ -6914,7 +6914,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var conversionTags = pipe(takeWhile(isConversionStatement), dropLastWhile(notNoop))(context.tags);
 	  var remainingTags = drop(length(conversionTags), context.tags);
 	
-	  if (isEmpty(conversionTags) || last(conversionTags).type !== 'NOOP') {
+	  if (isEmpty(conversionTags) || last(conversionTags).type !== 'TAG_NOOP') {
 	    return context;
 	  }
 	
@@ -7618,7 +7618,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(pipe, toPairs, groupBy, last, values, sortBy, head, map) {'use strict';
+	/* WEBPACK VAR INJECTION */(function(pipe, invert, toPairs, sortBy, head, map, last) {'use strict';
 	
 	exports.__esModule = true;
 	
@@ -7638,12 +7638,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var orderOperations = (_orderOperations = {}, _orderOperations[mathOperations.EQUATE] = 0, _orderOperations[mathOperations.ADD] = 1, _orderOperations[mathOperations.SUBTRACT] = 1, _orderOperations[mathOperations.MULTIPLY] = 2, _orderOperations[mathOperations.DIVIDE] = 2, _orderOperations[mathOperations.NEGATE] = 3, _orderOperations[mathOperations.EXPONENT] = 3, _orderOperations);
 	
 	exports.orderOperations = orderOperations;
-	var operationsOrder = pipe(toPairs, groupBy(last), values, sortBy(pipe(head, last)), map(map(head)))(orderOperations);
+	var operationsOrder = pipe(invert, toPairs, sortBy(head), map(last))(orderOperations);
 	
 	exports.operationsOrder = operationsOrder;
 	var orderDirection = (_orderDirection = {}, _orderDirection[orderOperations[mathOperations.EQUATE]] = 'forwards', _orderDirection[orderOperations[mathOperations.ADD]] = 'forwards', _orderDirection[orderOperations[mathOperations.MULTIPLY]] = 'forwards', _orderDirection[orderOperations[mathOperations.EXPONENT]] = 'backwards', _orderDirection);
 	exports.orderDirection = orderDirection;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(27), __webpack_require__(49), __webpack_require__(147), __webpack_require__(86), __webpack_require__(149), __webpack_require__(50), __webpack_require__(75), __webpack_require__(16)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(27), __webpack_require__(85), __webpack_require__(49), __webpack_require__(50), __webpack_require__(75), __webpack_require__(16), __webpack_require__(86)))
 
 /***/ },
 /* 147 */

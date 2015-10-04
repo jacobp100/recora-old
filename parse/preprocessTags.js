@@ -1,26 +1,29 @@
+import { TAG_NOOP, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_COMMA, TAG_UNIT, TAG_SYMBOL } from '../tagTypes';
+import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE } from '../operatorTypes';
+import { entity } from '../types/descriptors';
 import * as locale from '../locale';
 import { mapWithAccum } from '../util';
 
 const statementParts = [
   null, // full text
-  'TAG_OPEN_BRACKET',
-  'TAG_CLOSE_BRACKET',
+  TAG_OPEN_BRACKET,
+  TAG_CLOSE_BRACKET,
   'TEXT_SYMBOL_UNIT',
   null, // symbol-unit exponent
   'TEXT_NUMBER',
   'TEXT_COLOR',
   'TEXT_OPERATOR',
-  'TAG_COMMA',
+  TAG_COMMA,
 ];
 
 const operators = {
-  '+': 'ADD',
-  '-': 'SUBTRACT',
-  '*': 'MULTIPLY',
-  '/': 'DIVIDE',
-  '**': 'EXPONENT',
-  '^': 'EXPONENT',
-  '=': 'EQUATE',
+  '+': ADD,
+  '-': SUBTRACT,
+  '*': MULTIPLY,
+  '/': DIVIDE,
+  '**': EXPONENT,
+  '^': EXPONENT,
+  '=': EQUATE,
 };
 
 const processTagElement = {
@@ -57,7 +60,7 @@ const processTagElement = {
     if (unit !== null) {
       options.push({
         ...tag,
-        type: 'TAG_UNIT',
+        type: TAG_UNIT,
         value: unit,
         power,
       });
@@ -70,7 +73,7 @@ const processTagElement = {
       // But shouldn't the = operator return null if that was the case?
       options.push({
         ...tag,
-        type: 'TAG_SYMBOL',
+        type: TAG_SYMBOL,
         value,
         power,
       });
@@ -82,7 +85,7 @@ const processTagElement = {
     if (constant) {
       options.push({
         ...tag,
-        type: 'ENTITY',
+        type: entity.type,
         value: constant.exponent(power),
       });
     }
@@ -90,7 +93,7 @@ const processTagElement = {
     if (canNoop) {
       options.push({
         ...tag,
-        type: 'NOOP',
+        type: TAG_NOOP,
       });
     }
 
@@ -104,7 +107,7 @@ const processTagElement = {
     }
 
     return {
-      type: 'NOOP',
+      type: TAG_NOOP,
       start,
       end,
     };

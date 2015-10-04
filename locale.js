@@ -67,7 +67,7 @@ export function preprocessTags(context) {
         value: [
           { type: 'TAG_SYMBOL', value: 'a', power: 1, start, end },
           { type: 'TAG_NUMBER', value: 1, start, end },
-          { type: 'NOOP', start, end },
+          { type: 'TAG_NOOP', start, end },
         ],
       };
     } else if (unitPowerPrefixes[value]) {

@@ -1,20 +1,22 @@
+import { TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_OPERATOR, TAG_UNIT } from '../tagTypes';
+import { SUBTRACT, DIVIDE } from '../operatorTypes';
 import { untailTags, trimNoop } from '../utils/tagUtils';
 import { mapWithAccum, mapWithAccumRight, rejectNil } from '../util';
 
 const tagUnitPowerReciprocal = {
-  type: 'TAG_UNIT_POWER_PREFIX',
+  type: TAG_UNIT_POWER_PREFIX,
   value: -1,
 };
 
 const tagNegate = {
-  type: 'TAG_OPERATOR',
+  type: TAG_OPERATOR,
   value: 'NEGATE',
 };
 
 function fixNaturalNotationWithPrevious(previous, tag) {
   let newTag = tag;
 
-  if (tag.value === 'SUBTRACT' && (!previous || previous.type === 'TAG_OPERATOR')) {
+  if (tag.value === SUBTRACT && (!previous || previous.type === TAG_OPERATOR)) {
     // Fix negative signs at start of input (-1 meters) and after operators (3 * -1 meters)
     newTag = { ...tag, ...tagNegate };
   }
@@ -25,11 +27,11 @@ function fixNaturalNotationWithPrevious(previous, tag) {
 function fixNotationWithNext(next, tag) {
   let newTag = tag;
 
-  if (tag.type === 'TAG_OPERATOR' && next && next.type === 'TAG_UNIT') {
-    if (tag.value === 'DIVIDE') {
+  if (tag.type === TAG_OPERATOR && next && next.type === TAG_UNIT) {
+    if (tag.value === DIVIDE) {
       // Fix using / as an alias for 'per' (1 meter / second)
       newTag = { ...tag, ...tagUnitPowerReciprocal };
-    } else if (tag.value === 'SUBTRACT') {
+    } else if (tag.value === SUBTRACT) {
       // Fix any prefixed unit with a negative sign (-€5)
       newTag = { ...tag, ...tagNegate };
     }
@@ -47,7 +49,7 @@ const fixNaturalMathNotation = pipe(
 const resolveUnitPowerType = curry((type, power, tag) => {
   if (tag.type === type) {
     return [tag.value, null];
-  } else if (tag.type === 'TAG_UNIT') {
+  } else if (tag.type === TAG_UNIT) {
     return [1, { ...tag, power: tag.power * power }];
   }
 
@@ -55,12 +57,12 @@ const resolveUnitPowerType = curry((type, power, tag) => {
 });
 
 const resolveUnitPowerPrefixes = pipe(
-  mapWithAccum(resolveUnitPowerType('TAG_UNIT_POWER_PREFIX'), 1),
+  mapWithAccum(resolveUnitPowerType(TAG_UNIT_POWER_PREFIX), 1),
   rejectNil,
 );
 
 const resolveUnitPowerSuffixes = pipe(
-  mapWithAccumRight(resolveUnitPowerType('TAG_UNIT_POWER_SUFFIX'), 1),
+  mapWithAccumRight(resolveUnitPowerType(TAG_UNIT_POWER_SUFFIX), 1),
   rejectNil,
 );
 

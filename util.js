@@ -3,6 +3,8 @@ export const mapWithAccumRight = pipe(mapAccumRight, last);
 export const rejectNil = reject(isNil);
 export const lengthIsOne = pipe(length, equals(1));
 export const notNil = complement(isNil);
+export const objectEmpty = pipe(keys, isEmpty);
+export const objectNotEmpty = complement(objectEmpty);
 export function findPatternIndex(comparitor, subarray, array) {
   const subarrayLength = subarray.length;
   const to = array.length;

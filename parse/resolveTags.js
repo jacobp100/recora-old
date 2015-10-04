@@ -1,10 +1,10 @@
-import { orderOperations, operationsOrder } from '../constants';
+import { orderOperations, operationsOrder } from '../operatorTypes';
 import { lengthIsOne } from '../util';
 import { entity as entityDescriptor } from '../types/descriptors';
 import { baseDimensions } from '../types/entity';
 import assert from 'assert';
 
-const miscGroupBase = {
+const miscGroupBase = { // FIXME
   type: 'MISC_GROUP',
   groups: null,
 };
@@ -61,7 +61,7 @@ const tagResolvers = {
 
     return append(assocPath(['symbols', value], power, entityDescriptor), values);
   },
-  NOOP: append(entityDescriptor),
+  TAG_NOOP: append(entityDescriptor),
   BRACKETS_GROUP: flip(append),
   default: identity,
 };
@@ -192,7 +192,7 @@ const createASTFromTags = pipe(
 );
 
 const conversionStatements = [
-  { type: 'NOOP' }, // FIXME: should be TAG_NOOP
+  { type: 'TAG_NOOP' }, // FIXME: should be TAG_TAG_NOOP
   { type: 'TAG_UNIT' },
   { type: 'TAG_UNIT_POWER_PREFIX' },
   { type: 'TAG_UNIT_POWER_SUFFIX' },
@@ -200,7 +200,7 @@ const conversionStatements = [
   { type: 'TAG_COMMA' },
 ];
 const isConversionStatement = tag => any(whereEq(__, tag), conversionStatements);
-const isNoop = whereEq({ type: 'NOOP' }); // FIXME: it's in tagutils
+const isNoop = whereEq({ type: 'TAG_NOOP' }); // FIXME: it's in tagutils
 const notNoop = complement(isNoop);
 const isComma = whereEq({ type: 'TAG_COMMA' });
 
@@ -247,7 +247,7 @@ export function findLeftConversion(context) {
   )(context.tags);
   const remainingTags = drop(length(conversionTags), context.tags);
 
-  if (isEmpty(conversionTags) || last(conversionTags).type !== 'NOOP') {
+  if (isEmpty(conversionTags) || last(conversionTags).type !== 'TAG_NOOP') {
     return context;
   }
 

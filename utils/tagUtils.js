@@ -1,6 +1,4 @@
-// import { reduce, compose, dropLastWhile, dropWhile } from 'ramda';
-
-export const isNoop = whereEq({ type: 'NOOP' });
+export const isNoop = whereEq({ type: 'TAG_NOOP' });
 
 export const untailTags = reduce((out, tag) => {
   const { tail, ...tagWithoutTail } = tag;

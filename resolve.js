@@ -1,7 +1,7 @@
 /* eslint no-use-before-define: [1, "nofunc"] */
 import * as math from './math/math';
 import combineValues from './combineValues';
-import { orderDirection } from './constants';
+import { orderDirection } from './operatorTypes';
 
 const containsNil = any(isNil);
 const finalNil = pipe(always(reduced(null)));

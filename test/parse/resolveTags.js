@@ -7,7 +7,7 @@ describe('parse', function() {
       const context = {
         tags: [
           { type: 'TAG_UNIT', value: 'yard', power: 1 },
-          { type: 'NOOP' },
+          { type: 'TAG_NOOP' },
           { type: 'TAG_NUMBER', value: 1 },
           { type: 'TAG_UNIT', value: 'meter', power: 1 },
         ],
@@ -40,7 +40,7 @@ describe('parse', function() {
         tags: [
           { type: 'TAG_NUMBER', value: 1 },
           { type: 'TAG_UNIT', value: 'meter', power: 1 },
-          { type: 'NOOP' },
+          { type: 'TAG_NOOP' },
           { type: 'TAG_UNIT', value: 'yard', power: 1 },
         ],
       };
@@ -57,9 +57,9 @@ describe('parse', function() {
         tags: [
           { type: 'TAG_NUMBER', value: 1 },
           { type: 'TAG_UNIT', value: 'meter', power: 1 },
-          { type: 'NOOP' },
+          { type: 'TAG_NOOP' },
           { type: 'TAG_UNIT', value: 'foot', power: 1 },
-          { type: 'NOOP' },
+          { type: 'TAG_NOOP' },
           { type: 'TAG_UNIT', value: 'inch', power: 1 },
         ],
       };
@@ -77,7 +77,7 @@ describe('parse', function() {
           { type: 'TAG_NUMBER', value: 1 },
           { type: 'TAG_UNIT', value: 'meter', power: 1 },
           { type: 'TAG_UNIT', value: 'second', power: -1 },
-          { type: 'NOOP' },
+          { type: 'TAG_NOOP' },
           { type: 'TAG_UNIT', value: 'yard', power: 1 },
           { type: 'TAG_UNIT', value: 'minute', power: -1 },
         ],
@@ -98,7 +98,7 @@ describe('parse', function() {
           { type: 'TAG_UNIT', value: 'foot', power: 1 },
           { type: 'TAG_NUMBER', value: 4 },
           { type: 'TAG_UNIT', value: 'inch', power: 1 },
-          { type: 'NOOP' },
+          { type: 'TAG_NOOP' },
           { type: 'TAG_UNIT', value: 'centimeter', power: 1 },
         ],
       };
@@ -117,7 +117,7 @@ describe('parse', function() {
         tags: [
           { type: 'TAG_NUMBER', value: 1 },
           { type: 'TAG_UNIT', value: 'meter', power: 1 },
-          { type: 'NOOP' },
+          { type: 'TAG_NOOP' },
           { type: 'TAG_NUMBER', value: 1 },
           { type: 'TAG_UNIT', value: 'inch', power: 1 },
         ],

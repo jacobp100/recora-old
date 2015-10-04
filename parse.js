@@ -1,6 +1,6 @@
+import { entity } from './types/descriptors';
+import { PARSE_OPTIONS } from './tagTypes';
 import { getFormattingHints } from './locale';
-import assert from 'assert';
-
 import parseText from './parse/parseText';
 import preprocessTags from './parse/preprocessTags';
 import postprocessTags from './parse/postprocessTags';
@@ -8,37 +8,39 @@ import resolveTags from './parse/resolveTags';
 import resolve from './resolve';
 import { toString } from './types/types';
 import { convert, convertComposite } from './types/entity';
+import { notNil, objectNotEmpty } from './util';
+
 
 const cartesian = commute(of);
 
-const getDistance = pipe(
+const indexSquaredDistance = pipe(
   pluck('index'),
   map(x => x ** 2),
   sum,
 );
 
 const getParseOptions = pipe(
-  pickBy(whereEq({ type: 'PARSE_OPTIONS' })),
+  pickBy(whereEq({ type: PARSE_OPTIONS })),
   toPairs,
   map(([index, parseOption]) => (
-    map(value => ({ index, value }), parseOption.value))
-  ),
+    map(value => ({ index, value }), parseOption.value)
+  )),
   cartesian,
-  sortBy(getDistance),
+  sortBy(indexSquaredDistance),
 );
 
 const updateTagsWithParseoptions = (tags, { index, value }) => (
   update(Number(index), value, tags)
 );
 
-const transformParseOptions = curry((tags, parseOptions) => (
+const transformParseOptions = (tags, parseOptions) => (
   reduce(updateTagsWithParseoptions, tags, parseOptions)
-));
+);
 
 function getTagOptions(context) {
   return pipe(
     getParseOptions,
-    map(transformParseOptions(context.tags)),
+    map(partial(transformParseOptions, context.tags)),
     map(tags => ({ ...context, tags })),
   )(context.tags);
 }
@@ -49,52 +51,51 @@ const resolveTagOptions = pipe(
   resolve,
 );
 
-const hasCompositeConversion = propSatisfies(Array.isArray, 'conversion');
-const hasConversion = propSatisfies(complement(isNil), 'conversion');
+
+const hasCompositeConversion = where({ conversion: Array.isArray });
+const hasConversion = where({ conversion: notNil });
+const result = prop('result');
+const conversion = prop('conversion');
+
 const convertResult = over(
   lens(identity, assoc('result')),
   cond([
-    [hasCompositeConversion, converge(convertComposite, identity, prop('conversion'), prop('result'))],
-    [hasConversion, converge(convert, identity, prop('conversion'), prop('result'))],
-    [T, prop('result')],
+    [hasCompositeConversion, converge(convertComposite, identity, conversion, result)],
+    [hasConversion, converge(convert, identity, conversion, result)],
+    [T, result],
   ]),
 );
 
-const entityWithSymbols = both(
-  propEq('type', 'ENTITY'),
-  propSatisfies(pipe(keys, isEmpty, not), 'symbols'),
-);
 
 const resultToString = over(
   lens(identity, assoc('resultToString')),
-  converge(toString, identity, prop('result')),
+  converge(toString, identity, result),
 );
+
+
+const entityWithSymbols = where({
+  type: equals(entity.type),
+  symbols: objectNotEmpty,
+});
+const resultIsNil = where({ result: isNil });
+const resultIsEntityWithSymbols = where({ result: entityWithSymbols });
 
 const parseTagsWithOptions = pipe(
   getTagOptions,
   map(resolveTagOptions),
-  reject(propSatisfies(isNil, 'result')),
-  reject(propSatisfies(entityWithSymbols, 'result')),
+  reject(resultIsNil),
+  reject(resultIsEntityWithSymbols),
   map(convertResult),
-  reject(propSatisfies(isNil, 'result')),
+  reject(resultIsNil),
   map(resultToString),
   head,
 );
 
-const assertNoTextElementInTags = tap(
-  pipe(
-    prop('tags'),
-    pluck('type'),
-    none(test(/^TEXT_/)),
-    assert
-  )
-);
 
 const parse = pipe(
   parseText,
   getFormattingHints,
   preprocessTags,
-  assertNoTextElementInTags,
   parseTagsWithOptions,
 );
 export default parse;
