@@ -14,7 +14,7 @@ describe('regression', function() {
       const resultOutput = result.resultToString;
 
       if (resultOutput !== shittyFixOutputUntilIIncludeRealNumberFormatting(output)) {
-        const error = new Error(`Expected "${resultOutput}" to equal "${output}"`);
+        const error = new Error(`Expected "${resultOutput}" to equal "${output}"\n${JSON.stringify(result)}`);
         error.stack = null;
         throw error;
       }

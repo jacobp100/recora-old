@@ -142,6 +142,14 @@ describe('entity type', function() {
       assert.equal(result.value.toFixed(0), 212);
       assert.deepEqual(result.units, units);
     });
+
+    it('should convert between derived units', function() {
+      const value = { ...entity, value: 1, units: { Joule: 1 } };
+      const units = { kilowatt: 1, hour: 1 };
+      const result = convert(normalContext, units, value);
+
+      assert.deepEqual(result.units, units);
+    });
   });
 
   describe('convert composite', function() {

@@ -77,7 +77,7 @@ export const dimensions = (context, entity) => pipe(
   }),
   omit(['undefined']),
   mapObj(sumLastElementsInPairs),
-  pickBy(notNil),
+  pickBy(complement(equals(0))),
 )(entity);
 
 const derivedUnitsForType = ifElse(has(__, unitsDerived),
@@ -94,7 +94,7 @@ export const baseDimensions = pipe(
   )),
   groupBy(head),
   mapObj(sumLastElementsInPairs),
-  pickBy(notNil),
+  pickBy(complement(equals(0))),
 );
 
 function getSiUnits(context, entity) {
