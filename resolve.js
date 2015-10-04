@@ -83,6 +83,10 @@ const resolveEntity = (context, locals, entity) => {
 };
 
 export function resolveWithLocals(context, locals, value) {
+  if (!value) {
+    return null;
+  }
+
   switch (value.type) {
   case 'OPERATIONS_GROUP':
     return resolveOperationsGroup(context, locals, value);

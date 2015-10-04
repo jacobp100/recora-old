@@ -30,8 +30,8 @@ const baseDimensionsEqual = converge(equals,
 	converge(baseDimensions, context, rhs),
 );
 const shouldDivide = converge(shouldDivideDimensions,
-	pipe(dimensions, context, lhs),
-	pipe(dimensions, context, rhs),
+	converge(dimensions, context, lhs),
+	converge(dimensions, context, rhs),
 );
 const lhsUnitsLengthLessThanRhsUnitsLength = converge(lt,
 	pipe(lhs, unitsLength),
@@ -49,8 +49,9 @@ const combineEntities = cond([
 	// Divide the statement with the most units by the unit with the least
 	// I.e. `$5 at $3 per kilo` gives the same answer as `$3 per kilo using $5`
   [shouldDivide, ifElse(lhsUnitsLengthLessThanRhsUnitsLength,
-    entityMath.divide,
-    (ctx, a, b) => entityMath.divide(ctx, b, a))],
+    (ctx, a, b) => entityMath.divide(ctx, b, a),
+    entityMath.divide
+  )],
 	// No idea, just mulitply
   [T, entityMath.multiply],
 ]);

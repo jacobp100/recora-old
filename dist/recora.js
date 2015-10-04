@@ -6504,7 +6504,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var newTag = tag;
 	
 	  if (tag.type === 'TAG_OPERATOR' && next && next.type === 'TAG_UNIT') {
-	    if (tag.value === 'divide') {
+	    if (tag.value === 'DIVIDE') {
 	      // Fix using / as an alias for 'per' (1 meter / second)
 	      newTag = _extends({}, tag, tagUnitPowerReciprocal);
 	    } else if (tag.value === 'SUBTRACT') {
@@ -8496,6 +8496,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	function resolveWithLocals(context, locals, value) {
+	  if (!value) {
+	    return null;
+	  }
+	
 	  switch (value.type) {
 	    case 'OPERATIONS_GROUP':
 	      return resolveOperationsGroup(context, locals, value);
@@ -9017,7 +9021,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	converge(baseDimensionsEmpty, context, lhs), converge(baseDimensionsEmpty, context, rhs));
 	var unitsEqual = converge(equals, pipe(lhs, units), pipe(rhs, units));
 	var baseDimensionsEqual = converge(equals, converge(_typesEntity.baseDimensions, context, lhs), converge(_typesEntity.baseDimensions, context, rhs));
-	var shouldDivide = converge(shouldDivideDimensions, pipe(_typesEntity.dimensions, context, lhs), pipe(_typesEntity.dimensions, context, rhs));
+	var shouldDivide = converge(shouldDivideDimensions, converge(_typesEntity.dimensions, context, lhs), converge(_typesEntity.dimensions, context, rhs));
 	var lhsUnitsLengthLessThanRhsUnitsLength = converge(lt, pipe(lhs, unitsLength), pipe(rhs, unitsLength));
 	
 	var combineEntities = cond([
@@ -9030,9 +9034,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	[baseDimensionsEqual, entityMath.add],
 	// Divide the statement with the most units by the unit with the least
 	// I.e. `$5 at $3 per kilo` gives the same answer as `$3 per kilo using $5`
-	[shouldDivide, ifElse(lhsUnitsLengthLessThanRhsUnitsLength, entityMath.divide, function (ctx, a, b) {
+	[shouldDivide, ifElse(lhsUnitsLengthLessThanRhsUnitsLength, function (ctx, a, b) {
 	  return entityMath.divide(ctx, b, a);
-	})],
+	}, entityMath.divide)],
 	// No idea, just mulitply
 	[T, entityMath.multiply]]);
 	

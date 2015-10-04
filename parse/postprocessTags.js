@@ -26,7 +26,7 @@ function fixNotationWithNext(next, tag) {
   let newTag = tag;
 
   if (tag.type === 'TAG_OPERATOR' && next && next.type === 'TAG_UNIT') {
-    if (tag.value === 'divide') {
+    if (tag.value === 'DIVIDE') {
       // Fix using / as an alias for 'per' (1 meter / second)
       newTag = { ...tag, ...tagUnitPowerReciprocal };
     } else if (tag.value === 'SUBTRACT') {
