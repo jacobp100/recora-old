@@ -3556,14 +3556,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return (a - 32) / 1.8 + 273.15;
 	  },
 	  gasmarkForwardFn: function gasmarkForwardFn(a) {
-	    return kToGasMark[findIndex(gasMarkToK, function (k) {
+	    return kToGasMark[findIndex(function (k) {
 	      return k >= a;
-	    })] || last(kToGasMark);
+	    }, gasMarkToK)] || last(kToGasMark);
 	  },
 	  gasmarkBackwardFn: function gasmarkBackwardFn(a) {
-	    return gasMarkToK[findIndex(kToGasMark, function (gasMark) {
+	    return gasMarkToK[findIndex(function (gasMark) {
 	      return gasMark >= a;
-	    })] || last(gasMarkToK);
+	    }, kToGasMark)] || last(gasMarkToK);
 	  }
 	};
 	

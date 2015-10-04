@@ -8,8 +8,8 @@ const unitFunctions = {
   celsiusBackwardFn: a => a + 273.15,
   fahrenheitForwardFn: a => (a - 273.15) * 1.8 + 32,
   fahrenheitBackwardFn: a => (a - 32) / 1.8 + 273.15,
-  gasmarkForwardFn: a => (kToGasMark[findIndex(gasMarkToK, k => k >= a)] || last(kToGasMark)),
-  gasmarkBackwardFn: a => (gasMarkToK[findIndex(kToGasMark, gasMark => gasMark >= a)] || last(gasMarkToK)),
+  gasmarkForwardFn: a => (kToGasMark[findIndex(k => k >= a, gasMarkToK)] || last(kToGasMark)),
+  gasmarkBackwardFn: a => (gasMarkToK[findIndex(gasMark => gasMark >= a, kToGasMark)] || last(gasMarkToK)),
 };
 
 const getUnitFn = prop(__, unitFunctions);
