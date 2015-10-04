@@ -7812,7 +7812,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(toString, complement, isNil, pipe, map, last, sum, ifElse, always, prop, has, toPairs, filter, head, partial, length, keys, pickBy, reduce, evolve, multiply, omit, groupBy, mapObj, equals, __, chain, adjust, fromPairs) {'use strict';
+	/* WEBPACK VAR INJECTION */(function(toString, complement, isNil, pipe, map, last, sum, ifElse, always, prop, has, toPairs, filter, head, partial, length, keys, pickBy, reduce, evolve, multiply, omit, groupBy, mapObj, equals, __, chain, adjust, fromPairs, propEq) {'use strict';
 	
 	exports.__esModule = true;
 	
@@ -7978,7 +7978,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return convert(context, getSiUnits(context, resolvedEntity), resolvedEntity);
 	}
 	
-	var isCurrency = pipe(dimensions, equals({ currency: 1 }));
+	var isCurrency = pipe(dimensions, propEq('currency', 1));
 	
 	function toString(context, entity) {
 	  var formattingHints = {
@@ -7987,7 +7987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  return _locale.formatEntity(context, entity, formattingHints);
 	}
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(152), __webpack_require__(56), __webpack_require__(58), __webpack_require__(27), __webpack_require__(16), __webpack_require__(86), __webpack_require__(37), __webpack_require__(93), __webpack_require__(53), __webpack_require__(36), __webpack_require__(100), __webpack_require__(49), __webpack_require__(70), __webpack_require__(75), __webpack_require__(95), __webpack_require__(110), __webpack_require__(45), __webpack_require__(39), __webpack_require__(31), __webpack_require__(101), __webpack_require__(157), __webpack_require__(158), __webpack_require__(147), __webpack_require__(47), __webpack_require__(41), __webpack_require__(91), __webpack_require__(159), __webpack_require__(52), __webpack_require__(165)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(152), __webpack_require__(56), __webpack_require__(58), __webpack_require__(27), __webpack_require__(16), __webpack_require__(86), __webpack_require__(37), __webpack_require__(93), __webpack_require__(53), __webpack_require__(36), __webpack_require__(100), __webpack_require__(49), __webpack_require__(70), __webpack_require__(75), __webpack_require__(95), __webpack_require__(110), __webpack_require__(45), __webpack_require__(39), __webpack_require__(31), __webpack_require__(101), __webpack_require__(157), __webpack_require__(158), __webpack_require__(147), __webpack_require__(47), __webpack_require__(41), __webpack_require__(91), __webpack_require__(159), __webpack_require__(52), __webpack_require__(165), __webpack_require__(66)))
 
 /***/ },
 /* 152 */

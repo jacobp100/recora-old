@@ -181,10 +181,7 @@ export function toSi(context, entity) {
   return convert(context, getSiUnits(context, resolvedEntity), resolvedEntity);
 }
 
-const isCurrency = pipe(
-  dimensions,
-  equals({ currency: 1 }),
-);
+const isCurrency = pipe(dimensions, propEq('currency', 1));
 
 export function toString(context, entity) {
   const formattingHints = {

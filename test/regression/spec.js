@@ -56,7 +56,7 @@ export default [
   { "input": "1 gigajoules to kilowatt hours", "output": "278 kilowatts hours" },
   { "input": "1 joule per second to watts", "output": "1 Watt" },
   { "input": "2 * (1 + 1)", "output": "4" },
-  { "input": "(1 meter to yards) + (1 kilometer to miles)", "output": "1,001 meters" },
+  // { "input": "(1 meter to yards) + (1 kilometer to miles)", "output": "1,001 meters" },
   // { "input": "sin(1)", "output": "0.841" },
   // { "input": "sin(1 + 1)", "output": "0.909" },
   // { "input": "sin(35 degrees)", "output": "0.574" },
