@@ -24,12 +24,12 @@ const operators = {
 };
 
 const processTagElement = {
-  TEXT_SYMBOL_UNIT(context, tag) {
+  TEXT_SYMBOL_UNIT(context, tag, captureGroup) {
     const { value, start, end } = tag;
     let canNoop = false;
     const options = [];
 
-    const power = Number(tag[4] || 1);
+    const power = Number(captureGroup[4] || 1);
 
     // if (functions.hasOwnProperty(value)) {
     //   options.push({
@@ -141,17 +141,17 @@ const findValueAndType = pipe(
   head,
 );
 
-const processTag = curry((context, tag) => {
-  if (tag.type) {
-    return tag;
+const processTag = curry((context, captureGroup) => {
+  if (captureGroup.type) {
+    return captureGroup;
   }
 
-  const [type, value] = findValueAndType(tag);
-  const { start, end } = tag;
+  const [type, value] = findValueAndType(captureGroup);
+  const { start, end } = captureGroup;
 
   const newTag = { start, end, value, type };
 
-  return (processTagElement[type] || processTagElement.default)(context, newTag);
+  return (processTagElement[type] || processTagElement.default)(context, newTag, captureGroup);
 });
 
 function resolveTagBracket(bracketLevel, tag) {

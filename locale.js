@@ -73,7 +73,7 @@ export function preprocessTags(context) {
     } else if (unitPowerPrefixes[value]) {
       return { type: 'TAG_UNIT_POWER_PREFIX', value: unitPowerPrefixes[value], start, end };
     } else if (unitPowerSuffixes[value]) {
-      return { type: 'TAG_UNIT_POWER_Suffix', value: unitPowerSuffixes[value], start, end };
+      return { type: 'TAG_UNIT_POWER_SUFFIX', value: unitPowerSuffixes[value], start, end };
     }
     return tag;
   }

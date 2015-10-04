@@ -60,7 +60,7 @@ const resolveUnitPowerPrefixes = pipe(
 );
 
 const resolveUnitPowerSuffixes = pipe(
-  mapWithAccum(resolveUnitPowerType('TAG_UNIT_POWER_SUFFIX'), 1),
+  mapWithAccumRight(resolveUnitPowerType('TAG_UNIT_POWER_SUFFIX'), 1),
   rejectNil,
 );
 

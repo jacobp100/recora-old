@@ -2989,7 +2989,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else if (unitPowerPrefixes[value]) {
 	      return { type: 'TAG_UNIT_POWER_PREFIX', value: unitPowerPrefixes[value], start: start, end: end };
 	    } else if (unitPowerSuffixes[value]) {
-	      return { type: 'TAG_UNIT_POWER_Suffix', value: unitPowerSuffixes[value], start: start, end: end };
+	      return { type: 'TAG_UNIT_POWER_SUFFIX', value: unitPowerSuffixes[value], start: start, end: end };
 	    }
 	    return tag;
 	  }
@@ -6282,7 +6282,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	var processTagElement = {
-	  TEXT_SYMBOL_UNIT: function TEXT_SYMBOL_UNIT(context, tag) {
+	  TEXT_SYMBOL_UNIT: function TEXT_SYMBOL_UNIT(context, tag, captureGroup) {
 	    var value = tag.value;
 	    var start = tag.start;
 	    var end = tag.end;
@@ -6290,7 +6290,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var canNoop = false;
 	    var options = [];
 	
-	    var power = Number(tag[4] || 1);
+	    var power = Number(captureGroup[4] || 1);
 	
 	    // if (functions.hasOwnProperty(value)) {
 	    //   options.push({
@@ -6396,21 +6396,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return type !== null && tag !== undefined;
 	}), head);
 	
-	var processTag = curry(function (context, tag) {
-	  if (tag.type) {
-	    return tag;
+	var processTag = curry(function (context, captureGroup) {
+	  if (captureGroup.type) {
+	    return captureGroup;
 	  }
 	
-	  var _findValueAndType = findValueAndType(tag);
+	  var _findValueAndType = findValueAndType(captureGroup);
 	
 	  var type = _findValueAndType[0];
 	  var value = _findValueAndType[1];
-	  var start = tag.start;
-	  var end = tag.end;
+	  var start = captureGroup.start;
+	  var end = captureGroup.end;
 	
 	  var newTag = { start: start, end: end, value: value, type: type };
 	
-	  return (processTagElement[type] || processTagElement['default'])(context, newTag);
+	  return (processTagElement[type] || processTagElement['default'])(context, newTag, captureGroup);
 	});
 	
 	function resolveTagBracket(bracketLevel, tag) {
@@ -6531,7 +6531,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var resolveUnitPowerPrefixes = pipe(_util.mapWithAccum(resolveUnitPowerType('TAG_UNIT_POWER_PREFIX'), 1), _util.rejectNil);
 	
-	var resolveUnitPowerSuffixes = pipe(_util.mapWithAccum(resolveUnitPowerType('TAG_UNIT_POWER_SUFFIX'), 1), _util.rejectNil);
+	var resolveUnitPowerSuffixes = pipe(_util.mapWithAccumRight(resolveUnitPowerType('TAG_UNIT_POWER_SUFFIX'), 1), _util.rejectNil);
 	
 	var resolveUnitPowers = pipe(
 	// Resolve 3 meters squared, 3 square meters, 3 meters per second etc.

@@ -3,4 +3,4 @@ const Recora = require('./dist/recora');
 
 const recora = new Recora();
 
-console.log(JSON.stringify(recora.parse('5 meters / second to kilometers / hour')));
+console.log(JSON.stringify(recora.parse('1 acre to meters squared')));

@@ -103,7 +103,7 @@ export default [
   // { "input": "sin(x) + cos(x) - x^2 = 0", "output": "x = 1.149555" },
   { "input": "meters in a kilometer", "output": "1,000 meters" },
   { "input": "1000 meters a in kilometer", "output": "1 kilometer" },
-  { "input": "2a = 5", "output": "a = 5 / 2 or 2.500000" },
+  // { "description": "solve", "input": "2a = 5", "output": "a = 5 / 2 or 2.500000" },
   { "input": "5 meters per second to kilometers per hour", "output": "18 kilometers per hour" },
   { "input": "5 meters / second to kilometers / hour", "output": "18 kilometers per hour" },
   { "input": "5 meters per second to kilometers / hour", "output": "18 kilometers per hour" },
