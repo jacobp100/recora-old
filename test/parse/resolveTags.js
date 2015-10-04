@@ -91,6 +91,27 @@ describe('parse', function() {
       assert.equal(result.tags[2], context.tags[2]);
     });
 
+    it('should only find "cm" in "3 feet 4 inches to cm"', function() {
+      const context = {
+        tags: [
+          { type: 'TAG_NUMBER', value: 3 },
+          { type: 'TAG_UNIT', value: 'foot', power: 1 },
+          { type: 'TAG_NUMBER', value: 4 },
+          { type: 'TAG_UNIT', value: 'inch', power: 1 },
+          { type: 'NOOP' },
+          { type: 'TAG_UNIT', value: 'centimeter', power: 1 },
+        ],
+      };
+      const result = findRightConversion(context);
+
+      assert.deepEqual(result.conversion, { centimeter: 1 });
+      assert.equal(result.tags.length, 4);
+      assert.equal(result.tags[0], context.tags[0]);
+      assert.equal(result.tags[1], context.tags[1]);
+      assert.equal(result.tags[2], context.tags[2]);
+      assert.equal(result.tags[3], context.tags[3]);
+    });
+
     it('should not convert "1 meter 1 inch"', function() {
       const context = {
         tags: [

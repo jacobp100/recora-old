@@ -2,6 +2,8 @@ import units from './units';
 import si from './data/environment/si';
 import abbreviations from './data/en/abbreviations';
 import unitFormatting from './data/en/unitFormatting';
+import separatedUnits from './data/en/separatedUnits';
+import { findPatternIndex } from './util';
 
 // TODO: JSON
 const pluralMap = {
@@ -14,7 +16,7 @@ const pluralMap = {
   'fahrenheit': 'fahrenheit',
   'gas': 'gas',
 };
-const singularMap = invert(pluralMap);
+const singularMap = pipe(invert, mapObj(head))(pluralMap);
 
 function singularize(word) {
   const plural = word.toLowerCase().trim();
@@ -39,7 +41,76 @@ These functions are all in the locale 'en'. If we add more locales, we'll have t
 export const getNumberFormat = always('\\d+(?:\\.\\d+)?');
 export const parseNumber = (context, value) => Number(value.replace(',', ''));
 export const getFormattingHints = merge({ hints: [] });
-export const preprocessTags = identity;
+export function preprocessTags(context) {
+  const unitPowerPrefixes = {
+    per: -1,
+    square: 2,
+    cubic: 3,
+  };
+
+  const unitPowerSuffixes = {
+    squared: 2,
+    cubed: 3,
+  };
+
+  function resolveUnitPowersAndAmbiguitiesMapFn(tag) {
+    if (!tag) {
+      return tag;
+    }
+
+    const value = tag[0];
+    const { start, end } = tag;
+
+    if (value === 'a') {
+      return {
+        type: 'PARSE_OPTIONS',
+        value: [
+          { type: 'TAG_SYMBOL', value: 'a', power: 1, start, end },
+          { type: 'TAG_NUMBER', value: 1, start, end },
+          { type: 'NOOP', start, end },
+        ],
+      };
+    } else if (unitPowerPrefixes[value]) {
+      return { type: 'TAG_UNIT_POWER_PREFIX', value: unitPowerPrefixes[value], start, end };
+    } else if (unitPowerSuffixes[value]) {
+      return { type: 'TAG_UNIT_POWER_Suffix', value: unitPowerSuffixes[value], start, end };
+    }
+    return tag;
+  }
+  const resolveUnitPowersAndAmbiguities = map(resolveUnitPowersAndAmbiguitiesMapFn);
+
+  function resolveSeparatedUnitsReducerFn(tags, { unit, words }) {
+    const ind = findPatternIndex((word, tag) => (
+      tag && tag[0] && (singularize(tag[0]).toLowerCase() === word.toLowerCase())
+    ), words, tags);
+
+    if (ind === -1) {
+      return tags;
+    }
+
+    const unitDescriptor = {
+      type: 'TAG_UNIT',
+      power: 1,
+      value: unit,
+      start: tags[ind].start,
+      end: tags[ind + words.length - 1].end,
+    };
+
+    return pipe(
+      remove(ind, words.length),
+      insert(ind, unitDescriptor),
+    )(tags);
+  }
+  const resolveSeparatedUnits = reduce(resolveSeparatedUnitsReducerFn, __, separatedUnits);
+
+  return over(
+    lensProp('tags'),
+    pipe(
+      resolveUnitPowersAndAmbiguities,
+      resolveSeparatedUnits,
+    ),
+  )(context);
+}
 export function getSiUnit(context, name) {
   return si[name] || name;
 }
