@@ -2,6 +2,8 @@ import spec from './spec';
 import Recora from '../../index';
 
 describe('regression', function() {
+  this.slow(4);
+
   const recora = new Recora();
 
   function shittyFixOutputUntilIIncludeRealNumberFormatting(resultToString) {

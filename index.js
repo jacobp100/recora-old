@@ -1,4 +1,5 @@
 import parse from './parse';
+import baseContext from './baseContext';
 
 // TODO: Functions for differentation, sum (sigma), and multiplication (pi)
 
@@ -14,12 +15,7 @@ export default class Recora {
       locale,
       text,
       constants,
-      hints: null,
-      tags: null,
-      ast: null,
-      conversion: null,
-      result: null,
-      resultToString: '',
+      ...baseContext,
     };
     return parse(context) || context;
   }

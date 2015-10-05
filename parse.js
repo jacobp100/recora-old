@@ -1,3 +1,4 @@
+import baseContext from './baseContext';
 import { entity } from './types/descriptors';
 import { PARSE_OPTIONS } from './tagTypes';
 import { getFormattingHints } from './locale';
@@ -79,6 +80,8 @@ const entityWithSymbols = where({
 });
 const resultIsNil = where({ result: isNil });
 const resultIsEntityWithSymbols = where({ result: entityWithSymbols });
+const oneContext = pipe(length, equals(1));
+const multipleContexts = pipe(length, gt(1));
 
 const parseTagsWithOptions = pipe(
   getTagOptions,
@@ -87,8 +90,13 @@ const parseTagsWithOptions = pipe(
   reject(resultIsEntityWithSymbols),
   map(convertResult),
   reject(resultIsNil),
+  uniqWith((a, b) => equals(a.result, b.result)),
   map(resultToString),
-  head,
+  cond([
+    [oneContext, head],
+    [multipleContexts, always({ error: 'ambiguous result', ...baseContext })],
+    [isEmpty, always({ error: 'no result', ...baseContext })],
+  ]),
 );
 
 
