@@ -284,4 +284,17 @@ const resolveTags = pipe(
     createASTFromTags,
   ),
 );
-export default resolveTags;
+
+const hasMoreThanOneTag = pipe(
+  prop('tags'),
+  filter(whereEq({ type: 'TAG_SYMBOL' })),
+  pluck('value'),
+  uniq,
+  length,
+  gt(__, 0), // FIXME: Update to 1 (or more) when we use symbols
+);
+const quickResolveTags = ifElse(hasMoreThanOneTag,
+  assoc('result', null),
+  resolveTags,
+);
+export default quickResolveTags;

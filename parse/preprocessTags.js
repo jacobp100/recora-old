@@ -1,4 +1,4 @@
-import { TAG_NOOP, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_COMMA, TAG_UNIT, TAG_SYMBOL } from '../tagTypes';
+import { PARSE_OPTIONS, TAG_NOOP, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_COMMA, TAG_UNIT, TAG_SYMBOL, TAG_OPERATOR, TAG_NUMBER } from '../tagTypes';
 import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE } from '../operatorTypes';
 import { entity } from '../types/descriptors';
 import * as locale from '../locale';
@@ -99,8 +99,8 @@ const processTagElement = {
 
     if (options.length > 1) {
       return {
-        type: 'PARSE_OPTIONS',
-        value: options,
+        type: PARSE_OPTIONS,
+        value: map(of, options), // wrap all option values to arrays
       };
     } else if (options.length === 1) {
       return options[0];
@@ -122,14 +122,14 @@ const processTagElement = {
   TEXT_OPERATOR(context, tag) {
     return {
       ...tag,
-      type: 'TAG_OPERATOR',
+      type: TAG_OPERATOR,
       value: operators[tag.value],
     };
   },
   TEXT_NUMBER(context, tag) {
     return {
       ...tag,
-      type: 'TAG_NUMBER',
+      type: TAG_NUMBER,
       value: locale.parseNumber(context, tag.value),
     };
   },
@@ -158,9 +158,9 @@ const processTag = curry((context, captureGroup) => {
 });
 
 function resolveTagBracket(bracketLevel, tag) {
-  if (tag.type === 'TAG_OPEN_BRACKET') {
+  if (tag.type === TAG_OPEN_BRACKET) {
     return [bracketLevel + 1, { ...tag, value: bracketLevel }];
-  } else if (tag.type === 'TAG_CLOSE_BRACKET') {
+  } else if (tag.type === TAG_CLOSE_BRACKET) {
     return [bracketLevel - 1, { ...tag, value: bracketLevel - 1 }];
   }
   return [bracketLevel, tag];

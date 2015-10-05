@@ -37,9 +37,9 @@ const rhsBaseDimensions = converge(baseDimensions, context, rhs);
 const rhsToSi = converge(toSi, context, rhs);
 const rhsHasUnits = pipe(rhsUnitKeys, notEmpty);
 const rhsHasSymbols = pipe(rhsSymbols, keys, notEmpty);
-const rhsNotPureNumericEntity = either(rhsHasUnits, rhsHasSymbols);
+const rhsNotPureNumericEntity = anyPass([rhsHasUnits, rhsHasSymbols]);
 
-const eitherValueNil = either(lhsValueNil, rhsValueNil);
+const eitherValueNil = anyPass([lhsValueNil, rhsValueNil]);
 
 const symbolsMatch = converge(equals, lhsSymbols, rhsSymbols);
 const symbolsDiffer = complement(symbolsMatch);
@@ -61,15 +61,15 @@ const abstractMathAdd = cond([
 ]);
 
 
-const rhsIsZeroAndNotDivision = both(rhsValueZero, pipe(sign, equals(1)));
+const rhsIsZeroAndNotDivision = allPass([rhsValueZero, pipe(sign, equals(1))]);
 const overlapUnitKeysLength = pipe(
   converge(intersection, rhsUnitKeys, lhsUnitKeys),
   length
 );
-const lhsRhsKeysSetsContainNoSubOrSuperset = either(
+const lhsRhsKeysSetsContainNoSubOrSuperset = anyPass([
   converge(equals, overlapUnitKeysLength, lhsUnitKeysLength),
   converge(equals, overlapUnitKeysLength, rhsUnitKeysLength),
-);
+]);
 const needConversion = complement(lhsRhsKeysSetsContainNoSubOrSuperset);
 
 const mergeMultiplicationLhsUnitPairs = pipe(nthArg(0), toPairs);

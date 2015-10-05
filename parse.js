@@ -1,6 +1,6 @@
 import baseContext from './baseContext';
 import { entity } from './types/descriptors';
-import { PARSE_OPTIONS } from './tagTypes';
+import { PARSE_OPTIONS, TAG_SYMBOL } from './tagTypes';
 import { getFormattingHints } from './locale';
 import parseText from './parse/parseText';
 import preprocessTags from './parse/preprocessTags';
@@ -20,31 +20,64 @@ const indexSquaredDistance = pipe(
   sum,
 );
 
+const isParseOption = whereEq({ type: PARSE_OPTIONS });
 const getParseOptions = pipe(
-  pickBy(whereEq({ type: PARSE_OPTIONS })),
+  pickBy(isParseOption),
   toPairs,
   map(([index, parseOption]) => (
-    map(value => ({ index, value }), parseOption.value)
+    map(tags => ({ index: Number(index), tags }), parseOption.value)
   )),
   cartesian,
   sortBy(indexSquaredDistance),
 );
 
-const updateTagsWithParseoptions = (tags, { index, value }) => (
-  update(Number(index), value, tags)
+const chainIndexed = addIndex(chain);
+const transformParseOptions = (tags, parseOptions) => (
+  chainIndexed((tag, index) => {
+    const parseOption = find(whereEq({ index }), parseOptions);
+
+    if (parseOption) {
+      return parseOption.tags;
+    }
+    return tag;
+  })(tags)
 );
 
-const transformParseOptions = (tags, parseOptions) => (
-  reduce(updateTagsWithParseoptions, tags, parseOptions)
+const isSymbol = whereEq({ type: TAG_SYMBOL });
+const getParseOptionSymbols = pipe(
+  filter(isParseOption),
+  pluck('value'),
+  flatten,
+  filter(isSymbol),
+);
+const getInlineSymbols = filter(isSymbol);
+const countSymbols = pipe(
+  prop('tags'),
+  converge(concat, getParseOptionSymbols, getInlineSymbols),
+  countBy(prop('value')),
 );
 
 function getTagOptions(context) {
+  // Assert that when we get the parse options, we either include occurances of a symbol, or none
+  // I.e. x^2 + x = 5 either includes both occurances of x, or neither
+  const symbolCount = countSymbols(context);
+
+  // TODO: Test!
+  const noneOrAllSymbolsIncluded = pipe(
+    filter(isSymbol),
+    countBy(prop('value')),
+    toPairs,
+    all(([symbol, count]) => (count === 0 || count === symbolCount[symbol])),
+  );
+
   return pipe(
     getParseOptions,
     map(partial(transformParseOptions, context.tags)),
+    filter(noneOrAllSymbolsIncluded),
     map(tags => ({ ...context, tags })),
   )(context.tags);
 }
+
 
 const resolveTagOptions = pipe(
   postprocessTags,

@@ -17,10 +17,10 @@ const units = prop('units');
 const unitsLength = pipe(units, length);
 const baseDimensionsEmpty = pipe(baseDimensions, keys, isEmpty);
 
-const eitherBaseDimensionsEmpty = either(
-	converge(baseDimensionsEmpty, context, lhs),
-	converge(baseDimensionsEmpty, context, rhs),
-);
+const eitherBaseDimensionsEmpty = anyPass([
+  converge(baseDimensionsEmpty, context, lhs),
+  converge(baseDimensionsEmpty, context, rhs),
+]);
 const unitsEqual = converge(equals,
 	pipe(lhs, units),
 	pipe(rhs, units),
