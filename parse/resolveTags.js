@@ -1,3 +1,6 @@
+import { TAG_NOOP, TAG_COMMA, TAG_UNIT, TAG_OPERATOR, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX } from '../tagTypes';
+import { NEGATE } from '../operatorTypes';
+import { entity } from '../types/descriptors'; // FIXME: call ./types/descriptors ./types/index, then just import './types'
 import { orderOperations, operationsOrder } from '../operatorTypes';
 import { lengthIsOne } from '../util';
 import { entity as entityDescriptor } from '../types/descriptors';
@@ -15,11 +18,12 @@ const empty = {
 };
 
 const tagResolvers = {
+  // This could be exported from a module
   TAG_NUMBER(values, { value }) {
     assert(typeof value === 'number');
     const lastItem = last(values);
 
-    if (lastItem.type === 'ENTITY' && lastItem.value === null) {
+    if (lastItem.type === entity.type && lastItem.value === null) {
       return adjust(assoc('value', value), -1, values);
     }
 
@@ -29,7 +33,7 @@ const tagResolvers = {
     // This code is almost identical for symbols (s/unit/symbol/g)
     const lastItem = last(values);
 
-    if (lastItem.type === 'ENTITY') {
+    if (lastItem.type === entity.type) {
       return adjust(evolve({
         units: over(
           lensProp(value),
@@ -47,7 +51,7 @@ const tagResolvers = {
     // This code is almost identical for symbols (s/unit/symbol/g)
     const lastItem = last(values);
 
-    if (lastItem.type === 'ENTITY') {
+    if (lastItem.type === entity.type) {
       return adjust(evolve({
         symbols: over(
           lensProp(value),
@@ -69,14 +73,14 @@ const tagResolvers = {
 const objectIsEmpty = pipe(keys, isEmpty);
 
 const valueTypeIsEmpty = where({
-  type: equals('ENTITY'),
+  type: equals(entity.type),
   value: isNil,
   units: objectIsEmpty,
   symbols: objectIsEmpty,
 });
 
 const valueTypeHasNilValueButHasSymbols = where({
-  type: equals('ENTITY'),
+  type: equals(entity.type),
   value: isNil,
   symbols: complement(objectIsEmpty),
 });
@@ -95,7 +99,7 @@ const resolveTagsWithoutOperations = pipe(
 );
 
 const groupOperations = reduce((operationGroup, tag) => {
-  if (tag.type === 'TAG_OPERATOR' && operationGroup.level === orderOperations[tag.value]) {
+  if (tag.type === TAG_OPERATOR && operationGroup.level === orderOperations[tag.value]) {
     return evolve({
       operations: append(tag.value),
       groups: append([]),
@@ -108,7 +112,7 @@ const groupOperations = reduce((operationGroup, tag) => {
 });
 
 const tagOperatorMatchesValue = pipe(
-  assoc('value', __, { type: 'TAG_OPERATOR' }),
+  assoc('value', __, { type: TAG_OPERATOR }),
   whereEq,
 );
 
@@ -141,7 +145,7 @@ const resolveOperations = curry((startLevel, tags) => {
 });
 
 const splitTags = reduce((tags, tag) => {
-  if (tag.type === 'TAG_COMMA') {
+  if (tag.type === TAG_COMMA) {
     return append([tag], tags);
   }
   return adjust(append(tag), -1, tags);
@@ -152,7 +156,7 @@ const resolveTagsWithoutBrackets = pipe(
   map(resolveOperations(0)),
 );
 
-const isOpenBracket = propEq('type', 'TAG_OPEN_BRACKET');
+const isOpenBracket = propEq('type', TAG_OPEN_BRACKET);
 
 function resolveBrackets(tags) {
   let resolvedTags = tags;
@@ -162,7 +166,7 @@ function resolveBrackets(tags) {
     const openBracket = tags[openBracketIndex];
 
     const matchingCloseBracket = whereEq({
-      type: 'TAG_CLOSE_BRACKET',
+      type: TAG_CLOSE_BRACKET,
       value: openBracket.value,
     });
     let closeBracketIndex = findIndex(matchingCloseBracket, tags);
@@ -192,17 +196,17 @@ const createASTFromTags = pipe(
 );
 
 const conversionStatements = [
-  { type: 'TAG_NOOP' }, // FIXME: should be TAG_TAG_NOOP
-  { type: 'TAG_UNIT' },
-  { type: 'TAG_UNIT_POWER_PREFIX' },
-  { type: 'TAG_UNIT_POWER_SUFFIX' },
-  { type: 'TAG_OPERATOR', value: 'NEGATE' },
-  { type: 'TAG_COMMA' },
+  { type: TAG_NOOP },
+  { type: TAG_UNIT },
+  { type: TAG_UNIT_POWER_PREFIX },
+  { type: TAG_UNIT_POWER_SUFFIX },
+  { type: TAG_OPERATOR, value: NEGATE },
+  { type: TAG_COMMA },
 ];
 const isConversionStatement = tag => any(whereEq(__, tag), conversionStatements);
-const isNoop = whereEq({ type: 'TAG_NOOP' }); // FIXME: it's in tagutils
+const isNoop = whereEq({ type: TAG_NOOP }); // FIXME: it's in tagutils
 const notNoop = complement(isNoop);
-const isComma = whereEq({ type: 'TAG_COMMA' });
+const isComma = whereEq({ type: TAG_COMMA });
 
 const addConversionToContext = (context, conversionTagsWithNoop, tags) => {
   const units = pipe(
@@ -247,7 +251,7 @@ export function findLeftConversion(context) {
   )(context.tags);
   const remainingTags = drop(length(conversionTags), context.tags);
 
-  if (isEmpty(conversionTags) || last(conversionTags).type !== 'TAG_NOOP') {
+  if (isEmpty(conversionTags) || last(conversionTags).type !== TAG_NOOP) {
     return context;
   }
 

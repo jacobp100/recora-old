@@ -5924,11 +5924,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
+	var _tagTypes = __webpack_require__(94);
+	
 	var _operatorTypes = __webpack_require__(123);
 	
-	var _util = __webpack_require__(116);
-	
 	var _typesDescriptors = __webpack_require__(93);
+	
+	// FIXME: call ./types/descriptors ./types/index, then just import './types'
+	
+	var _util = __webpack_require__(116);
 	
 	var _typesEntity = __webpack_require__(151);
 	
@@ -5947,13 +5951,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	var tagResolvers = {
+	  // This could be exported from a module
 	  TAG_NUMBER: function TAG_NUMBER(values, _ref) {
 	    var value = _ref.value;
 	
 	    _assert2['default'](typeof value === 'number');
 	    var lastItem = last(values);
 	
-	    if (lastItem.type === 'ENTITY' && lastItem.value === null) {
+	    if (lastItem.type === _typesDescriptors.entity.type && lastItem.value === null) {
 	      return adjust(assoc('value', value), -1, values);
 	    }
 	
@@ -5966,7 +5971,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // This code is almost identical for symbols (s/unit/symbol/g)
 	    var lastItem = last(values);
 	
-	    if (lastItem.type === 'ENTITY') {
+	    if (lastItem.type === _typesDescriptors.entity.type) {
 	      return adjust(evolve({
 	        units: over(lensProp(value), pipe(defaultTo(0), add(power)))
 	      }), -1, values);
@@ -5981,7 +5986,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // This code is almost identical for symbols (s/unit/symbol/g)
 	    var lastItem = last(values);
 	
-	    if (lastItem.type === 'ENTITY') {
+	    if (lastItem.type === _typesDescriptors.entity.type) {
 	      return adjust(evolve({
 	        symbols: over(lensProp(value), pipe(defaultTo(0), add(power)))
 	      }), -1, values);
@@ -5997,14 +6002,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var objectIsEmpty = pipe(keys, isEmpty);
 	
 	var valueTypeIsEmpty = where({
-	  type: equals('ENTITY'),
+	  type: equals(_typesDescriptors.entity.type),
 	  value: isNil,
 	  units: objectIsEmpty,
 	  symbols: objectIsEmpty
 	});
 	
 	var valueTypeHasNilValueButHasSymbols = where({
-	  type: equals('ENTITY'),
+	  type: equals(_typesDescriptors.entity.type),
 	  value: isNil,
 	  symbols: complement(objectIsEmpty)
 	});
@@ -6015,7 +6020,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// Only wrap in value group iff groups.length > 1
 	var groupOperations = reduce(function (operationGroup, tag) {
-	  if (tag.type === 'TAG_OPERATOR' && operationGroup.level === _operatorTypes.orderOperations[tag.value]) {
+	  if (tag.type === _tagTypes.TAG_OPERATOR && operationGroup.level === _operatorTypes.orderOperations[tag.value]) {
 	    return evolve({
 	      operations: append(tag.value),
 	      groups: append([])
@@ -6027,7 +6032,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, operationGroup);
 	});
 	
-	var tagOperatorMatchesValue = pipe(assoc('value', __, { type: 'TAG_OPERATOR' }), whereEq);
+	var tagOperatorMatchesValue = pipe(assoc('value', __, { type: _tagTypes.TAG_OPERATOR }), whereEq);
 	
 	var resolveOperations = curry(function (startLevel, tags) {
 	  var tagsContainOperation = pipe(tagOperatorMatchesValue, any(__, tags));
@@ -6049,7 +6054,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	
 	var splitTags = reduce(function (tags, tag) {
-	  if (tag.type === 'TAG_COMMA') {
+	  if (tag.type === _tagTypes.TAG_COMMA) {
 	    return append([tag], tags);
 	  }
 	  return adjust(append(tag), -1, tags);
@@ -6057,7 +6062,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var resolveTagsWithoutBrackets = pipe(splitTags, map(resolveOperations(0)));
 	
-	var isOpenBracket = propEq('type', 'TAG_OPEN_BRACKET');
+	var isOpenBracket = propEq('type', _tagTypes.TAG_OPEN_BRACKET);
 	
 	function resolveBrackets(tags) {
 	  var resolvedTags = tags;
@@ -6067,7 +6072,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var openBracket = tags[openBracketIndex];
 	
 	    var matchingCloseBracket = whereEq({
-	      type: 'TAG_CLOSE_BRACKET',
+	      type: _tagTypes.TAG_CLOSE_BRACKET,
 	      value: openBracket.value
 	    });
 	    var closeBracketIndex = findIndex(matchingCloseBracket, tags);
@@ -6093,14 +6098,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var createASTFromTags = pipe(resolveBrackets, ifElse(pipe(length, equals(1)), head, always(null)));
 	
-	var conversionStatements = [{ type: 'TAG_NOOP' }, // FIXME: should be TAG_TAG_NOOP
-	{ type: 'TAG_UNIT' }, { type: 'TAG_UNIT_POWER_PREFIX' }, { type: 'TAG_UNIT_POWER_SUFFIX' }, { type: 'TAG_OPERATOR', value: 'NEGATE' }, { type: 'TAG_COMMA' }];
+	var conversionStatements = [{ type: _tagTypes.TAG_NOOP }, { type: _tagTypes.TAG_UNIT }, { type: _tagTypes.TAG_UNIT_POWER_PREFIX }, { type: _tagTypes.TAG_UNIT_POWER_SUFFIX }, { type: _tagTypes.TAG_OPERATOR, value: _operatorTypes.NEGATE }, { type: _tagTypes.TAG_COMMA }];
 	var isConversionStatement = function isConversionStatement(tag) {
 	  return any(whereEq(__, tag), conversionStatements);
 	};
-	var isNoop = whereEq({ type: 'TAG_NOOP' }); // FIXME: it's in tagutils
+	var isNoop = whereEq({ type: _tagTypes.TAG_NOOP }); // FIXME: it's in tagutils
 	var notNoop = complement(isNoop);
-	var isComma = whereEq({ type: 'TAG_COMMA' });
+	var isComma = whereEq({ type: _tagTypes.TAG_COMMA });
 	
 	var addConversionToContext = function addConversionToContext(context, conversionTagsWithNoop, tags) {
 	  var units = pipe(reject(isNoop), reject(isComma), map(converge(createMapEntry, prop('value'), prop('power'))))(conversionTagsWithNoop);
@@ -6133,7 +6137,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var conversionTags = pipe(takeWhile(isConversionStatement), dropLastWhile(notNoop))(context.tags);
 	  var remainingTags = drop(length(conversionTags), context.tags);
 	
-	  if (isEmpty(conversionTags) || last(conversionTags).type !== 'TAG_NOOP') {
+	  if (isEmpty(conversionTags) || last(conversionTags).type !== _tagTypes.TAG_NOOP) {
 	    return context;
 	  }
 	
