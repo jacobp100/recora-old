@@ -1,19 +1,9 @@
-import { TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_COMMA } from './tags';
+import { TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET } from './tags';
+import { statementParts } from './text';
 import * as processTagElement from './processTagElement';
 import * as locale from '../locale';
 import { mapWithAccum } from '../util';
 
-const statementParts = [
-  null, // full text
-  TAG_OPEN_BRACKET,
-  TAG_CLOSE_BRACKET,
-  'TEXT_SYMBOL_UNIT',
-  null, // symbol-unit exponent
-  'TEXT_NUMBER',
-  'TEXT_COLOR',
-  'TEXT_OPERATOR',
-  TAG_COMMA,
-];
 
 const findValueAndType = pipe(
   zip(statementParts),

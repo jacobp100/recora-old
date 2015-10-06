@@ -1,4 +1,4 @@
-import { TAG_PARSE_OPTIONS, TAG_SYMBOL } from './tags';
+import { TAG_PARSE_OPTIONS } from './tags';
 import { isSymbol } from './tags/util';
 import parseText from './parseText';
 import preprocessTags from './preprocessTags';

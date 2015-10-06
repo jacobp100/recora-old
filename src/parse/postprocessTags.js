@@ -3,15 +3,8 @@ import { trimNoop } from './tags/util';
 import { SUBTRACT, DIVIDE, NEGATE } from '../operatorTypes';
 import { mapWithAccum, mapWithAccumRight, rejectNil } from '../util';
 
-const tagUnitPowerReciprocal = {
-  type: TAG_UNIT_POWER_PREFIX,
-  value: -1,
-};
-
-const tagNegate = {
-  type: TAG_OPERATOR,
-  value: NEGATE,
-};
+const tagUnitPowerReciprocal = { type: TAG_UNIT_POWER_PREFIX, value: -1 };
+const tagNegate = { type: TAG_OPERATOR, value: NEGATE };
 
 function fixNaturalNotationWithPrevious(previous, tag) {
   let newTag = tag;
