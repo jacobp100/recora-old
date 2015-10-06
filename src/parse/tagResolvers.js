@@ -7,15 +7,16 @@ function tagUnitSymbol(unitOrSymbol) {
     const lastItem = last(values);
 
     if (lastItem.type === entity.type) {
-      return adjust(evolve({
-        [unitOrSymbol]: over(
-          lensProp(value),
-          pipe(
-            defaultTo(0),
-            add(power),
-          ),
+      const addPowerToValue = over(
+        lensProp(value),
+        pipe(
+          defaultTo(0),
+          add(power),
         ),
-      }), -1, values);
+      );
+      const evolveArg = createMapEntry(unitOrSymbol, addPowerToValue);
+      const updateValuePower = evolve(evolveArg);
+      return adjust(updateValuePower, -1, values);
     }
 
     return append(assocPath([unitOrSymbol, value], power, entity), values);
@@ -34,6 +35,8 @@ export function TAG_NUMBER(values, { value }) {
   return append({ ...entity, value }, values);
 }
 
+export const TAG_UNIT = tagUnitSymbol('units');
+export const TAG_SYMBOL = tagUnitSymbol('symbols');
 export const TAG_NOOP = append(entity);
 export const BRACKET_GROUP = flip(append);
 export const DEFAULT = identity;
