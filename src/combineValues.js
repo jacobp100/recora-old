@@ -1,3 +1,4 @@
+import { entity } from './types';
 import { dimensions, baseDimensions } from './types/entity';
 import * as entityMath from './math/entity';
 
@@ -58,8 +59,8 @@ const combineEntities = cond([
 
 
 const combineValueMap = {
-  'ENTITY': {
-    'ENTITY': combineEntities,
+  [entity.type]: {
+    [entity.type]: combineEntities,
   },
 };
 

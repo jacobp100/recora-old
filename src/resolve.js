@@ -1,4 +1,5 @@
 /* eslint no-use-before-define: [1, "nofunc"] */
+import { operationsGroup, miscGroup, bracketGroup, entity } from './types';
 import * as math from './math';
 import combineValues from './combineValues';
 import { orderDirection } from './operatorTypes';
@@ -66,13 +67,13 @@ const resolveBracketGroup = ifElse(resolveBracketGroupHasOneGroup,
   always(null),
 );
 
-const resolveEntity = (context, locals, entity) => {
-  if (entity.value === null) {
+const resolveEntity = (context, locals, value) => {
+  if (value.value === null) {
     return null;
   }
 
   const symbolsMultilicationFactor = pipe(
-    mapObj((key, value) => (value * propOr(key, 0, entity.symbols))),
+    mapObj((symbol, power) => (power * propOr(symbol, 0, value.symbols))),
     values,
     ifElse(isEmpty,
       always(1),
@@ -83,7 +84,7 @@ const resolveEntity = (context, locals, entity) => {
   return evolve({
     value: multiply(symbolsMultilicationFactor),
     symbols: omit(keys(locals)),
-  })(entity);
+  })(value);
 };
 
 export function resolveWithLocals(context, locals, value) {
@@ -92,13 +93,13 @@ export function resolveWithLocals(context, locals, value) {
   }
 
   switch (value.type) {
-  case 'OPERATIONS_GROUP':
+  case operationsGroup.type:
     return resolveOperationsGroup(context, locals, value);
-  case 'MISC_GROUP':
+  case miscGroup.type:
     return resolveMiscGroup(context, locals, value);
-  case 'BRACKETS_GROUP':
+  case bracketGroup.type:
     return resolveBracketGroup(context, locals, value);
-  case 'ENTITY':
+  case entity.type:
     return resolveEntity(context, locals, value);
   default:
     return value;

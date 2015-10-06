@@ -1,4 +1,4 @@
-import { findLeftConversion, findRightConversion } from '../../parse/resolveTags';
+import { findLeftConversion, findRightConversion } from '../../src/parse/resolveTags';
 import assert from 'assert';
 
 describe('parse', function() {

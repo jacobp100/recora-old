@@ -13,12 +13,17 @@ export const compositeEntity = {
 
 export const operationsGroup = {
   type: 'OPERATIONS_GROUP',
-  groups: [],
-  operations: [],
+  groups: null,
+  operations: null,
   level: -1,
 };
 
-export const miscGroupBase = {
+export const bracketGroup = {
+  type: 'BRACKET_GROUP',
+  groups: null,
+};
+
+export const miscGroup = {
   type: 'MISC_GROUP',
   groups: null,
 };

@@ -1,6 +1,6 @@
-import { TAG_NOOP, TAG_COMMA, TAG_UNIT, TAG_OPERATOR, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX } from '../tagTypes';
+import { TAG_NOOP, TAG_COMMA, TAG_UNIT, TAG_SYMBOL, TAG_OPERATOR, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_NUMBER } from '../tagTypes';
 import { NEGATE } from '../operatorTypes';
-import { entity, miscGroupBase, empty } from '../types'; // FIXME: call ./types ./types/index, then just import './types'
+import { entity, miscGroup, empty, bracketGroup, operationsGroup } from '../types';
 import * as tagResolvers from './tagResolvers';
 import { orderOperations, operationsOrder } from '../operatorTypes';
 import { lengthIsOne } from '../util';
@@ -30,7 +30,7 @@ const resolveTagsWithoutOperations = pipe(
   cond([
     [isEmpty, always(empty)],
     [lengthIsOne, head],
-    [T, assoc('groups', __, miscGroupBase)], // Only wrap in value group iff groups.length > 1
+    [T, assoc('groups', __, miscGroup)], // Only wrap in value group iff groups.length > 1
   ]),
 );
 
@@ -71,7 +71,7 @@ const resolveOperations = curry((startLevel, tags) => {
 
   return pipe(
     groupOperations({
-      type: 'OPERATIONS_GROUP',
+      ...operationsGroup,
       groups: [[]],
       operations: [],
       level,
@@ -115,12 +115,12 @@ function resolveBrackets(tags) {
     const tagsInBracket = slice(openBracketIndex + 1, closeBracketIndex, tags);
     const tagsAfter = slice(closeBracketIndex + 1, Infinity, tags);
 
-    const bracketGroup = {
-      type: 'BRACKETS_GROUP',
+    const newBracketGroup = {
+      ...bracketGroup,
       groups: resolveBrackets(tagsInBracket),
     };
 
-    resolvedTags = [...tagsBefore, bracketGroup, ...tagsAfter];
+    resolvedTags = [...tagsBefore, newBracketGroup, ...tagsAfter];
   }
 
   return resolveTagsWithoutBrackets(resolvedTags);
@@ -203,7 +203,7 @@ export function findRightConversion(context) {
 
   const precedingTag = context.tags[length(context.tags) - length(conversionTags) - 1];
 
-  if (precedingTag && (precedingTag.type === 'TAG_NUMBER' || precedingTag.type === 'DATE_TIME')) {
+  if (precedingTag && (precedingTag.type === TAG_NUMBER || precedingTag.type === 'DATE_TIME')) {
     // Gathered too many tags and went into tags that would form an entity, drop some tags
     conversionTags = dropWhile(notNoop, conversionTags);
   }
@@ -227,7 +227,7 @@ const resolveTags = pipe(
 
 const hasMoreThanOneTag = pipe(
   prop('tags'),
-  filter(whereEq({ type: 'TAG_SYMBOL' })),
+  filter(whereEq({ type: TAG_SYMBOL })),
   pluck('value'),
   uniq,
   length,

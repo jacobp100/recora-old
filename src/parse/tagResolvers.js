@@ -51,5 +51,5 @@ export function TAG_SYMBOL(values, { value, power }) {
 }
 
 export const TAG_NOOP = append(entity);
-export const BRACKETS_GROUP = flip(append);
+export const BRACKET_GROUP = flip(append);
 export default identity;

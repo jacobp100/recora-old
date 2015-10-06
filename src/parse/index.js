@@ -1,15 +1,15 @@
-import baseContext from './baseContext';
-import { entity } from './types';
-import { TAG_PARSE_OPTIONS, TAG_SYMBOL } from './tagTypes';
-import { getFormattingHints } from './locale';
-import parseText from './parse/parseText';
-import preprocessTags from './parse/preprocessTags';
-import postprocessTags from './parse/postprocessTags';
-import resolveTags from './parse/resolveTags';
-import resolve from './resolve';
-import { toString } from './types/types';
-import { convert, convertComposite } from './types/entity';
-import { notNil, objectNotEmpty } from './util';
+import baseContext from '../baseContext';
+import { entity } from '../types';
+import { TAG_PARSE_OPTIONS, TAG_SYMBOL } from '../tagTypes';
+import { getFormattingHints } from '../locale';
+import parseText from './parseText';
+import preprocessTags from './preprocessTags';
+import postprocessTags from './postprocessTags';
+import resolveTags from './resolveTags';
+import resolve from '../resolve';
+import { toString } from '../types/types';
+import { convert, convertComposite } from '../types/entity';
+import { notNil, objectNotEmpty } from '../util';
 
 
 const cartesian = commute(of);

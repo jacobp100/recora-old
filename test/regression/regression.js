@@ -1,5 +1,5 @@
 import spec from './spec';
-import Recora from '../../index';
+import Recora from '../../src/';
 
 describe('regression', function() {
   this.slow(4);

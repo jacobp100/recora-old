@@ -5,4 +5,4 @@ require('babel/register')({
 const ramda = require('ramda');
 
 Object.assign(global, ramda);
-global.print = require('./debug/print');
+global.print = require('./src/debug/print');
