@@ -9,6 +9,6 @@ export function toString(context, value) {
   case compositeEntity.type:
     return compositeEntityToString(context, value);
   default:
-    return `[type ${value}]`;
+    return `[type ${value.type}]`;
   }
 }

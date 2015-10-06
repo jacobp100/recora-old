@@ -1,5 +1,5 @@
 /* eslint no-use-before-define: [1, "nofunc"] */
-import * as math from './math/math';
+import * as math from './math';
 import combineValues from './combineValues';
 import { orderDirection } from './operatorTypes';
 

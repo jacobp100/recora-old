@@ -1,4 +1,4 @@
-import { PARSE_OPTIONS, TAG_NOOP, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_COMMA, TAG_UNIT, TAG_SYMBOL, TAG_OPERATOR, TAG_NUMBER } from '../tagTypes';
+import { TAG_PARSE_OPTIONS, TAG_NOOP, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_COMMA, TAG_UNIT, TAG_SYMBOL, TAG_OPERATOR, TAG_NUMBER } from '../tagTypes';
 import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE } from '../operatorTypes';
 import { entity } from '../types';
 import * as locale from '../locale';
@@ -99,7 +99,7 @@ const processTagElement = {
 
     if (options.length > 1) {
       return {
-        type: PARSE_OPTIONS,
+        type: TAG_PARSE_OPTIONS,
         value: map(of, options), // wrap all option values to arrays
       };
     } else if (options.length === 1) {

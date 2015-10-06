@@ -12,7 +12,7 @@ ramdaPlugins.print = path.join(__dirname, 'debug/print');
 
 module.exports = {
   context: __dirname,
-  entry: './index',
+  entry: './src/index',
   devtool: 'source-map',
   output: {
     path: path.join(__dirname, '/dist'),

@@ -1,4 +1,4 @@
-export const PARSE_OPTIONS = 'PARSE_OPTIONS'; // FIXME: TAG_PARSE_OPTIONS
+export const TAG_PARSE_OPTIONS = 'TAG_PARSE_OPTIONS';
 export const TAG_CLOSE_BRACKET = 'TAG_CLOSE_BRACKET';
 export const TAG_COMMA = 'TAG_COMMA';
 export const TAG_NOOP = 'TAG_NOOP';

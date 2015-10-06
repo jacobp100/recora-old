@@ -1,3 +1,4 @@
+require('babel/register')
 require('source-map-support').install();
 const Recora = require('./dist/recora');
 

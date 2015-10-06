@@ -63,7 +63,7 @@ export function preprocessTags(context) {
 
     if (value === 'a') {
       return {
-        type: 'PARSE_OPTIONS',
+        type: 'TAG_PARSE_OPTIONS',
         value: [
           { type: 'TAG_SYMBOL', value: 'a', power: 1, start, end },
           { type: 'TAG_NUMBER', value: 1, start, end },

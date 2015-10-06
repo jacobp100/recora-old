@@ -1,6 +1,6 @@
 import baseContext from './baseContext';
 import { entity } from './types';
-import { PARSE_OPTIONS, TAG_SYMBOL } from './tagTypes';
+import { TAG_PARSE_OPTIONS, TAG_SYMBOL } from './tagTypes';
 import { getFormattingHints } from './locale';
 import parseText from './parse/parseText';
 import preprocessTags from './parse/preprocessTags';
@@ -20,7 +20,7 @@ const indexSquaredDistance = pipe(
   sum,
 );
 
-const isParseOption = whereEq({ type: PARSE_OPTIONS });
+const isParseOption = whereEq({ type: TAG_PARSE_OPTIONS });
 const getParseOptions = pipe(
   pickBy(isParseOption),
   toPairs,
