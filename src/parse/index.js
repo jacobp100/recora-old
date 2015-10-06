@@ -1,14 +1,15 @@
-import baseContext from '../baseContext';
-import { entity } from '../types';
-import { TAG_PARSE_OPTIONS, TAG_SYMBOL } from '../tagTypes';
-import { getFormattingHints } from '../locale';
+import { TAG_PARSE_OPTIONS, TAG_SYMBOL } from './tags';
+import { isSymbol } from './tags/util';
 import parseText from './parseText';
 import preprocessTags from './preprocessTags';
 import postprocessTags from './postprocessTags';
 import resolveTags from './resolveTags';
-import resolve from '../resolve';
+import baseContext from '../baseContext';
+import { entity } from '../types';
 import { toString } from '../types/types';
 import { convert, convertComposite } from '../types/entity';
+import { getFormattingHints } from '../locale';
+import resolve from '../resolve';
 import { notNil, objectNotEmpty } from '../util';
 
 
@@ -43,7 +44,6 @@ const transformParseOptions = (tags, parseOptions) => (
   })(tags)
 );
 
-const isSymbol = whereEq({ type: TAG_SYMBOL });
 const getParseOptionSymbols = pipe(
   filter(isParseOption),
   pluck('value'),

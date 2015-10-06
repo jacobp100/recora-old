@@ -1,10 +1,10 @@
-import { TAG_NOOP, TAG_COMMA, TAG_UNIT, TAG_SYMBOL, TAG_OPERATOR, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_NUMBER } from '../tagTypes';
-import { NEGATE } from '../operatorTypes';
-import { entity, miscGroup, empty, bracketGroup, operationsGroup } from '../types';
+import { TAG_NOOP, TAG_COMMA, TAG_UNIT, TAG_OPERATOR, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_NUMBER } from './tags';
+import { isNoop, isSymbol } from './tags/util';
 import * as tagResolvers from './tagResolvers';
-import { orderOperations, operationsOrder } from '../operatorTypes';
-import { lengthIsOne } from '../util';
+import { orderOperations, operationsOrder, NEGATE } from '../operatorTypes';
+import { entity, miscGroup, empty, bracketGroup, operationsGroup } from '../types';
 import { baseDimensions } from '../types/entity';
+import { lengthIsOne } from '../util';
 
 const objectIsEmpty = pipe(keys, isEmpty);
 
@@ -49,7 +49,7 @@ const groupOperations = reduce((operationGroup, tag) => {
 
 const tagOperatorMatchesValue = pipe(
   assoc('value', __, { type: TAG_OPERATOR }),
-  whereEq,
+  whereEq, // Uhh?
 );
 
 const resolveOperations = curry((startLevel, tags) => {
@@ -92,7 +92,7 @@ const resolveTagsWithoutBrackets = pipe(
   map(resolveOperations(0)),
 );
 
-const isOpenBracket = propEq('type', TAG_OPEN_BRACKET);
+const isOpenBracket = whereEq({ type: TAG_OPEN_BRACKET });
 
 function resolveBrackets(tags) {
   let resolvedTags = tags;
@@ -140,7 +140,6 @@ const conversionStatements = [
   { type: TAG_COMMA },
 ];
 const isConversionStatement = tag => any(whereEq(__, tag), conversionStatements);
-const isNoop = whereEq({ type: TAG_NOOP }); // FIXME: it's in tagutils
 const notNoop = complement(isNoop);
 const isComma = whereEq({ type: TAG_COMMA });
 
@@ -227,7 +226,7 @@ const resolveTags = pipe(
 
 const hasMoreThanOneTag = pipe(
   prop('tags'),
-  filter(whereEq({ type: TAG_SYMBOL })),
+  filter(isSymbol),
   pluck('value'),
   uniq,
   length,

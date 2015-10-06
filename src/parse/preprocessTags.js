@@ -1,4 +1,4 @@
-import { TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_COMMA } from '../tagTypes';
+import { TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_COMMA } from './tags';
 import * as processTagElement from './processTagElement';
 import * as locale from '../locale';
 import { mapWithAccum } from '../util';
