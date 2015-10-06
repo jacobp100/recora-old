@@ -1,6 +1,6 @@
 import { getNumberFormat } from '../locale';
 
-const regexpToArray = (exp, text) => {
+function regexpToArray(exp, text) {
   const regexp = new RegExp(exp, 'g');
   let result;
   const tags = [];
@@ -13,7 +13,7 @@ const regexpToArray = (exp, text) => {
   }
 
   return tags;
-};
+}
 
 function regexpToText({ locale, text }) {
   const numberFormat = getNumberFormat(locale);

@@ -2,16 +2,16 @@ import { TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET } from './tags';
 import { statementParts } from './text';
 import * as processTagElement from './processTagElement';
 import * as locale from '../locale';
-import { mapWithAccum } from '../util';
+import { mapWithAccum, notNil } from '../util';
 
 
 const findValueAndType = pipe(
   zip(statementParts),
-  filter(([type, tag]) => (type !== null && tag !== undefined)),
+  filter(all(notNil)),
   head,
 );
 
-const processTag = curry((context, captureGroup) => {
+function processTag(context, captureGroup) {
   if (captureGroup.type) {
     return captureGroup;
   }
@@ -22,7 +22,7 @@ const processTag = curry((context, captureGroup) => {
   const newTag = { start, end, value, type };
 
   return (processTagElement[type] || processTagElement.DEFAULT)(context, newTag, captureGroup);
-});
+}
 
 function resolveTagBracket(bracketLevel, tag) {
   if (tag.type === TAG_OPEN_BRACKET) {
@@ -41,7 +41,7 @@ const preprocessTags = pipe(
   ),
   over(
     lens(identity, assoc('tags')),
-    context => map(processTag(context), context.tags),
+    context => map(partial(processTag, context), context.tags),
   ),
   over(
     lensProp('tags'),

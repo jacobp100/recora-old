@@ -4,21 +4,19 @@ import * as tagResolvers from './tagResolvers';
 import { orderOperations, operationsOrder, NEGATE } from '../operatorTypes';
 import { entity, miscGroup, empty, bracketGroup, operationsGroup } from '../types';
 import { baseDimensions } from '../types/entity';
-import { lengthIsOne } from '../util';
-
-const objectIsEmpty = pipe(keys, isEmpty);
+import { lengthIsOne, objectEmpty } from '../util';
 
 const valueTypeIsEmpty = where({
   type: equals(entity.type),
   value: isNil,
-  units: objectIsEmpty,
-  symbols: objectIsEmpty,
+  units: objectEmpty,
+  symbols: objectEmpty,
 });
 
 const valueTypeHasNilValueButHasSymbols = where({
   type: equals(entity.type),
   value: isNil,
-  symbols: complement(objectIsEmpty),
+  symbols: complement(objectEmpty),
 });
 
 const resolveTagsWithoutOperations = pipe(
@@ -47,12 +45,9 @@ const groupOperations = reduce((operationGroup, tag) => {
   }, operationGroup);
 });
 
-const tagOperatorMatchesValue = pipe(
-  assoc('value', __, { type: TAG_OPERATOR }),
-  whereEq, // Uhh?
-);
+const tagOperatorMatchesValue = value => whereEq({ type: TAG_OPERATOR, value });
 
-const resolveOperations = curry((startLevel, tags) => {
+function resolveOperations(startLevel, tags) {
   const tagsContainOperation = pipe(
     tagOperatorMatchesValue,
     any(__, tags),
@@ -76,9 +71,9 @@ const resolveOperations = curry((startLevel, tags) => {
       operations: [],
       level,
     }),
-    evolve({ groups: map(resolveOperations(level + 1)) }),
+    evolve({ groups: map(partial(resolveOperations, level + 1)) }),
   )(tags);
-});
+}
 
 const splitTags = reduce((tags, tag) => {
   if (tag.type === TAG_COMMA) {
@@ -89,7 +84,7 @@ const splitTags = reduce((tags, tag) => {
 
 const resolveTagsWithoutBrackets = pipe(
   splitTags,
-  map(resolveOperations(0)),
+  map(partial(resolveOperations, 0)),
 );
 
 const isOpenBracket = whereEq({ type: TAG_OPEN_BRACKET });
@@ -131,17 +126,18 @@ const createASTFromTags = pipe(
   ifElse(pipe(length, equals(1)), head, always(null)),
 );
 
-const conversionStatements = [
-  { type: TAG_NOOP },
-  { type: TAG_UNIT },
-  { type: TAG_UNIT_POWER_PREFIX },
-  { type: TAG_UNIT_POWER_SUFFIX },
-  { type: TAG_OPERATOR, value: NEGATE },
-  { type: TAG_COMMA },
-];
-const isConversionStatement = tag => any(whereEq(__, tag), conversionStatements);
 const notNoop = complement(isNoop);
 const isComma = whereEq({ type: TAG_COMMA });
+const conversionStatements = [
+  isNoop,
+  isComma,
+  whereEq({ type: TAG_UNIT }),
+  whereEq({ type: TAG_UNIT_POWER_PREFIX }),
+  whereEq({ type: TAG_UNIT_POWER_SUFFIX }),
+  whereEq({ type: TAG_OPERATOR, value: NEGATE }),
+  whereEq({ type: TAG_COMMA }),
+];
+const isConversionStatement = anyPass(conversionStatements);
 
 const addConversionToContext = (context, conversionTagsWithNoop, tags) => {
   const units = pipe(
