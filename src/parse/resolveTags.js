@@ -23,7 +23,7 @@ const valueTypeHasNilValueButHasSymbols = where({
 
 const resolveTagsWithoutOperations = pipe(
   reduce((values, tag) => (
-    (tagResolvers[tag.type] || tagResolvers.default)(values, tag)
+    (tagResolvers[tag.type] || tagResolvers.DEFAULT)(values, tag)
   ), [entity]),
   map(ifElse(valueTypeHasNilValueButHasSymbols, assoc('value', 1), identity)),
   reject(valueTypeIsEmpty),

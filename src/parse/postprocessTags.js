@@ -1,6 +1,6 @@
 import { TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_OPERATOR, TAG_UNIT } from '../tagTypes';
-import { SUBTRACT, DIVIDE } from '../operatorTypes';
-import { untailTags, trimNoop } from '../utils/tagUtils';
+import { SUBTRACT, DIVIDE, NEGATE } from '../operatorTypes';
+import { trimNoop } from '../tagUtils';
 import { mapWithAccum, mapWithAccumRight, rejectNil } from '../util';
 
 const tagUnitPowerReciprocal = {
@@ -10,7 +10,7 @@ const tagUnitPowerReciprocal = {
 
 const tagNegate = {
   type: TAG_OPERATOR,
-  value: 'NEGATE',
+  value: NEGATE,
 };
 
 function fixNaturalNotationWithPrevious(previous, tag) {
@@ -76,7 +76,6 @@ const resolveUnitPowers = pipe(
 const postprocessTags = over(
   lensProp('tags'),
   pipe(
-    untailTags,
     fixNaturalMathNotation,
     resolveUnitPowers,
     trimNoop,
