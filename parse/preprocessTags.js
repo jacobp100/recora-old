@@ -1,6 +1,6 @@
 import { PARSE_OPTIONS, TAG_NOOP, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_COMMA, TAG_UNIT, TAG_SYMBOL, TAG_OPERATOR, TAG_NUMBER } from '../tagTypes';
 import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE } from '../operatorTypes';
-import { entity } from '../types/descriptors';
+import { entity } from '../types';
 import * as locale from '../locale';
 import { mapWithAccum } from '../util';
 

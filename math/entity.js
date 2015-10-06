@@ -1,4 +1,4 @@
-import { entity } from '../types/descriptors';
+import { entity } from '../types';
 import { baseDimensions, toSi, resolveDimensionlessUnits } from '../types/entity';
 
 

@@ -1,4 +1,4 @@
-import { entity, compositeEntity } from './descriptors';
+import { entity, compositeEntity } from './index';
 import { toString as entityToString } from './entity';
 import { toString as compositeEntityToString } from './compositeEntity';
 

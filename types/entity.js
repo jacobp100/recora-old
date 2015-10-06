@@ -1,4 +1,4 @@
-import { entity as entityDescriptor } from './descriptors';
+import { entity as entityDescriptor } from './index';
 import unitsDerived from '../data/unitsDerived';
 import { getUnitValue, getSiUnit, formatEntity } from '../locale';
 import { mapWithAccum } from '../util';

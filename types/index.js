@@ -17,3 +17,13 @@ export const operationsGroup = {
   operations: [],
   level: -1,
 };
+
+export const miscGroupBase = {
+  type: 'MISC_GROUP',
+  groups: null,
+};
+
+export const empty = {
+  type: 'EMPTY',
+  value: null,
+};

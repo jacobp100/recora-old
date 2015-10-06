@@ -1,4 +1,4 @@
-import { entity } from '../../types/descriptors';
+import { entity } from '../../types';
 import { isResolvable, dimensions, baseDimensions, toSi, convert, convertComposite } from '../../types/entity';
 import * as locale from '../../locale';
 import assert from 'assert';

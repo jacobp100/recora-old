@@ -1,74 +1,10 @@
 import { TAG_NOOP, TAG_COMMA, TAG_UNIT, TAG_OPERATOR, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX } from '../tagTypes';
 import { NEGATE } from '../operatorTypes';
-import { entity } from '../types/descriptors'; // FIXME: call ./types/descriptors ./types/index, then just import './types'
+import { entity, miscGroupBase, empty } from '../types'; // FIXME: call ./types ./types/index, then just import './types'
+import * as tagResolvers from './tagResolvers';
 import { orderOperations, operationsOrder } from '../operatorTypes';
 import { lengthIsOne } from '../util';
-import { entity as entityDescriptor } from '../types/descriptors';
 import { baseDimensions } from '../types/entity';
-import assert from 'assert';
-
-const miscGroupBase = { // FIXME
-  type: 'MISC_GROUP',
-  groups: null,
-};
-
-const empty = {
-  type: 'EMPTY',
-  value: null,
-};
-
-const tagResolvers = {
-  // This could be exported from a module
-  TAG_NUMBER(values, { value }) {
-    assert(typeof value === 'number');
-    const lastItem = last(values);
-
-    if (lastItem.type === entity.type && lastItem.value === null) {
-      return adjust(assoc('value', value), -1, values);
-    }
-
-    return append({ ...entityDescriptor, value }, values);
-  },
-  TAG_UNIT(values, { value, power }) {
-    // This code is almost identical for symbols (s/unit/symbol/g)
-    const lastItem = last(values);
-
-    if (lastItem.type === entity.type) {
-      return adjust(evolve({
-        units: over(
-          lensProp(value),
-          pipe(
-            defaultTo(0),
-            add(power),
-          ),
-        ),
-      }), -1, values);
-    }
-
-    return append(assocPath(['units', value], power, entityDescriptor), values);
-  },
-  TAG_SYMBOL(values, { value, power }) {
-    // This code is almost identical for symbols (s/unit/symbol/g)
-    const lastItem = last(values);
-
-    if (lastItem.type === entity.type) {
-      return adjust(evolve({
-        symbols: over(
-          lensProp(value),
-          pipe(
-            defaultTo(0),
-            add(power),
-          ),
-        ),
-      }), -1, values);
-    }
-
-    return append(assocPath(['symbols', value], power, entityDescriptor), values);
-  },
-  TAG_NOOP: append(entityDescriptor),
-  BRACKETS_GROUP: flip(append),
-  default: identity,
-};
 
 const objectIsEmpty = pipe(keys, isEmpty);
 
@@ -88,7 +24,7 @@ const valueTypeHasNilValueButHasSymbols = where({
 const resolveTagsWithoutOperations = pipe(
   reduce((values, tag) => (
     (tagResolvers[tag.type] || tagResolvers.default)(values, tag)
-  ), [entityDescriptor]),
+  ), [entity]),
   map(ifElse(valueTypeHasNilValueButHasSymbols, assoc('value', 1), identity)),
   reject(valueTypeIsEmpty),
   cond([
@@ -225,7 +161,7 @@ const addConversionToContext = (context, conversionTagsWithNoop, tags) => {
   }
 
   const allEqualDimensions = pipe(
-    map(assoc('units', __, entityDescriptor)), // Get entities
+    map(assoc('units', __, entity)), // Get entities
     map(partial(baseDimensions, context)),
     uniq,
     length,

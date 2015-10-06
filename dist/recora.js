@@ -5930,7 +5930,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _typesDescriptors = __webpack_require__(93);
 	
-	// FIXME: call ./types/descriptors ./types/index, then just import './types'
+	// FIXME: call ./types ./types/index, then just import './types'
 	
 	var _util = __webpack_require__(116);
 	

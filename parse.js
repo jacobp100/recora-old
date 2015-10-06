@@ -1,5 +1,5 @@
 import baseContext from './baseContext';
-import { entity } from './types/descriptors';
+import { entity } from './types';
 import { PARSE_OPTIONS, TAG_SYMBOL } from './tagTypes';
 import { getFormattingHints } from './locale';
 import parseText from './parse/parseText';
