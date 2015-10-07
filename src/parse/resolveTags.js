@@ -135,7 +135,6 @@ const conversionStatements = [
   whereEq({ type: TAG_UNIT_POWER_PREFIX }),
   whereEq({ type: TAG_UNIT_POWER_SUFFIX }),
   whereEq({ type: TAG_OPERATOR, value: NEGATE }),
-  whereEq({ type: TAG_COMMA }),
 ];
 const isConversionStatement = anyPass(conversionStatements);
 
@@ -159,8 +158,7 @@ const addConversionToContext = (context, conversionTagsWithNoop, tags) => {
     map(assoc('units', __, entity)), // Get entities
     map(partial(baseDimensions, context)),
     uniq,
-    length,
-    equals(1),
+    lengthIsOne,
   )(units);
 
   if (allEqualDimensions) {

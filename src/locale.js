@@ -1,3 +1,5 @@
+import { TAG_OPERATOR, TAG_SYMBOL, TAG_NUMBER, TAG_NOOP } from './parse/tags';
+import { MULTIPLY_COND_DIMENSIONS_LENGTH_1 } from './operatorTypes';
 import units from './units';
 import si from './data/environment/si';
 import abbreviations from './data/en/abbreviations';
@@ -65,12 +67,21 @@ export function preprocessTags(context) {
       return {
         type: 'TAG_PARSE_OPTIONS',
         value: [
-          { type: 'TAG_SYMBOL', value: 'a', power: 1, start, end },
-          { type: 'TAG_NUMBER', value: 1, start, end },
-          { type: 'TAG_NOOP', start, end },
+          [{ type: TAG_SYMBOL, value: 'a', power: 1, start, end }],
+          [{ type: TAG_NUMBER, value: 1, start, end }],
+          [{ type: TAG_NOOP, start, end }],
         ],
       };
-    } else if (unitPowerPrefixes[value]) {
+    } else if (value === 'by') {
+      return {
+        type: 'TAG_PARSE_OPTIONS',
+        value: [
+          [{ type: TAG_OPERATOR, value: MULTIPLY_COND_DIMENSIONS_LENGTH_1, start, end }],
+          [{ type: TAG_SYMBOL, value: 'by', power: 1, start, end }],
+          [{ type: TAG_NOOP, start, end }],
+        ],
+      };
+    }else if (unitPowerPrefixes[value]) {
       return { type: 'TAG_UNIT_POWER_PREFIX', value: unitPowerPrefixes[value], start, end };
     } else if (unitPowerSuffixes[value]) {
       return { type: 'TAG_UNIT_POWER_SUFFIX', value: unitPowerSuffixes[value], start, end };

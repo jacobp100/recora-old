@@ -1,7 +1,7 @@
-require('babel/register')
-require('source-map-support').install();
-const Recora = require('./dist/recora');
+require('./mochahook');
+// require('source-map-support').install();
+const Recora = require('./src');
 
 const recora = new Recora();
 
-console.log(JSON.stringify(recora.parse('how how brown cow')));
+console.log(JSON.stringify(recora.parse('20cm by 20cm')));

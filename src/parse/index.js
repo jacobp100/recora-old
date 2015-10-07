@@ -113,8 +113,6 @@ const entityWithSymbols = where({
 });
 const resultIsNil = where({ result: isNil });
 const resultIsEntityWithSymbols = where({ result: entityWithSymbols });
-const oneContext = pipe(length, equals(1));
-const multipleContexts = pipe(length, gt(1));
 
 const parseTagsWithOptions = pipe(
   getTagOptions,
@@ -125,11 +123,7 @@ const parseTagsWithOptions = pipe(
   reject(resultIsNil),
   uniqWith((a, b) => equals(a.result, b.result)),
   map(resultToString),
-  cond([
-    [oneContext, head],
-    [multipleContexts, always({ error: 'ambiguous result', ...baseContext })],
-    [isEmpty, always({ error: 'no result', ...baseContext })],
-  ]),
+  head,
 );
 
 

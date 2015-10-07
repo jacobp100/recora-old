@@ -42,8 +42,6 @@ const lhsUnitsLengthLessThanRhsUnitsLength = converge(lt,
 const combineEntities = cond([
   // Unitless values multiply: `2 sin(...)` etc
   [eitherBaseDimensionsEmpty, entityMath.multiply],
-  // 5cm by 40cm should be multiplied and not added (as would happen below)
-  [unitsEqual, entityMath.multiply],
 	// If the dimensions are equal, either convert or add (unless unitless)
 	// I.e. `3 feet 5 inches` needs to be added
 	[baseDimensionsEqual, entityMath.add],
