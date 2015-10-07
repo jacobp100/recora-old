@@ -3,7 +3,7 @@ import { getTagOptions } from '../../src/parse';
 import assert from 'assert';
 
 describe('parse', function() {
-  describe.only('get tag options', function() {
+  describe('get tag options', function() {
     it('should return all options in order for parse options', function() {
       const option1 = { type: TAG_SYMBOL, value: 'to' };
       const option2 = { type: TAG_NOOP };

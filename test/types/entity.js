@@ -1,4 +1,4 @@
-import { entity } from '../../src/types';
+import { entity, compositeEntity } from '../../src/types';
 import { isResolvable, dimensions, baseDimensions, toSi, convert, convertComposite } from '../../src/types/entity';
 import * as locale from '../../src/environment';
 import assert from 'assert';
@@ -168,7 +168,7 @@ describe('entity type', function() {
       const result = convertComposite(normalContext, units, value);
       const [feet, inch] = result.value;
 
-      assert.equal(result.type, 'COMPOSITE_ENTITY');
+      assert.equal(result.type, compositeEntity.type);
       assert.equal(result.value.length, 2);
       assert.equal(feet.value, 3);
       assert.deepEqual(feet.units, { foot: 1 });

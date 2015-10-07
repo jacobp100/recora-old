@@ -22,7 +22,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 2 };
       const result = add(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.equal(result.value, 3);
       assert.deepEqual(result.units, {});
       assert.deepEqual(result.symbols, {});
@@ -35,7 +35,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 2, units: { inch: 1 } };
       const result = add(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.equal(result.value, 3);
       assert.deepEqual(result.units, { inch: 1 });
       assert.deepEqual(result.symbols, {});
@@ -48,7 +48,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 2, units: { yard: 1 } };
       const result = add(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.deepEqual(result.units, { meter: 1 });
       assert.deepEqual(result.symbols, {});
     });
@@ -60,7 +60,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 2, units: { yard: 1 } };
       const result = add(newContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.deepEqual(result.units, { inch: 1 });
       assert.deepEqual(result.symbols, {});
     });
@@ -86,7 +86,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 0, units: { second: 1 } };
       const result = add(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.equal(result.value, 1);
       assert.deepEqual(result.units, { inch: 1 });
     });
@@ -96,7 +96,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 0, symbols: { b: 1 } };
       const result = add(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.equal(result.value, 1);
       assert.deepEqual(result.symbols, { a: 1 });
     });
@@ -108,7 +108,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 2 };
       const result = subtract(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.equal(result.value, -1);
       assert.deepEqual(result.units, {});
       assert.deepEqual(result.symbols, {});
@@ -119,7 +119,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 1, units: { second: 1 } };
       const result = subtract(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.equal(result.value, -1);
       assert.deepEqual(result.units, { second: 1 });
     });
@@ -129,7 +129,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 1, symbols: { b: 1 } };
       const result = subtract(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.equal(result.value, -1);
       assert.deepEqual(result.symbols, { b: 1 });
     });
@@ -151,7 +151,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 0, units: { inch: 1 } };
       const result = multiply(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.equal(result.value, 0);
       assert.deepEqual(result.units, {});
       assert.deepEqual(result.symbols, {});
@@ -164,7 +164,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 3, units: { inch: 1 } };
       const result = multiply(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.equal(result.value, 3);
       assert.deepEqual(result.units, { inch: 2 });
       assert.deepEqual(result.symbols, {});
@@ -177,7 +177,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 1, units: { inch: 1 } };
       const result = multiply(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.deepEqual(result.units, { meter: 2 });
       assert.deepEqual(result.symbols, {});
     });
@@ -187,7 +187,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 3, symbols: { b: -1 } };
       const result = multiply(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.equal(result.value, 3);
       assert.deepEqual(result.units, {});
       assert.deepEqual(result.symbols, { a: 1, b: -1 });
@@ -198,7 +198,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 1, units: { degree: 1 } };
       const result = multiply(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.equal(result.value.toFixed(5), '0.00030');
       assert.deepEqual(result.units, {});
     });
@@ -251,7 +251,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 2, units: { inch: -1 } };
       const result = divide(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.equal(result.value, 2);
       assert.deepEqual(result.units, { inch: 2 });
       assert.deepEqual(result.symbols, {});
@@ -262,7 +262,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 0, units: { second: 1 } };
       const result = divide(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.equal(result.value, Infinity);
       assert.deepEqual(result.units, { meter: 1, second: -1 });
       assert.deepEqual(result.symbols, {});
@@ -273,7 +273,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 3, symbols: { b: -1 } };
       const result = divide(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.equal(result.value, 3);
       assert.deepEqual(result.units, {});
       assert.deepEqual(result.symbols, { a: 1, b: 1 });
@@ -312,7 +312,7 @@ describe('entity math', function() {
       const rhs = { ...entity, value: 3 };
       const result = exponent(normalContext, lhs, rhs);
 
-      assert.equal(result.type, 'ENTITY');
+      assert.equal(result.type, entity.type);
       assert.equal(result.value, 8);
       assert.deepEqual(result.units, { meter: 3 });
       assert.deepEqual(result.symbols, { a: -6 });
