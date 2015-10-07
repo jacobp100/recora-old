@@ -22,10 +22,6 @@ const eitherBaseDimensionsEmpty = anyPass([
   converge(baseDimensionsEmpty, context, lhs),
   converge(baseDimensionsEmpty, context, rhs),
 ]);
-const unitsEqual = converge(equals,
-	pipe(lhs, units),
-	pipe(rhs, units),
-);
 const baseDimensionsEqual = converge(equals,
 	converge(baseDimensions, context, lhs),
 	converge(baseDimensions, context, rhs),
