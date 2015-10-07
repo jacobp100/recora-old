@@ -1,5 +1,5 @@
 import { TAG_PARSE_OPTIONS, TAG_NOOP, TAG_UNIT, TAG_SYMBOL, TAG_OPERATOR, TAG_NUMBER } from './tags';
-import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE } from '../operatorTypes';
+import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE } from '../math/operators';
 import { getUnitName, parseNumber } from '../locale';
 import { entity } from '../types';
 

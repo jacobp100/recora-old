@@ -1,6 +1,6 @@
-import { entity } from './types';
-import { dimensions, baseDimensions } from './types/entity';
-import * as entityMath from './math/entity';
+import { entity } from '../types';
+import { dimensions, baseDimensions } from '../types/entity';
+import * as entityMath from '../math/entity';
 
 
 function shouldDivideDimensions(lhsDimensions, rhsDimensions) {

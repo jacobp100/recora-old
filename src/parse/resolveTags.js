@@ -1,7 +1,7 @@
 import { TAG_NOOP, TAG_COMMA, TAG_UNIT, TAG_OPERATOR, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_NUMBER } from './tags';
 import { isNoop, isSymbol } from './tags/util';
 import * as tagResolvers from './tagResolvers';
-import { orderOperations, operationsOrder, NEGATE } from '../operatorTypes';
+import { orderOperations, operationsOrder, NEGATE } from '../math/operators';
 import { entity, miscGroup, empty, bracketGroup, operationsGroup } from '../types';
 import { baseDimensions } from '../types/entity';
 import { lengthIsOne, objectEmpty } from '../util';

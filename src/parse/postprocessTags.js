@@ -1,6 +1,6 @@
 import { TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_OPERATOR, TAG_UNIT } from './tags';
 import { trimNoop } from './tags/util';
-import { SUBTRACT, DIVIDE, NEGATE } from '../operatorTypes';
+import { SUBTRACT, DIVIDE, NEGATE } from '../math/operators';
 import { mapWithAccum, mapWithAccumRight, rejectNil } from '../util';
 
 const tagUnitPowerReciprocal = { type: TAG_UNIT_POWER_PREFIX, value: -1 };

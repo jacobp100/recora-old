@@ -1,8 +1,8 @@
 /* eslint no-use-before-define: [1, "nofunc"] */
-import { operationsGroup, miscGroup, bracketGroup, entity } from './types';
-import * as math from './math';
 import combineValues from './combineValues';
-import { orderDirection } from './operatorTypes';
+import { operationsGroup, miscGroup, bracketGroup, entity } from '../types';
+import * as math from '../math';
+import { orderDirection } from '../math/operators';
 
 const containsNil = any(isNil);
 const finalNil = pipe(always(reduced(null)));

@@ -1,5 +1,5 @@
 import { TAG_OPERATOR, TAG_SYMBOL, TAG_NUMBER, TAG_NOOP } from './parse/tags';
-import { MULTIPLY_COND_DIMENSIONS_LENGTH_1 } from './operatorTypes';
+import { MULTIPLY_COND_DIMENSIONS_LENGTH_1 } from './math/operators';
 import units from './units';
 import si from './data/environment/si';
 import abbreviations from './data/en/abbreviations';
