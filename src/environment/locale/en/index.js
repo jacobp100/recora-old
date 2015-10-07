@@ -8,12 +8,14 @@ export { preprocessTags } from './preprocessTags';
 
 
 export function getUnitName(context, unit) {
-  if (unit === 's') {
-    return 'second';
+  let abbreviation = abbreviations[unit];
+
+  if (abbreviation) {
+    return abbreviation;
   }
 
   const singularUnit = singularize(unit);
-  const abbreviation = abbreviations[singularUnit];
+  abbreviation = abbreviations[singularUnit];
 
   if (abbreviation) {
     return abbreviation;

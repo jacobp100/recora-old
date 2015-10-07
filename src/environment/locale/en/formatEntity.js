@@ -33,25 +33,26 @@ function formatEntityNumber(entity, formattingHints) {
   return entity.value.toExponential(3);
 }
 
-function formatEntityUnits(entity, str) {
-  return reduce((out, [unit, value]) => {
-    if (isSpecialUnit(unit)) {
-      return out;
-    } else if (value === 1 && unitFormatting[unit]) {
-      const specialUnit = unitFormatting[unit];
 
-      if (specialUnit.prefix) {
-        return specialUnit.prefix + out;
-      } else if (specialUnit.suffix) {
-        return out + specialUnit.suffix;
-      }
-    } else {
-      const unitPlural = (value >= 1 && entity.value !== 1) ? pluralize(unit) : unit;
+function formatEntityReducerFn(entity, out, [unit, value]) {
+  if (isSpecialUnit(unit)) {
+    return out;
+  } else if (value === 1 && unitFormatting[unit]) {
+    const specialUnit = unitFormatting[unit];
 
-      return `${out} ${(value < 0) ? 'per ' : ''}${unitPlural}${powerString(Math.abs(value))}`;
+    if (specialUnit.prefix) {
+      return specialUnit.prefix + out;
+    } else if (specialUnit.suffix) {
+      return out + specialUnit.suffix;
     }
-  }, str, toPairs(entity.units));
+  } else {
+    const unitPlural = (value >= 1 && entity.value !== 1) ? pluralize(unit) : unit;
+
+    return `${out} ${(value < 0) ? 'per ' : ''}${unitPlural}${powerString(Math.abs(value))}`;
+  }
 }
+const formatEntityUnits = (entity, str) => reduce(partial(formatEntityReducerFn, entity), str, toPairs(entity.units));
+
 
 export function formatEntity(context, entity, formattingHints) {
   return pipe(

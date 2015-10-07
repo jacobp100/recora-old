@@ -24,6 +24,7 @@
 	"fathom"            : { "type": "length",         "base": 1.8288        },
 	"furlong"           : { "type": "length",         "base": 201           },
 	"light year"        : { "type": "length",         "base": 9.4605284e15  },
+	"parsec"            : { "type": "length",         "base": 3.086e16      },
 	"angstrom"          : { "type": "length",         "base": 1e-10         },
 	"nautical mile"     : { "type": "length",         "base": 1852          },
 
