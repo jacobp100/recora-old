@@ -1,13 +1,11 @@
-import { TAG_OPERATOR, TAG_SYMBOL, TAG_NUMBER, TAG_NOOP } from './parse/tags';
-import { MULTIPLY_COND_DIMENSIONS_LENGTH_1 } from './math/operators';
-import units from './units';
-import si from './data/environment/si';
-import abbreviations from './data/en/abbreviations';
-import unitFormatting from './data/en/unitFormatting';
-import separatedUnits from './data/en/separatedUnits';
-import { findPatternIndex } from './util';
+import { TAG_OPERATOR, TAG_SYMBOL, TAG_NUMBER, TAG_NOOP } from '../../../parse/tags';
+import { MULTIPLY_COND_DIMENSIONS_LENGTH_1 } from '../../../math/operators';
+import units from '../../../units';
+import unitFormatting from '../../../data/en/unitFormatting';
+import abbreviations from '../../../data/en/abbreviations';
+import separatedUnits from '../../../data/en/separatedUnits';
+import { findPatternIndex } from '../../../util';
 
-// TODO: JSON
 const pluralMap = {
   'century': 'centuries',
   'inch': 'inches',
@@ -36,14 +34,8 @@ function pluralize(word) {
   return pluralMap[singular] || (singular + 's');
 }
 
-/*
-These functions are all in the locale 'en'. If we add more locales, we'll have to refactor this.
-*/
-
-export const getNumberFormat = always('\\d+(?:\\.\\d+)?');
-export const parseNumber = (context, value) => Number(value.replace(',', ''));
-export const getFormattingHints = merge({ hints: [] });
 export function preprocessTags(context) {
+  // FIXME: REFACTOR
   const unitPowerPrefixes = {
     per: -1,
     square: 2,
@@ -81,7 +73,7 @@ export function preprocessTags(context) {
           [{ type: TAG_NOOP, start, end }],
         ],
       };
-    }else if (unitPowerPrefixes[value]) {
+    } else if (unitPowerPrefixes[value]) {
       return { type: 'TAG_UNIT_POWER_PREFIX', value: unitPowerPrefixes[value], start, end };
     } else if (unitPowerSuffixes[value]) {
       return { type: 'TAG_UNIT_POWER_SUFFIX', value: unitPowerSuffixes[value], start, end };
@@ -122,13 +114,7 @@ export function preprocessTags(context) {
     ),
   )(context);
 }
-export function getSiUnit(context, name) {
-  return si[name] || name;
-}
-export function getUnitValue(context, name) {
-  // FIXME: Check context
-  return units[name];
-}
+
 export function getUnitName(context, unit) {
   if (unit === 's') {
     return 'second';
@@ -144,7 +130,6 @@ export function getUnitName(context, unit) {
   }
   return null;
 }
-export const getConstant = always(null); // FIXME
 
 // FIXME: This is all shitty. types/entity should call back into locale to do special formatting, such as currency, and also regular formatting, such as adding a unit
 const isSpecialUnit = pipe(

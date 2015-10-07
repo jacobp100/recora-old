@@ -1,4 +1,4 @@
-import { getNumberFormat } from '../locale';
+import { getNumberFormat } from '../environment';
 
 function regexpToArray(exp, text) {
   const regexp = new RegExp(exp, 'g');

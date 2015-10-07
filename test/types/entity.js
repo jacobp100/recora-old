@@ -1,6 +1,6 @@
 import { entity } from '../../src/types';
 import { isResolvable, dimensions, baseDimensions, toSi, convert, convertComposite } from '../../src/types/entity';
-import * as locale from '../../src/locale';
+import * as locale from '../../src/environment';
 import assert from 'assert';
 
 describe('entity type', function() {

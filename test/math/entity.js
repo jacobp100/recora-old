@@ -1,6 +1,6 @@
 import { entity } from '../../src/types';
 import { add, subtract, multiply, divide, exponent } from '../../src/math/entity';
-import * as locale from '../../src/locale';
+import * as locale from '../../src/environment';
 import assert from 'assert';
 
 describe('entity math', function() {

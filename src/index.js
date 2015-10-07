@@ -6,14 +6,16 @@ import baseContext from './baseContext';
 export default class Recora {
   constructor(locale) {
     this.locale = locale || 'en';
+    this.units = {};
     this.constants = {};
   }
 
   parse(text) {
-    const { locale, constants } = this;
+    const { locale, units, constants } = this;
     const context = {
       locale,
       text,
+      units,
       constants,
       ...baseContext,
     };

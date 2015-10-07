@@ -8,7 +8,7 @@ import baseContext from '../baseContext';
 import { entity } from '../types';
 import { toString } from '../types/types';
 import { convert, convertComposite } from '../types/entity';
-import { getFormattingHints } from '../locale';
+import { getFormattingHints } from '../environment';
 import resolve from '../resolve';
 import { notNil, objectNotEmpty } from '../util';
 
