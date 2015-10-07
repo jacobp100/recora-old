@@ -1,5 +1,5 @@
 import { entity } from '../../src/types';
-import { add, subtract, multiply, divide, exponent } from '../../src/math/entity';
+import { add, subtract, multiply, multiplyCondDimensionsLength1, divide, exponent } from '../../src/math/entity';
 import * as locale from '../../src/environment';
 import assert from 'assert';
 
@@ -50,6 +50,18 @@ describe('entity math', function() {
 
       assert.equal(result.type, 'ENTITY');
       assert.deepEqual(result.units, { meter: 1 });
+      assert.deepEqual(result.symbols, {});
+    });
+
+    it('should convert to si units defined in the context when adding two entities of differing units', function() {
+      const newContext = { ...normalContext, si: { length: 'inch' } };
+
+      const lhs = { ...entity, value: 1, units: { inch: 1 } };
+      const rhs = { ...entity, value: 2, units: { yard: 1 } };
+      const result = add(newContext, lhs, rhs);
+
+      assert.equal(result.type, 'ENTITY');
+      assert.deepEqual(result.units, { inch: 1 });
       assert.deepEqual(result.symbols, {});
     });
 
@@ -189,6 +201,45 @@ describe('entity math', function() {
       assert.equal(result.type, 'ENTITY');
       assert.equal(result.value.toFixed(5), '0.00030');
       assert.deepEqual(result.units, {});
+    });
+  });
+
+  describe('multiply cond dimensions length 1', function() {
+    it('should multiply if both dimensions are of type length', function() {
+      assert.notEqual(locale.getSiUnit(normalContext, 'length'), 'inch');
+
+      const lhs = { ...entity, value: 1, units: { inch: 1 } };
+      const rhs = { ...entity, value: 3, units: { inch: 1 } };
+      const expectedResult = multiply(normalContext, lhs, rhs);
+      const result = multiplyCondDimensionsLength1(normalContext, lhs, rhs);
+
+      assert.deepEqual(result, expectedResult);
+    });
+
+    it('should multiply if units are different but both dimensions are of type length', function() {
+      assert.notEqual(locale.getSiUnit(normalContext, 'length'), 'inch');
+
+      const lhs = { ...entity, value: 1, units: { inch: 1 } };
+      const rhs = { ...entity, value: 3, units: { meter: 1 } };
+      const result = multiplyCondDimensionsLength1(normalContext, lhs, rhs);
+      const expectedResult = multiply(normalContext, lhs, rhs);
+
+      assert.deepEqual(result, expectedResult);
+    });
+
+    it('should not multiply one side is not of dimensions length', function() {
+      assert.notEqual(locale.getSiUnit(normalContext, 'length'), 'inch');
+
+      const length = { ...entity, value: 1, units: { meter: 1 } };
+      const notLength = { ...entity, value: 3, units: { second: 1 } };
+
+      const result1 = multiplyCondDimensionsLength1(normalContext, length, notLength);
+      const result2 = multiplyCondDimensionsLength1(normalContext, notLength, length);
+      const result3 = multiplyCondDimensionsLength1(normalContext, notLength, notLength);
+
+      assert.equal(result1, null);
+      assert.equal(result2, null);
+      assert.equal(result3, null);
     });
   });
 

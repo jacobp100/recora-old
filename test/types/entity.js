@@ -113,6 +113,15 @@ describe('entity type', function() {
 
       assert.deepEqual(siValue.units, { meter: 1 });
     });
+
+    it('should convert to si units defined in the context', function() {
+      const newContext = { ...normalContext, si: { length: 'inch' } };
+
+      const value = { ...entity, units: { meter: 1 } };
+      const siValue = toSi(newContext, value);
+
+      assert.deepEqual(siValue.units, { inch: 1 });
+    });
   });
 
   describe('convert', function() {
