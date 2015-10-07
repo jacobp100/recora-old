@@ -4,7 +4,6 @@ import parseText from './parseText';
 import preprocessTags from './preprocessTags';
 import postprocessTags from './postprocessTags';
 import resolveTags from './resolveTags';
-import baseContext from '../baseContext';
 import { entity } from '../types';
 import { toString } from '../types/types';
 import { convert, convertComposite } from '../types/entity';
@@ -57,7 +56,7 @@ const countSymbols = pipe(
   countBy(prop('value')),
 );
 
-function getTagOptions(context) {
+export function getTagOptions(context) { // exported for testing
   // Assert that when we get the parse options, we either include occurances of a symbol, or none
   // I.e. x^2 + x = 5 either includes both occurances of x, or neither
   const symbolCount = countSymbols(context);

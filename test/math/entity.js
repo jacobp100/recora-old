@@ -4,7 +4,7 @@ import * as locale from '../../src/environment';
 import assert from 'assert';
 
 describe('entity math', function() {
-  const normalContext = {}; // Not implemented yet
+  const normalContext = {};
 
   describe('add', function() {
     it('should return null if one side is null', function() {

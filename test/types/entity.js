@@ -4,7 +4,7 @@ import * as locale from '../../src/environment';
 import assert from 'assert';
 
 describe('entity type', function() {
-  const normalContext = {}; // Not implemented yet
+  const normalContext = {};
 
   describe('is resolvable', function() {
     it('returns true if an entity contains only linear units', function() {
