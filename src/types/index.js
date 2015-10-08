@@ -5,6 +5,11 @@ export const entity = {
   symbols: {},
 };
 
+export const percentage = {
+  type: 'PERCENTAGE',
+  value: null,
+};
+
 export const funcApplication = {
   type: 'FUNC_APPLICATION',
   func: null,

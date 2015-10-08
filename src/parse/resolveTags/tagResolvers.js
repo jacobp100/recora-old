@@ -1,8 +1,9 @@
-import { entity } from '../../types';
+import { entity, percentage } from '../../types';
+import { objectEmpty } from '../../util';
 import assert from 'assert';
 
 
-// FIXME: should just be an object
+// FIXME: exports should just be an object
 function tagUnitSymbol(unitOrSymbol) {
   return function tagUnitOrSymbolFn(values, { value, power }) {
     const lastItem = last(values);
@@ -36,7 +37,24 @@ export function TAG_NUMBER(values, { value }) {
   return append({ ...entity, value }, values);
 }
 
-export const TAG_UNIT = tagUnitSymbol('units');
+const defaultResolveUnit = tagUnitSymbol('units');
+export function TAG_UNIT(values, unit) {
+  const lastItem = last(values);
+
+  if (unit.value !== 'percent') {
+    return defaultResolveUnit(values, unit);
+  }
+
+  let newValue = null;
+
+  if (lastItem.type === entity.type && objectEmpty(lastItem.units) && objectEmpty(lastItem.symbols)) {
+    const { value } = lastItem;
+    newValue = { ...percentage, value };
+  }
+
+  return update(-1, newValue, values);
+}
+
 export const TAG_SYMBOL = tagUnitSymbol('symbols');
 export const TAG_NOOP = append(entity);
 

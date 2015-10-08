@@ -125,12 +125,12 @@ const abstractMathExponent = cond([
 ]);
 
 
-const dimensionsAreLengthEq1 = equals({ length: 1 });
-const lhsDimensionsAreLengthEq1 = pipe(lhsDimensions, dimensionsAreLengthEq1);
-const rhsDimensionsAreLengthEq1 = pipe(rhsDimensions, dimensionsAreLengthEq1);
+const dimensionsAreLengthOnly = pipe(keys, equals(['length']));
+const lhsDimensionsAreLengthEq1 = pipe(lhsDimensions, dimensionsAreLengthOnly);
+const rhsDimensionsAreLengthEq1 = pipe(rhsDimensions, dimensionsAreLengthOnly);
 const bothDimensionsLength1 = allPass([lhsDimensionsAreLengthEq1, rhsDimensionsAreLengthEq1]);
 
-const abstractMathMultiplyCondDimensionsLength1 = cond([
+const abstractMathmultiplyCondDimensionsLengthOnly = cond([
   [bothDimensionsLength1, abstractMathMultiply],
   [T, toNil],
 ]);
@@ -139,7 +139,7 @@ const abstractMathMultiplyCondDimensionsLength1 = cond([
 const valueAdd = partial(abstractMathAdd, 1);
 const valueSubtract = partial(abstractMathAdd, -1);
 const valueMultiply = partial(abstractMathMultiply, 1);
-const valueMultiplyCondDimensionsLength1 = partial(abstractMathMultiplyCondDimensionsLength1, 1);
+const valuemultiplyCondDimensionsLengthOnly = partial(abstractMathmultiplyCondDimensionsLengthOnly, 1);
 const valueDivide = partial(abstractMathMultiply, -1);
 const valueExponent = partial(abstractMathExponent, 1);
 // No inverse exponent
@@ -148,7 +148,7 @@ export {
   valueAdd as add,
   valueSubtract as subtract,
   valueMultiply as multiply,
-  valueMultiplyCondDimensionsLength1 as multiplyCondDimensionsLength1,
+  valuemultiplyCondDimensionsLengthOnly as multiplyCondDimensionsLengthOnly,
   valueDivide as divide,
   valueExponent as exponent,
 };
