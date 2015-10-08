@@ -2,7 +2,7 @@ import { TAG_PARSE_OPTIONS, TAG_NOOP, TAG_UNIT, TAG_SYMBOL, TAG_OPERATOR, TAG_NU
 import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE } from '../../math/operators';
 import { getUnitName, parseNumber } from '../../environment';
 import { entity } from '../../types';
-import * as functions from '../../types/funcApplication/functions';
+import functions from '../../baseContext/functions';
 
 const charToOperator = {
   '+': ADD,

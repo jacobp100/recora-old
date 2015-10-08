@@ -8,7 +8,7 @@ export const entity = {
 export const funcApplication = {
   type: 'FUNC_APPLICATION',
   func: null,
-  groups: null,
+  groups: [],
 };
 
 export const func = {
@@ -25,19 +25,19 @@ export const compositeEntity = {
 
 export const operationsGroup = {
   type: 'OPERATIONS_GROUP',
-  groups: null,
-  operations: null,
+  groups: [],
+  operations: [[]],
   level: -1,
 };
 
 export const bracketGroup = {
   type: 'BRACKET_GROUP',
-  groups: null,
+  groups: [],
 };
 
 export const miscGroup = {
   type: 'MISC_GROUP',
-  groups: null,
+  groups: [],
 };
 
 export const empty = {
