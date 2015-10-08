@@ -1,10 +1,10 @@
-import { TAG_NOOP, TAG_COMMA, TAG_UNIT, TAG_OPERATOR, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_NUMBER } from './tags';
-import { isNoop, isSymbol } from './tags/util';
 import * as tagResolvers from './tagResolvers';
-import { orderOperations, operationsOrder, NEGATE } from '../math/operators';
-import { entity, miscGroup, empty, bracketGroup, operationsGroup } from '../types';
-import { baseDimensions } from '../types/entity';
-import { lengthIsOne, objectEmpty } from '../util';
+import { TAG_NOOP, TAG_COMMA, TAG_UNIT, TAG_OPERATOR, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_NUMBER, TAG_FUNCTION } from '../tags';
+import { isNoop, isSymbol } from '../tags/util';
+import { orderOperations, operationsOrder, NEGATE } from '../../math/operators';
+import { entity, funcApplication, func, miscGroup, empty, bracketGroup, operationsGroup } from '../../types';
+import { baseDimensions } from '../../types/entity';
+import { lengthIsOne, objectEmpty } from '../../util';
 
 const valueTypeIsEmpty = where({
   type: equals(entity.type),
@@ -19,7 +19,8 @@ const valueTypeHasNilValueButHasSymbols = where({
   symbols: complement(objectEmpty),
 });
 
-const resolveTagsWithoutOperations = pipe(
+
+const groupRemainingTags = pipe(
   reduce((values, tag) => (
     (tagResolvers[tag.type] || tagResolvers.DEFAULT)(values, tag)
   ), [entity]),
@@ -31,6 +32,53 @@ const resolveTagsWithoutOperations = pipe(
     [T, assoc('groups', __, miscGroup)], // Only wrap in value group iff groups.length > 1
   ]),
 );
+
+
+const isFunction = whereEq({ type: TAG_FUNCTION });
+
+function resolveTagsWithoutOperations(tags) {
+  const functionIndex = findIndex(isFunction, tags);
+
+  if (functionIndex === -1) {
+    return groupRemainingTags(tags);
+  }
+
+  const funcTag = tags[functionIndex];
+  const nextTag = tags[functionIndex + 1];
+
+  if (!nextTag) {
+    return groupRemainingTags(dropLast(1, tags));
+  }
+
+  const newFunc = { ...func, name: funcTag.value, power: funcTag.power };
+
+  const tagsBefore = slice(0, functionIndex, tags);
+
+  if (nextTag.type === bracketGroup.type) {
+    const tagsAfter = pipe(
+      slice(functionIndex + 2, Infinity),
+      resolveTagsWithoutOperations,
+    )(tags);
+
+    const newFuncApplication = {
+      ...funcApplication,
+      func: newFunc,
+      groups: nextTag.groups, // already resolved
+    };
+
+    return groupRemainingTags([...tagsBefore, newFuncApplication, ...tagsAfter]);
+  }
+
+  const funcArguments = slice(functionIndex + 1, Infinity, tags);
+  const newFuncApplication = {
+    ...funcApplication,
+    func: newFunc,
+    groups: [resolveTagsWithoutOperations(funcArguments)],
+  };
+
+  return groupRemainingTags([...tagsBefore, newFuncApplication]);
+}
+
 
 const groupOperations = reduce((operationGroup, tag) => {
   if (tag.type === TAG_OPERATOR && operationGroup.level === orderOperations[tag.value]) {
@@ -74,6 +122,7 @@ function resolveOperations(startLevel, tags) {
     evolve({ groups: map(partial(resolveOperations, level + 1)) }),
   )(tags);
 }
+
 
 const splitTags = reduce((tags, tag) => {
   if (tag.type === TAG_COMMA) {
@@ -121,6 +170,7 @@ function resolveBrackets(tags) {
   return resolveTagsWithoutBrackets(resolvedTags);
 }
 
+
 const createASTFromTags = pipe(
   resolveBrackets,
   ifElse(pipe(length, equals(1)), head, always(null)),
@@ -137,6 +187,7 @@ const conversionStatements = [
   whereEq({ type: TAG_OPERATOR, value: NEGATE }),
 ];
 const isConversionStatement = anyPass(conversionStatements);
+
 
 const addConversionToContext = (context, conversionTagsWithNoop, tags) => {
   const units = pipe(

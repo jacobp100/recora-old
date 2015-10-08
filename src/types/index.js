@@ -5,6 +5,18 @@ export const entity = {
   symbols: {},
 };
 
+export const funcApplication = {
+  type: 'FUNC_APPLICATION',
+  func: null,
+  groups: null,
+};
+
+export const func = {
+  type: 'FUNC',
+  name: null,
+  power: 1,
+};
+
 export const compositeEntity = {
   type: 'COMPOSITE_ENTITY',
   entity: null,

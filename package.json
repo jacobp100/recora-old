@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "mathp": "^1.4.0",
     "ramda": "^0.17.1"
   },
   "devDependencies": {

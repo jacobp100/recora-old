@@ -1,14 +1,14 @@
 {
-	"Kelvin"     : { "suffix": " Kelvin"   },
-	"Celsius"    : { "suffix": "℃"         },
-	"Fahrenheit" : { "suffix": "℉"         },
-	"gas mark"   : { "prefix": "Gas mark " },
-	"angstrom"   : { "suffix": " Å"        },
-	"GBP"        : { "prefix": "£"         },
-	"USD"        : { "prefix": "$"         },
-	"EUR"        : { "suffix": "€"         },
-	"percent"    : { "suffix": "%"         },
-	"degree"     : { "suffix": "°"         },
-	"arcsecond"  : { "suffix": "″"         },
-	"arcminute"  : { "suffix": "′"         }
+  "Kelvin"     : { "suffix": " Kelvin"   },
+  "Celsius"    : { "suffix": "℃"         },
+  "Fahrenheit" : { "suffix": "℉"         },
+  "gas mark"   : { "prefix": "Gas mark " },
+  "angstrom"   : { "suffix": " Å"        },
+  "GBP"        : { "prefix": "£"         },
+  "USD"        : { "prefix": "$"         },
+  "EUR"        : { "suffix": "€"         },
+  "percent"    : { "suffix": "%"         },
+  "degree"     : { "suffix": "°"         },
+  "arcsecond"  : { "suffix": "″"         },
+  "arcminute"  : { "suffix": "′"         }
 }

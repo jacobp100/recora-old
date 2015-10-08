@@ -23,31 +23,31 @@ const eitherBaseDimensionsEmpty = anyPass([
   converge(baseDimensionsEmpty, context, rhs),
 ]);
 const baseDimensionsEqual = converge(equals,
-	converge(baseDimensions, context, lhs),
-	converge(baseDimensions, context, rhs),
+  converge(baseDimensions, context, lhs),
+  converge(baseDimensions, context, rhs),
 );
 const shouldDivide = converge(shouldDivideDimensions,
-	converge(dimensions, context, lhs),
-	converge(dimensions, context, rhs),
+  converge(dimensions, context, lhs),
+  converge(dimensions, context, rhs),
 );
 const lhsUnitsLengthLessThanRhsUnitsLength = converge(lt,
-	pipe(lhs, unitsLength),
-	pipe(rhs, unitsLength),
+  pipe(lhs, unitsLength),
+  pipe(rhs, unitsLength),
 );
 
 const combineEntities = cond([
   // Unitless values multiply: `2 sin(...)` etc
   [eitherBaseDimensionsEmpty, entityMath.multiply],
-	// If the dimensions are equal, either convert or add (unless unitless)
-	// I.e. `3 feet 5 inches` needs to be added
-	[baseDimensionsEqual, entityMath.add],
-	// Divide the statement with the most units by the unit with the least
-	// I.e. `$5 at $3 per kilo` gives the same answer as `$3 per kilo using $5`
+  // If the dimensions are equal, either convert or add (unless unitless)
+  // I.e. `3 feet 5 inches` needs to be added
+  [baseDimensionsEqual, entityMath.add],
+  // Divide the statement with the most units by the unit with the least
+  // I.e. `$5 at $3 per kilo` gives the same answer as `$3 per kilo using $5`
   [shouldDivide, ifElse(lhsUnitsLengthLessThanRhsUnitsLength,
     (ctx, a, b) => entityMath.divide(ctx, b, a),
     entityMath.divide
   )],
-	// No idea, just mulitply
+  // No idea, just mulitply
   [T, entityMath.multiply],
 ]);
 

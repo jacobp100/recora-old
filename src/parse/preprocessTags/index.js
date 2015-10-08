@@ -1,8 +1,8 @@
-import { TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET } from './tags';
-import { statementParts } from './text';
 import * as processTagElement from './processTagElement';
-import * as locale from '../environment';
-import { mapWithAccum, notNil } from '../util';
+import { TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET } from '../tags';
+import { statementParts } from '../text';
+import * as locale from '../../environment';
+import { mapWithAccum, notNil } from '../../util';
 
 
 const findValueAndType = pipe(

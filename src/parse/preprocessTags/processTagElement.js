@@ -1,7 +1,8 @@
-import { TAG_PARSE_OPTIONS, TAG_NOOP, TAG_UNIT, TAG_SYMBOL, TAG_OPERATOR, TAG_NUMBER } from './tags';
-import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE } from '../math/operators';
-import { getUnitName, parseNumber } from '../environment';
-import { entity } from '../types';
+import { TAG_PARSE_OPTIONS, TAG_NOOP, TAG_UNIT, TAG_SYMBOL, TAG_OPERATOR, TAG_NUMBER, TAG_FUNCTION } from '../tags';
+import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE } from '../../math/operators';
+import { getUnitName, parseNumber } from '../../environment';
+import { entity } from '../../types';
+import * as functions from '../../types/funcApplication/functions';
 
 const charToOperator = {
   '+': ADD,
@@ -20,14 +21,14 @@ export function TEXT_SYMBOL_UNIT(context, tag, captureGroup) {
 
   const power = Number(captureGroup[4] || 1);
 
-  // if (functions.hasOwnProperty(value)) {
-  //   options.push({
-  //     ...out,
-  //     type: 'TAG_FUNCTION',
-  //     value,
-  //     power,
-  //   });
-  // }
+  if (functions[value]) {
+    options.push({
+      ...tag,
+      type: TAG_FUNCTION,
+      value,
+      power,
+    });
+  }
 
   // if (power === 1) {
   //   const colour = colorForge.css(value);

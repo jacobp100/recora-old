@@ -1,12 +1,12 @@
 {
-	"time"        : "second",
-	"length"      : "meter",
-	"currency"    : "GBP",
-	"weight"      : "gram",
-	"temperature" : "Celsius",
-	"area"        : "acre",
-	"volume"      : "liter",
-	"energy"      : "Joule",
-	"memory"      : "byte",
-	"power"       : "Watt"
+  "time"        : "second",
+  "length"      : "meter",
+  "currency"    : "GBP",
+  "weight"      : "gram",
+  "temperature" : "Celsius",
+  "area"        : "acre",
+  "volume"      : "liter",
+  "energy"      : "Joule",
+  "memory"      : "byte",
+  "power"       : "Watt"
 }

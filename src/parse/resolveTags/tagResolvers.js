@@ -1,4 +1,4 @@
-import { entity } from '../types';
+import { entity } from '../../types';
 import assert from 'assert';
 
 
@@ -38,5 +38,8 @@ export function TAG_NUMBER(values, { value }) {
 export const TAG_UNIT = tagUnitSymbol('units');
 export const TAG_SYMBOL = tagUnitSymbol('symbols');
 export const TAG_NOOP = append(entity);
+
 export const BRACKET_GROUP = flip(append);
+export const FUNC_APPLICATION = flip(append);
+
 export const DEFAULT = identity;

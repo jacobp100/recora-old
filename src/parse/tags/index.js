@@ -3,6 +3,7 @@ export const TAG_CLOSE_BRACKET = 'TAG_CLOSE_BRACKET';
 export const TAG_COMMA = 'TAG_COMMA';
 export const TAG_NOOP = 'TAG_NOOP';
 export const TAG_NUMBER = 'TAG_NUMBER';
+export const TAG_FUNCTION = 'TAG_FUNCTION';
 export const TAG_OPEN_BRACKET = 'TAG_OPEN_BRACKET';
 export const TAG_OPERATOR = 'TAG_OPERATOR';
 export const TAG_SYMBOL = 'TAG_SYMBOL';

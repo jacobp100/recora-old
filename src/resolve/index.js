@@ -1,6 +1,7 @@
 /* eslint no-use-before-define: [1, "nofunc"] */
 import combineValues from './combineValues';
-import { operationsGroup, miscGroup, bracketGroup, entity } from '../types';
+import { operationsGroup, miscGroup, bracketGroup, entity, funcApplication } from '../types';
+import { apply } from '../types/funcApplication'; // should this just be in math?
 import * as math from '../math';
 import { orderDirection } from '../math/operators';
 
@@ -53,6 +54,7 @@ const resolveOperationsGroup = (context, locals, group) => {
   );
 };
 
+
 const resolveMiscGroupReduceFn = resolveBreakNil(combineValues);
 const resolveMiscGroupReducer = (context, locals, group) => reduce(
   partial(resolveMiscGroupReduceFn, context),
@@ -66,6 +68,18 @@ const resolveBracketGroup = ifElse(resolveBracketGroupHasOneGroup,
   resolveMiscGroup,
   always(null),
 );
+
+
+const resolveFuncApplaction = (context, locals, value) => {
+  const groups = map(partial(resolveWithLocals, context, locals), value.groups);
+
+  if (containsNil(groups)) {
+    return null;
+  }
+
+  return apply(context, value.func, groups);
+};
+
 
 const resolveEntity = (context, locals, value) => {
   if (value.value === null) {
@@ -87,6 +101,7 @@ const resolveEntity = (context, locals, value) => {
   })(value);
 };
 
+
 export function resolveWithLocals(context, locals, value) {
   if (!value) {
     return null;
@@ -97,6 +112,8 @@ export function resolveWithLocals(context, locals, value) {
     return resolveOperationsGroup(context, locals, value);
   case miscGroup.type:
     return resolveMiscGroup(context, locals, value);
+  case funcApplication.type:
+    return resolveFuncApplaction(context, locals, value);
   case bracketGroup.type:
     return resolveBracketGroup(context, locals, value);
   case entity.type:
