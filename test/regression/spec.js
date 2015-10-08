@@ -70,7 +70,7 @@ export default [
   { "description": "accept shorthand", "input": "sqrt 4", "output": "2" },
   { "description": "accept shorthand", "input": "-sqrt 4", "output": "-2" },
   { "description": "accept shorthand", "input": "sqrt 4 + 1", "output": "3" },
-  // { "description": "accept shorthand", "input": "sin^2(1)", "output": "(sin(1))^2" },
+  { "description": "accept shorthand", "input": "sqrt^2(4)", "output": "4" },
   { "description": "accept shorthand", "input": "sqrt sqrt 16", "output": "2" },
   { "input": "2gb at 50kb/s to hours, minutes and seconds", "output": "11 hours 6 minutes 40 seconds" },
   { "input": "1 yard to feet and inches", "output": "3 feet 0 inches" },

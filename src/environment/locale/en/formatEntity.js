@@ -26,7 +26,7 @@ function formatEntityNumber(entity, formattingHints) {
     const magnitude = Math.pow(10, orderOfMagnitude);
 
     if (absValue - Math.floor(absValue) < magnitude * 1E-3) {
-      return entity.value.toFixed(0);
+      return entity.value.toFixed(0); // Last three numbers zero. i.e. 1,234,000
     }
     return entity.value.toFixed(2 - orderOfMagnitude);
   }
