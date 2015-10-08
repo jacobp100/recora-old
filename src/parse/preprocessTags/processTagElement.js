@@ -1,6 +1,7 @@
 import { TAG_PARSE_OPTIONS, TAG_NOOP, TAG_UNIT, TAG_SYMBOL, TAG_OPERATOR, TAG_NUMBER, TAG_FUNCTION } from '../tags';
+import { getUnitName, parseNumber, getConstant } from '../../environment';
 import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE } from '../../math/operators';
-import { getUnitName, parseNumber } from '../../environment';
+import { exponent } from '../../math/entity';
 import { entity } from '../../types';
 import functions from '../../baseContext/functions';
 
@@ -68,13 +69,9 @@ export function TEXT_SYMBOL_UNIT(context, tag, captureGroup) {
     canNoop = true;
   }
 
-  const constant = context.constants[value];
+  const constant = getConstant(context, value);
   if (constant) {
-    options.push({
-      ...tag,
-      type: entity.type,
-      value: constant.exponent(power),
-    });
+    options.push(exponent(context, constant, { ...entity, value: power }));
   }
 
   if (canNoop) {

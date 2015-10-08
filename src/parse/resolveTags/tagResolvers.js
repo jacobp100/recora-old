@@ -2,6 +2,7 @@ import { entity } from '../../types';
 import assert from 'assert';
 
 
+// FIXME: should just be an object
 function tagUnitSymbol(unitOrSymbol) {
   return function tagUnitOrSymbolFn(values, { value, power }) {
     const lastItem = last(values);
@@ -39,7 +40,9 @@ export const TAG_UNIT = tagUnitSymbol('units');
 export const TAG_SYMBOL = tagUnitSymbol('symbols');
 export const TAG_NOOP = append(entity);
 
-export const BRACKET_GROUP = flip(append);
-export const FUNC_APPLICATION = flip(append);
+const appendValue = flip(append);
+export const ENTITY = appendValue;
+export const BRACKET_GROUP = appendValue;
+export const FUNC_APPLICATION = appendValue;
 
 export const DEFAULT = identity;

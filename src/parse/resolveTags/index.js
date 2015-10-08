@@ -6,6 +6,7 @@ import { entity, funcApplication, func, miscGroup, empty, bracketGroup, operatio
 import { baseDimensions } from '../../types/entity';
 import { lengthIsOne, objectEmpty } from '../../util';
 
+
 const valueTypeIsEmpty = where({
   type: equals(entity.type),
   value: isNil,
