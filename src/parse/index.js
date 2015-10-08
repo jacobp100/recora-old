@@ -90,6 +90,7 @@ const hasConversion = where({ conversion: notNil });
 const result = prop('result');
 const conversion = prop('conversion');
 
+// convert and convertCompisite needs to be moved to types/types, so colours etc. can be converted
 const convertResult = over(
   lens(identity, assoc('result')),
   cond([

@@ -10,6 +10,11 @@ export const percentage = {
   value: null,
 };
 
+export const color = {
+  type: 'COLOR',
+  value: null,
+};
+
 export const funcApplication = {
   type: 'FUNC_APPLICATION',
   func: null,

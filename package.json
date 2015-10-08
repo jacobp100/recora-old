@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "color-forge": "^1.0.17",
     "mathp": "^1.4.0",
     "ramda": "^0.17.1"
   },

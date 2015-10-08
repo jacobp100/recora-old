@@ -37,30 +37,40 @@ export function TAG_NUMBER(values, { value }) {
   return append({ ...entity, value }, values);
 }
 
-const defaultResolveUnit = tagUnitSymbol('units');
-export function TAG_UNIT(values, unit) {
-  const lastItem = last(values);
 
+export const TAG_SYMBOL = tagUnitSymbol('symbols');
+const defaultResolveUnit = tagUnitSymbol('units');
+
+function entityToPercentage(value) {
+  if (objectEmpty(value.units) && objectEmpty(value.symbols)) {
+    return { ...percentage, value: value.value };
+  }
+  return null;
+}
+
+export function TAG_UNIT(values, unit) {
+  // Try to parse as an entity, unless we encounter a percentage
+  // In which case, attempty to convert, but return null if not possible (the entity had existing units or symbols)
   if (unit.value !== 'percent') {
     return defaultResolveUnit(values, unit);
   }
 
+  const lastItem = last(values);
   let newValue = null;
 
-  if (lastItem.type === entity.type && objectEmpty(lastItem.units) && objectEmpty(lastItem.symbols)) {
-    const { value } = lastItem;
-    newValue = { ...percentage, value };
+  if (lastItem.type === entity.type) {
+    newValue = entityToPercentage(lastItem);
   }
 
   return update(-1, newValue, values);
 }
 
-export const TAG_SYMBOL = tagUnitSymbol('symbols');
-export const TAG_NOOP = append(entity);
 
 const appendValue = flip(append);
 export const ENTITY = appendValue;
 export const BRACKET_GROUP = appendValue;
 export const FUNC_APPLICATION = appendValue;
 
+
+export const TAG_NOOP = append(entity);
 export const DEFAULT = identity;
