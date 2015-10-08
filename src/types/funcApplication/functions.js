@@ -4,9 +4,9 @@ import { objectEmpty } from '../../util';
 
 const equation = curry((inputFn, context, power, [entity]) => {
   if (objectEmpty(entity.symbols) && objectEmpty(dimensions(context, entity))) {
-    const siValue = toSi(context, entity).value;
-    const value = Math.pow(inputFn(siValue), power);
-    return { ...entity, value };
+    const si = toSi(context, entity);
+    const value = Math.pow(inputFn(si.value), power);
+    return { ...si, value };
   }
   return null;
 });
