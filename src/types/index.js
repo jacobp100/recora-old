@@ -13,6 +13,7 @@ export const percentage = {
 export const color = {
   type: 'COLOR',
   value: null,
+  colorSpace: null,
 };
 
 export const funcApplication = {

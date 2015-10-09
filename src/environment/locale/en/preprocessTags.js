@@ -1,6 +1,6 @@
 import { singularize } from './pluralization';
 import { TAG_OPERATOR, TAG_SYMBOL, TAG_NUMBER, TAG_NOOP } from '../../../parse/tags';
-import { MULTIPLY_COND_DIMENSIONS_LENGTH_1 } from '../../../math/operators';
+import { MULTIPLY_COND_DIMENSIONS_LENGTH_ONLY } from '../../../math/operators';
 import separatedUnits from '../../../data/en/separatedUnits';
 import { findPatternIndex } from '../../../util';
 
@@ -36,7 +36,7 @@ function resolveUnitPowersAndAmbiguitiesMapFn(tag) {
     return {
       type: 'TAG_PARSE_OPTIONS',
       value: [
-        [{ type: TAG_OPERATOR, value: MULTIPLY_COND_DIMENSIONS_LENGTH_1, start, end }],
+        [{ type: TAG_OPERATOR, value: MULTIPLY_COND_DIMENSIONS_LENGTH_ONLY, start, end }],
         [{ type: TAG_SYMBOL, value: 'by', power: 1, start, end }],
         [{ type: TAG_NOOP, start, end }],
       ],

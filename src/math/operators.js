@@ -2,7 +2,7 @@ export const EQUATE = 'EQUATE';
 export const ADD = 'ADD';
 export const SUBTRACT = 'SUBTRACT';
 export const MULTIPLY = 'MULTIPLY';
-export const MULTIPLY_COND_DIMENSIONS_LENGTH_1 = 'MULTIPLY_COND_DIMENSIONS_LENGTH_1';
+export const MULTIPLY_COND_DIMENSIONS_LENGTH_ONLY = 'MULTIPLY_COND_DIMENSIONS_LENGTH_ONLY';
 export const DIVIDE = 'DIVIDE';
 export const NEGATE = 'NEGATE';
 export const EXPONENT = 'EXPONENT';
@@ -21,7 +21,7 @@ export const orderOperations = {
   [SUBTRACT]: operationLevels.ADD_SUBTRACT,
   [MULTIPLY]: operationLevels.MULTIPLY_DIVIDE,
   [DIVIDE]: operationLevels.MULTIPLY_DIVIDE,
-  [MULTIPLY_COND_DIMENSIONS_LENGTH_1]: operationLevels.MISC_1,
+  [MULTIPLY_COND_DIMENSIONS_LENGTH_ONLY]: operationLevels.MISC_1,
   [EXPONENT]: operationLevels.EXPONENT_NEGATE,
   [NEGATE]: operationLevels.EXPONENT_NEGATE,
 };

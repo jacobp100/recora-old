@@ -68,6 +68,7 @@ export function TAG_UNIT(values, unit) {
 
 const appendValue = flip(append);
 export const ENTITY = appendValue;
+export const COLOR = appendValue;
 export const BRACKET_GROUP = appendValue;
 export const FUNC_APPLICATION = appendValue;
 

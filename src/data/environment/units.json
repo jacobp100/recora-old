@@ -1,6 +1,6 @@
 {
-  "_rgb"              : { "type": "_colour",        "base": 1                 },
-  "_hsl"              : { "type": "_colour",        "base": 1                 },
+  "_rgb"              : { "type": "_color",         "base": 1                 },
+  "_hsl"              : { "type": "_color",         "base": 1                 },
   "_date"             : { "type": "_date",          "base": 1                 },
 
   "second"            : { "type": "time",           "base": 1                 },

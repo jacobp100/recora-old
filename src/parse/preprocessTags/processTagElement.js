@@ -1,8 +1,9 @@
+import Color from 'color-forge';
 import { TAG_PARSE_OPTIONS, TAG_NOOP, TAG_UNIT, TAG_SYMBOL, TAG_OPERATOR, TAG_NUMBER, TAG_FUNCTION } from '../tags';
 import { getUnitName, parseNumber, getConstant } from '../../environment';
 import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE } from '../../math/operators';
 import { exponent } from '../../math/entity';
-import { entity } from '../../types';
+import { entity, color } from '../../types';
 import functions from '../../baseContext/functions';
 
 const charToOperator = {
@@ -31,17 +32,16 @@ export function TEXT_SYMBOL_UNIT(context, tag, captureGroup) {
     });
   }
 
-  // if (power === 1) {
-  //   const colour = colorForge.css(value);
-  //
-  //   if (colour !== null) {
-  //     options.push({
-  //       ...out,
-  //       type: 'TAG_COLOR',
-  //       value: colour,
-  //     });
-  //   }
-  // }
+  if (power === 1) {
+    const colour = Color.css(value);
+
+    if (colour !== null) {
+      options.push({
+        ...color,
+        value: colour,
+      });
+    }
+  }
 
   const unit = getUnitName(context, value);
 
@@ -97,13 +97,12 @@ export function TEXT_SYMBOL_UNIT(context, tag, captureGroup) {
   };
 }
 
-// export function TEXT_COLOR(tag) {
-//   return {
-//     ...tag,
-//     type: 'TAG_COLOR',
-//     value: colorForce.hex(value);
-//   }
-// }
+export function TEXT_COLOR(context, { value }) {
+  return {
+    ...color,
+    value: Color.hex(value),
+  };
+}
 
 export function TEXT_OPERATOR(context, tag) {
   return {

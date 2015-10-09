@@ -1,6 +1,7 @@
-import { entity, percentage, empty } from '../types';
+import { entity, percentage, color, empty } from '../types';
 import * as entityMath from './entity';
 import * as entityPercentageMath from './entityPercentage';
+import * as colorPercentageMath from './colorPercentage';
 
 
 const negativeEntity = { ...entity, value: -1 };
@@ -10,11 +11,17 @@ const addValueMap = {
     [entity.type]: entityMath.add,
     [percentage.type]: entityPercentageMath.add,
   },
+  [color.type]: {
+    [percentage.type]: colorPercentageMath.add,
+  },
 };
 const subtractValueMap = {
   [entity.type]: {
     [entity.type]: entityMath.subtract,
     [percentage.type]: entityPercentageMath.subtract,
+  },
+  [color.type]: {
+    [percentage.type]: colorPercentageMath.subtract,
   },
 };
 const multiplyValueMap = {
@@ -53,7 +60,7 @@ const createOperation = (valueMap) => (context, lhs, rhs) => {
 export const ADD = createOperation(addValueMap);
 export const SUBTRACT = createOperation(subtractValueMap);
 export const MULTIPLY = createOperation(multiplyValueMap);
-export const MULTIPLY_COND_DIMENSIONS_LENGTH_1 = createOperation(multiplyCondDimensionsLengthOnly);
+export const MULTIPLY_COND_DIMENSIONS_LENGTH_ONLY = createOperation(multiplyCondDimensionsLengthOnly);
 export const DIVIDE = createOperation(divideValueMap);
 export const NEGATE = createOperation(negateValueMap);
 export const EXPONENT = createOperation(exponentValueMap);
