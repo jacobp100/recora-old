@@ -1,7 +1,7 @@
 import Color from 'color-forge';
 import { TAG_PARSE_OPTIONS, TAG_NOOP, TAG_UNIT, TAG_SYMBOL, TAG_OPERATOR, TAG_NUMBER, TAG_FUNCTION } from '../tags';
 import { getUnitName, parseNumber, getConstant } from '../../environment';
-import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE } from '../../math/operators';
+import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE, FACTORIAL } from '../../math/operators';
 import { exponent } from '../../math/entity';
 import { entity, color } from '../../types';
 import functions from '../../baseContext/functions';
@@ -14,6 +14,7 @@ const charToOperator = {
   '**': EXPONENT,
   '^': EXPONENT,
   '=': EQUATE,
+  '!': FACTORIAL,
 };
 
 export function TEXT_SYMBOL_UNIT(context, tag, captureGroup) {

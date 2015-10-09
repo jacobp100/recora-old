@@ -200,5 +200,6 @@ export default [
   { "input": "#800 * #880", "output": "#490000" },
   { "input": "#800 / #880", "output": "#ff0000" },
   { "input": "red", "output": "#ff0000" },
-  { "input": "red + lime", "output": "#ffff00" }
+  { "input": "red + lime", "output": "#ffff00" },
+  { "input": "5!", "output": "-5" } // temporary test
 ]

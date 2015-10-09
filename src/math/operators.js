@@ -6,6 +6,7 @@ export const MULTIPLY_COND_DIMENSIONS_LENGTH_ONLY = 'MULTIPLY_COND_DIMENSIONS_LE
 export const DIVIDE = 'DIVIDE';
 export const NEGATE = 'NEGATE';
 export const EXPONENT = 'EXPONENT';
+export const FACTORIAL = 'FACTORIAL';
 
 const operationLevels = {
   EQUATE: 0,
@@ -13,6 +14,7 @@ const operationLevels = {
   MULTIPLY_DIVIDE: 2,
   MISC_1: 3,
   EXPONENT_NEGATE: 4,
+  FACTORIAL: 5,
 };
 
 export const orderOperations = {
@@ -24,6 +26,7 @@ export const orderOperations = {
   [MULTIPLY_COND_DIMENSIONS_LENGTH_ONLY]: operationLevels.MISC_1,
   [EXPONENT]: operationLevels.EXPONENT_NEGATE,
   [NEGATE]: operationLevels.EXPONENT_NEGATE,
+  [FACTORIAL]: operationLevels.FACTORIAL,
 };
 
 export const operationsOrder = pipe(
@@ -39,4 +42,5 @@ export const orderDirection = {
   [operationLevels.MULTIPLY_DIVIDE]: 'forwards',
   [operationLevels.MISC_1]: 'forwards',
   [operationLevels.EXPONENT_NEGATE]: 'backwards',
+  [operationLevels.FACTORIAL]: 'backwards',
 };

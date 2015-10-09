@@ -4,4 +4,4 @@ const Recora = require('./src');
 
 const recora = new Recora();
 
-console.log(JSON.stringify(recora.parse('5 * sin(2)')));
+console.log(JSON.stringify(recora.parse('5!')));

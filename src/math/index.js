@@ -58,6 +58,11 @@ const negateValueMap = {
     [entity.type]: (context, lhs, rhs) => entityMath.multiply(context, negativeEntity, rhs),
   },
 };
+const factorialValueMap = { // FIXME: Temporary test
+  [entity.type]: {
+    [empty.type]: (context, lhs, rhs) => entityMath.multiply(context, negativeEntity, lhs),
+  },
+};
 const exponentValueMap = {
   [entity.type]: {
     [entity.type]: entityMath.exponent,
@@ -79,3 +84,4 @@ export const MULTIPLY_COND_DIMENSIONS_LENGTH_ONLY = createOperation(multiplyCond
 export const DIVIDE = createOperation(divideValueMap);
 export const NEGATE = createOperation(negateValueMap);
 export const EXPONENT = createOperation(exponentValueMap);
+export const FACTORIAL = createOperation(factorialValueMap);
