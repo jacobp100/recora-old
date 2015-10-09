@@ -39,7 +39,7 @@ export function TAG_NUMBER(values, { value }) {
 
 
 export const TAG_SYMBOL = tagUnitSymbol('symbols');
-const defaultResolveUnit = tagUnitSymbol('units');
+export const TAG_UNIT = tagUnitSymbol('units');
 
 function entityToPercentage(value) {
   if (objectEmpty(value.units) && objectEmpty(value.symbols)) {
@@ -48,13 +48,7 @@ function entityToPercentage(value) {
   return null;
 }
 
-export function TAG_UNIT(values, unit) {
-  // Try to parse as an entity, unless we encounter a percentage
-  // In which case, attempty to convert, but return null if not possible (the entity had existing units or symbols)
-  if (unit.value !== 'percent') {
-    return defaultResolveUnit(values, unit);
-  }
-
+export function TAG_PERCENTAGE(values) {
   const lastItem = last(values);
   let newValue = null;
 
