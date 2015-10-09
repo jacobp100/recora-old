@@ -5,6 +5,10 @@ export function darken(context, color, value) {
   return { ...color, value: color.value.darken(value) };
 }
 
+export function channelMultiply(context, color, value) {
+  return { ...color, value: color.value.channelMultiply(value) };
+}
+
 export function convert(context, color, units) {
   const unitKeys = keys(units);
   const unitName = head(unitKeys);

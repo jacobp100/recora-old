@@ -1,7 +1,7 @@
 import { entity as entityDescriptor } from './index';
 import unitsDerived from '../data/unitsDerived';
 import { getUnitValue, getSiUnit, formatEntity } from '../environment';
-import { mapWithAccum } from '../util';
+import { mapWithAccum, objectEmpty } from '../util';
 
 
 const notNil = complement(isNil);
@@ -33,6 +33,15 @@ function getNonLinearUnitPairs(context, units) {
       pipe(head, partial(isNonLinearUnit, context)),
     ),
   )(units);
+}
+
+const isEmptyPredicate = where({
+  value: notNil,
+  units: objectEmpty,
+  symbols: objectEmpty,
+});
+export function isNumber(context, entity) {
+  return isEmptyPredicate(entity);
 }
 
 export function isResolvable(context, entity) {

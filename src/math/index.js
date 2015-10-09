@@ -3,6 +3,7 @@ import * as entityMath from './entity';
 import * as entityPercentageMath from './entityPercentage';
 import * as colorMath from './color';
 import * as colorPercentageMath from './colorPercentage';
+import * as colorEntityMath from './colorEntity';
 
 
 const negativeEntity = { ...entity, value: -1 };
@@ -34,6 +35,7 @@ const multiplyValueMap = {
   },
   [color.type]: {
     [color.type]: colorMath.multiply,
+    [entity.type]: colorEntityMath.multiply,
   },
 };
 const multiplyCondDimensionsLengthOnly = {
@@ -48,6 +50,7 @@ const divideValueMap = {
   },
   [color.type]: {
     [color.type]: colorMath.divide,
+    [entity.type]: colorEntityMath.divide,
   },
 };
 const negateValueMap = {
