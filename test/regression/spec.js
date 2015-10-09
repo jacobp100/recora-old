@@ -181,7 +181,7 @@ export default [
   { "input": "#888 * #888", "output": "#494949" },
   { "input": "#888 / #888", "output": "#ffffff" },
   { "input": "#888 / #fff", "output": "#888888" },
-  // { "input": "#888 ** 2", "output": "#494949" },
+  { "input": "#888 ** 2", "output": "#494949" },
   // { "input": "darken(#FF0000, 25%)", "output": "#800000" },
   // { "input": "lighten(#800000, 50%)", "output": "#ff8080" },
   // { "input": "mix(#800000, #ff0000)", "output": "#c00000" },

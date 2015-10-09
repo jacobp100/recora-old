@@ -62,6 +62,9 @@ const exponentValueMap = {
   [entity.type]: {
     [entity.type]: entityMath.exponent,
   },
+  [color.type]: {
+    [entity.type]: colorEntityMath.exponent,
+  },
 };
 
 const createOperation = (valueMap) => (context, lhs, rhs) => {

@@ -9,6 +9,10 @@ export function channelMultiply(context, color, value) {
   return { ...color, value: color.value.channelMultiply(value) };
 }
 
+export function exponent(context, color, value) {
+  return { ...color, value: color.value.exponent(value) };
+}
+
 export function convert(context, color, units) {
   const unitKeys = keys(units);
   const unitName = head(unitKeys);
