@@ -107,10 +107,7 @@ function resolveFunctions(tags) {
   let newFuncApplication;
 
   if (nextTag.type === bracketGroup.type) {
-    tagsAfter = pipe(
-      slice(functionIndex + 2, Infinity),
-      resolveFunctions,
-    )(tags);
+    tagsAfter = drop(functionIndex + 2, tags);
 
     newFuncApplication = {
       ...funcApplication,
@@ -118,13 +115,10 @@ function resolveFunctions(tags) {
       groups: nextTag.groups, // already resolved
     };
   } else {
-    const nextTagStartIndex = functionIndex + 1;
-    const funcArguments = pipe(
-      drop(nextTagStartIndex),
-      takeWhile(isInShorthandFunctionSyntax),
-    )(tags);
+    const allTagsAfter = drop(functionIndex + 1, tags);
+    const funcArguments = takeWhile(isInShorthandFunctionSyntax, allTagsAfter);
 
-    tagsAfter = drop(nextTagStartIndex + length(funcArguments), tags);
+    tagsAfter = drop(length(funcArguments), allTagsAfter);
 
     newFuncApplication = {
       ...funcApplication,
@@ -133,7 +127,7 @@ function resolveFunctions(tags) {
     };
   }
 
-  return resolveOperations([...tagsBefore, newFuncApplication, ...tagsAfter]);
+  return resolveFunctions([...tagsBefore, newFuncApplication, ...tagsAfter]);
 }
 
 

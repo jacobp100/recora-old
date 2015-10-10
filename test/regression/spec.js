@@ -77,6 +77,7 @@ export default [
   { "description": "accept shorthand", "input": "sqrt sqrt 16", "output": "2" },
   { "description": "accept shorthand", "input": "sin -1", "output": "-0.841" },
   { "description": "accept shorthand", "input": "sin 3!", "output": "-0.279" },
+  { "input": "sqrt(16) + sqrt(4)", "output": "6" },
   { "input": "2gb at 50kb/s to hours, minutes and seconds", "output": "11 hours 6 minutes 40 seconds" },
   { "input": "1 yard to feet and inches", "output": "3 feet 0 inches" },
   { "input": "2000 kibibits to mebibits", "output": "1.95 mebibits" },
