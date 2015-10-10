@@ -1,12 +1,21 @@
 import { entity, percentage, color, empty } from '../types';
+import { isNumber } from '../types/entity';
 import * as entityMath from './entity';
 import * as entityPercentageMath from './entityPercentage';
 import * as colorMath from './color';
 import * as colorPercentageMath from './colorPercentage';
 import * as colorEntityMath from './colorEntity';
+import gamma from 'gamma';
 
 
 const negativeEntity = { ...entity, value: -1 };
+const entityNegate = (context, emptyValue, entityValue) => entityMath.multiply(context, negativeEntity, entityValue);
+const entityFactorial = ifElse(
+  isNumber,
+  pipe(nthArg(1), evolve({ value: pipe(add(1), gamma) })),
+  always(null),
+);
+
 
 const addValueMap = {
   [entity.type]: {
@@ -55,12 +64,12 @@ const divideValueMap = {
 };
 const negateValueMap = {
   [empty.type]: {
-    [entity.type]: (context, lhs, rhs) => entityMath.multiply(context, negativeEntity, rhs),
+    [entity.type]: entityNegate,
   },
 };
-const factorialValueMap = { // FIXME: Temporary test
+const factorialValueMap = {
   [entity.type]: {
-    [empty.type]: (context, lhs, rhs) => entityMath.multiply(context, negativeEntity, lhs),
+    [empty.type]: entityFactorial,
   },
 };
 const exponentValueMap = {
