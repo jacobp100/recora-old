@@ -44,3 +44,8 @@ export const orderDirection = {
   [operationLevels.EXPONENT_NEGATE]: 'backwards',
   [operationLevels.FACTORIAL]: 'backwards',
 };
+
+export const unaryOperators = [
+  NEGATE,
+  FACTORIAL,
+];

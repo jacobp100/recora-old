@@ -1,4 +1,4 @@
-import { TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_OPERATOR, TAG_UNIT } from './tags';
+import { TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_OPERATOR, TAG_FUNCTION, TAG_UNIT } from './tags';
 import { trimNoop } from './tags/util';
 import { SUBTRACT, DIVIDE, NEGATE } from '../math/operators';
 import { mapWithAccum, mapWithAccumRight, rejectNil } from '../util';
@@ -9,7 +9,7 @@ const tagNegate = { type: TAG_OPERATOR, value: NEGATE };
 function fixNaturalNotationWithPrevious(previous, tag) {
   let newTag = tag;
 
-  if (tag.value === SUBTRACT && (!previous || previous.type === TAG_OPERATOR)) {
+  if (tag.value === SUBTRACT && (!previous || previous.type === TAG_OPERATOR || previous.type === TAG_FUNCTION)) {
     // Fix negative signs at start of input (-1 meters) and after operators (3 * -1 meters)
     newTag = { ...tag, ...tagNegate };
   }

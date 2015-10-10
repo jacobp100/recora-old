@@ -45,6 +45,9 @@ export default [
   { "input": "3 feet 4 inches to centimetres", "output": "102 centimeters" },
   { "input": "-------4", "output": "-4" },
   { "input": "1------1", "output": "2" },
+  { "input": "5!", "output": "120" },
+  { "input": "4.5!", "output": "52.3" },
+  { "input": "4!", "output": "24" },
   { "input": "180 degrees + 3.14 radians", "output": "6.28" },
   { "input": "5 kilos at £1/kg", "output": "£5.00" },
   { "input": "£5 using £1/kg", "output": "5 kilograms" },
@@ -72,6 +75,8 @@ export default [
   { "description": "accept shorthand", "input": "sqrt 4 + 1", "output": "3" },
   { "description": "accept shorthand", "input": "sqrt^2(4)", "output": "4" },
   { "description": "accept shorthand", "input": "sqrt sqrt 16", "output": "2" },
+  { "description": "accept shorthand", "input": "sin -1", "output": "-0.841" },
+  { "description": "accept shorthand", "input": "sin 3!", "output": "-0.279" },
   { "input": "2gb at 50kb/s to hours, minutes and seconds", "output": "11 hours 6 minutes 40 seconds" },
   { "input": "1 yard to feet and inches", "output": "3 feet 0 inches" },
   { "input": "2000 kibibits to mebibits", "output": "1.95 mebibits" },
@@ -200,7 +205,5 @@ export default [
   { "input": "#800 * #880", "output": "#490000" },
   { "input": "#800 / #880", "output": "#ff0000" },
   { "input": "red", "output": "#ff0000" },
-  { "input": "red + lime", "output": "#ffff00" },
-  { "input": "5!", "output": "120" },
-  { "input": "4.5!", "output": "52.3" }
+  { "input": "red + lime", "output": "#ffff00" }
 ]

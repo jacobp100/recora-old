@@ -1,7 +1,7 @@
 import * as tagResolvers from './tagResolvers';
 import { TAG_NOOP, TAG_COMMA, TAG_UNIT, TAG_OPERATOR, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_NUMBER, TAG_FUNCTION } from '../tags';
 import { isNoop, isSymbol } from '../tags/util';
-import { orderOperations, operationsOrder, NEGATE } from '../../math/operators';
+import { orderOperations, operationsOrder, unaryOperators, NEGATE } from '../../math/operators';
 import { entity, funcApplication, func, miscGroup, empty, bracketGroup, operationsGroup } from '../../types';
 import { baseDimensions } from '../../types/entity';
 import { lengthIsOne, objectEmpty } from '../../util';
@@ -35,52 +35,6 @@ const groupRemainingTags = pipe(
 );
 
 
-const isFunction = whereEq({ type: TAG_FUNCTION });
-
-function resolveTagsWithoutOperations(tags) {
-  const functionIndex = findIndex(isFunction, tags);
-
-  if (functionIndex === -1) {
-    return groupRemainingTags(tags);
-  }
-
-  const funcTag = tags[functionIndex];
-  const nextTag = tags[functionIndex + 1];
-
-  if (!nextTag) {
-    return groupRemainingTags(dropLast(1, tags));
-  }
-
-  const newFunc = { ...func, name: funcTag.value, power: funcTag.power };
-
-  const tagsBefore = slice(0, functionIndex, tags);
-
-  if (nextTag.type === bracketGroup.type) {
-    const tagsAfter = pipe(
-      slice(functionIndex + 2, Infinity),
-      resolveTagsWithoutOperations,
-    )(tags);
-
-    const newFuncApplication = {
-      ...funcApplication,
-      func: newFunc,
-      groups: nextTag.groups, // already resolved
-    };
-
-    return groupRemainingTags([...tagsBefore, newFuncApplication, ...tagsAfter]);
-  }
-
-  const funcArguments = slice(functionIndex + 1, Infinity, tags);
-  const newFuncApplication = {
-    ...funcApplication,
-    func: newFunc,
-    groups: [resolveTagsWithoutOperations(funcArguments)],
-  };
-
-  return groupRemainingTags([...tagsBefore, newFuncApplication]);
-}
-
-
 const groupOperations = reduce((operationGroup, tag) => {
   if (tag.type === TAG_OPERATOR && operationGroup.level === orderOperations[tag.value]) {
     return evolve({
@@ -96,7 +50,7 @@ const groupOperations = reduce((operationGroup, tag) => {
 
 const tagOperatorMatchesValue = value => whereEq({ type: TAG_OPERATOR, value });
 
-function resolveOperations(startLevel, tags) {
+function resolveOperationsFn(startLevel, tags) {
   const tagsContainOperation = pipe(
     tagOperatorMatchesValue,
     any(__, tags),
@@ -108,7 +62,7 @@ function resolveOperations(startLevel, tags) {
   )(operationsOrder);
 
   if (!operations) {
-    return resolveTagsWithoutOperations(tags);
+    return groupRemainingTags(tags);
   }
 
   const level = indexOf(operations, operationsOrder);
@@ -120,8 +74,66 @@ function resolveOperations(startLevel, tags) {
       operations: [],
       level,
     }),
-    evolve({ groups: map(partial(resolveOperations, level + 1)) }),
+    evolve({ groups: map(partial(resolveOperationsFn, level + 1)) }),
   )(tags);
+}
+const resolveOperations = partial(resolveOperationsFn, 0);
+
+
+const isFunction = whereEq({ type: TAG_FUNCTION });
+const isInShorthandFunctionSyntax = anyPass([
+  complement(whereEq({ type: TAG_OPERATOR })),
+  where({ value: contains(__, unaryOperators) }),
+]);
+
+function resolveFunctions(tags) {
+  const functionIndex = findIndex(isFunction, tags);
+
+  if (functionIndex === -1) {
+    return resolveOperations(tags);
+  }
+
+  const funcTag = tags[functionIndex];
+  const nextTag = tags[functionIndex + 1];
+
+  if (!nextTag) {
+    return resolveOperations(dropLast(1, tags));
+  }
+
+  const newFunc = { ...func, name: funcTag.value, power: funcTag.power };
+
+  const tagsBefore = slice(0, functionIndex, tags);
+  let tagsAfter;
+  let newFuncApplication;
+
+  if (nextTag.type === bracketGroup.type) {
+    tagsAfter = pipe(
+      slice(functionIndex + 2, Infinity),
+      resolveFunctions,
+    )(tags);
+
+    newFuncApplication = {
+      ...funcApplication,
+      func: newFunc,
+      groups: nextTag.groups, // already resolved
+    };
+  } else {
+    const nextTagStartIndex = functionIndex + 1;
+    const funcArguments = pipe(
+      drop(nextTagStartIndex),
+      takeWhile(isInShorthandFunctionSyntax),
+    )(tags);
+
+    tagsAfter = drop(nextTagStartIndex + length(funcArguments), tags);
+
+    newFuncApplication = {
+      ...funcApplication,
+      func: newFunc,
+      groups: [resolveFunctions(funcArguments)],
+    };
+  }
+
+  return resolveOperations([...tagsBefore, newFuncApplication, ...tagsAfter]);
 }
 
 
@@ -134,7 +146,7 @@ const splitTags = reduce((tags, tag) => {
 
 const resolveTagsWithoutBrackets = pipe(
   splitTags,
-  map(partial(resolveOperations, 0)),
+  map(resolveFunctions),
 );
 
 const isOpenBracket = whereEq({ type: TAG_OPEN_BRACKET });
