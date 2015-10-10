@@ -4,7 +4,7 @@ import parseText from './parseText';
 import preprocessTags from './preprocessTags';
 import postprocessTags from './postprocessTags';
 import resolveTags from './resolveTags';
-import { entity } from '../types';
+import { entity, empty } from '../types';
 import { toString } from '../types/types';
 import { convert, convertComposite } from '../types/entity';
 import { getFormattingHints } from '../environment';
@@ -113,12 +113,17 @@ const entityWithSymbols = where({
 });
 const resultIsNil = where({ result: isNil });
 const resultIsEntityWithSymbols = where({ result: entityWithSymbols });
+const irrelevantResults = anyPass([
+  whereEq({ type: empty.type }),
+]);
+const resultIsIrrelevant = where({ result: irrelevantResults });
 
 const parseTagsWithOptions = pipe(
   getTagOptions,
   map(resolveTagOptions),
   reject(resultIsNil),
   reject(resultIsEntityWithSymbols),
+  reject(resultIsIrrelevant),
   map(convertResult),
   reject(resultIsNil),
   uniqWith((a, b) => equals(a.result, b.result)),
