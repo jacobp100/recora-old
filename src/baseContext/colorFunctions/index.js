@@ -16,13 +16,13 @@ const isNumberEntity = allPass([
 
 const isPercent = pipe(inputType, equals(percentage.type));
 
-const percentageEntityToNumber = cond([
+const asNumber = cond([
   [isNumberEntity, pipe(toSi, value)],
   [isPercent, pipe(inputValue, multiply(1 / 100))],
   [T, always(null)],
 ]);
 
-const percentageEntityToPercentage = cond([
+const asPercentage = cond([
   [isNumberEntity, pipe(toSi, value, ifElse(lte(__, 1),
     multiply(100),
     identity,
@@ -31,7 +31,7 @@ const percentageEntityToPercentage = cond([
   [T, always(null)],
 ]);
 
-const percentageEntityToDegrees = cond([
+const asDegrees = cond([
   [isNumberEntity, inputValue], // NOT toSi, accept 180 degrees and 180
   [isPercent, pipe(inputValue, multiply(100 / 360))],
   [T, always(null)],
@@ -55,21 +55,9 @@ function colorConversion(space, fn1, fn2, fn3) {
 }
 
 
-export const rgb = colorConversion('rgb',
-  percentageEntityToNumber,
-  percentageEntityToNumber,
-  percentageEntityToNumber,
-);
-export const hsl = colorConversion('hsl',
-  percentageEntityToDegrees,
-  percentageEntityToPercentage,
-  percentageEntityToPercentage,
-);
-export const hsv = colorConversion('hsv',
-  percentageEntityToDegrees,
-  percentageEntityToPercentage,
-  percentageEntityToPercentage,
-);
+export const rgb = colorConversion('rgb', asNumber, asNumber, asNumber);
+export const hsl = colorConversion('hsl', asDegrees, asPercentage, asPercentage);
+export const hsv = colorConversion('hsv', asDegrees, asPercentage, asPercentage);
 
 // export function darken(colour, amount) {
 //   var value = Number(amount.toSi());
