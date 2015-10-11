@@ -4,35 +4,36 @@ import { entity, percentage, color } from '../../types';
 import { noneNil } from '../../util';
 
 
-const context = nthArg(0);
-const value = nthArg(1);
-const type = pipe(value, prop('type'));
+const input = nthArg(1);
+const value = prop('value');
+const inputValue = pipe(input, value);
+const inputType = pipe(input, prop('type'));
 
 const isNumberEntity = allPass([
-  pipe(type, equals(entity.type)),
+  pipe(inputType, equals(entity.type)),
   isNumber,
 ]);
 
-const isPercent = pipe(type, equals(percentage.type));
+const isPercent = pipe(inputType, equals(percentage.type));
 
 const percentageEntityToNumbers = cond([
-  [isNumberEntity, pipe(toSi, prop('value'))],
-  [isPercent, pipe(value, prop('value'), multiply(1 / 100))],
+  [isNumberEntity, pipe(toSi, value)],
+  [isPercent, pipe(inputValue, multiply(1 / 100))],
   [T, always(null)],
 ]);
 
 const percentageEntityToPercentage = cond([
-  [isNumberEntity, pipe(toSi, prop('value'), ifElse(lte(__, 1),
+  [isNumberEntity, pipe(toSi, value, ifElse(lte(__, 1),
     multiply(100),
     identity,
   ))],
-  [isPercent, pipe(value, prop('value'))],
+  [isPercent, inputValue],
   [T, always(null)],
 ]);
 
 const percentageEntityToDegrees = cond([
-  [isNumberEntity, pipe(value, prop('value'))], // NOT toSi, accept 180 degrees and 180
-  [isPercent, pipe(value, prop('value'), multiply(100 / 360))],
+  [isNumberEntity, inputValue], // NOT toSi, accept 180 degrees and 180
+  [isPercent, pipe(inputValue, multiply(100 / 360))],
   [T, always(null)],
 ]);
 
@@ -57,17 +58,17 @@ function colorConversion(space, fn1, fn2, fn3) {
 export const rgb = colorConversion('rgb',
   percentageEntityToNumbers,
   percentageEntityToNumbers,
-  percentageEntityToNumbers
+  percentageEntityToNumbers,
 );
 export const hsl = colorConversion('hsl',
   percentageEntityToDegrees,
   percentageEntityToPercentage,
-  percentageEntityToPercentage
+  percentageEntityToPercentage,
 );
 export const hsv = colorConversion('hsv',
   percentageEntityToDegrees,
   percentageEntityToPercentage,
-  percentageEntityToPercentage
+  percentageEntityToPercentage,
 );
 
 // export function darken(colour, amount) {
