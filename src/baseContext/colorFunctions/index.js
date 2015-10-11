@@ -16,9 +16,9 @@ const isNumberEntity = allPass([
 
 const isPercent = pipe(inputType, equals(percentage.type));
 
-const asNumber = cond([
+const as255Number = cond([
   [isNumberEntity, pipe(toSi, value)],
-  [isPercent, pipe(inputValue, multiply(1 / 100))],
+  [isPercent, pipe(inputValue, multiply(255 / 100))],
   [T, always(null)],
 ]);
 
@@ -37,14 +37,11 @@ const asDegrees = cond([
   [T, always(null)],
 ]);
 
-function colorConversion(space, fn1, fn2, fn3) {
+function colorConversion(space, functions) {
   return function colorConversionFunction(ctx, power, values) {
-    if (power === 1 && values.length === 3) {
-      const a = fn1(ctx, values[0]);
-      const b = fn2(ctx, values[1]);
-      const c = fn3(ctx, values[2]);
-
-      const spaceValues = [a, b, c];
+    if (power === 1 && values.length === functions.length) {
+      const functionValueZip = zip(functions, values);
+      const spaceValues = map(([fn, value]) => fn(ctx, value), functionValueZip);
 
       if (noneNil(spaceValues)) {
         return { ...color, value: Color[space](spaceValues) };
@@ -55,9 +52,9 @@ function colorConversion(space, fn1, fn2, fn3) {
 }
 
 
-export const rgb = colorConversion('rgb', asNumber, asNumber, asNumber);
-export const hsl = colorConversion('hsl', asDegrees, asPercentage, asPercentage);
-export const hsv = colorConversion('hsv', asDegrees, asPercentage, asPercentage);
+export const rgb = colorConversion('rgb', [as255Number, as255Number, as255Number]);
+export const hsl = colorConversion('hsl', [asDegrees, asPercentage, asPercentage]);
+export const hsv = colorConversion('hsv', [asDegrees, asPercentage, asPercentage]);
 
 // export function darken(colour, amount) {
 //   var value = Number(amount.toSi());
