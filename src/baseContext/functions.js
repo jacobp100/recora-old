@@ -1,6 +1,7 @@
 import mathp from 'mathp';
 import { toSi, dimensions } from '../types/entity';
 import { objectEmpty } from '../util';
+import { rgb, hsl } from './colorFunctions';
 
 const equation = curry((inputFn, context, power, [entity]) => {
   if (objectEmpty(entity.symbols) && objectEmpty(dimensions(context, entity))) {
@@ -56,5 +57,8 @@ const functions = {
 
   cosc: equation(x => Math.cos(x) / x),
   tanc: equation(x => (x === 0) ? 1 : Math.tan(x) / x),
+
+  rgb,
+  hsl,
 };
 export default functions;

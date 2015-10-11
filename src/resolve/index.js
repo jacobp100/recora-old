@@ -4,8 +4,8 @@ import { operationsGroup, miscGroup, bracketGroup, entity, funcApplication } fro
 import { apply } from '../types/funcApplication'; // should this just be in math?
 import * as math from '../math';
 import { orderDirection } from '../math/operators';
+import { containsNil } from '../util';
 
-const containsNil = any(isNil);
 const finalNil = pipe(always(reduced(null)));
 
 const resolveBreakNil = fn => pipe(
