@@ -16,7 +16,7 @@ const isNumberEntity = allPass([
 
 const isPercent = pipe(inputType, equals(percentage.type));
 
-const percentageEntityToNumbers = cond([
+const percentageEntityToNumber = cond([
   [isNumberEntity, pipe(toSi, value)],
   [isPercent, pipe(inputValue, multiply(1 / 100))],
   [T, always(null)],
@@ -56,9 +56,9 @@ function colorConversion(space, fn1, fn2, fn3) {
 
 
 export const rgb = colorConversion('rgb',
-  percentageEntityToNumbers,
-  percentageEntityToNumbers,
-  percentageEntityToNumbers,
+  percentageEntityToNumber,
+  percentageEntityToNumber,
+  percentageEntityToNumber,
 );
 export const hsl = colorConversion('hsl',
   percentageEntityToDegrees,
