@@ -10,6 +10,7 @@ const input = nthArg(1);
 const value = prop('value');
 const units = prop('units');
 const inputValue = pipe(input, value);
+const siValue = pipe(toSi, value);
 
 const isNumberEntity = allPass([
   pipe(input, isEntity),
@@ -25,13 +26,13 @@ const isDegreesEntity = allPass([
 const isPercent = pipe(input, isPercentage);
 
 const as255Number = cond([
-  [isNumberEntity, pipe(toSi, value)],
+  [isNumberEntity, siValue],
   [isPercent, pipe(inputValue, multiply(255 / 100))],
   [T, always(null)],
 ]);
 
 const asPercentage = cond([
-  [isNumberEntity, pipe(toSi, value, ifElse(lte(__, 1),
+  [isNumberEntity, pipe(siValue, ifElse(lte(__, 1),
     multiply(100),
     identity,
   ))],
@@ -40,8 +41,8 @@ const asPercentage = cond([
 ]);
 
 const asDegrees = cond([
-  [isDegreesEntity, pipe(toSi, value, multiply(360 / (2 * Math.PI)))],
-  [isNumberEntity, pipe(toSi, value, ifElse(lte(__, 1),
+  [isDegreesEntity, pipe(siValue, multiply(360 / (2 * Math.PI)))],
+  [isNumberEntity, pipe(siValue, ifElse(lte(__, 1),
     multiply(360),
     identity,
   ))], // NOT toSi, accept 180 degrees and 180
@@ -75,8 +76,12 @@ function lightenDarken(fn) {
     const colorValue = values[0];
 
     if (power === 1 && values.length <= 2 && isColor(colorValue)) {
-      const shiftPercent = values[1] ? asPercentage(ctx, values[1]) : 10;
-      return fn(ctx, colorValue, shiftPercent / 100);
+      const shiftValue = values[1];
+      const shiftPercent = shiftValue ? asPercentage(ctx, shiftValue) : 10;
+
+      if (shiftPercent !== null) {
+        return fn(ctx, colorValue, shiftPercent / 100);
+      }
     }
 
     return null;
@@ -86,84 +91,36 @@ function lightenDarken(fn) {
 export const lighten = lightenDarken(colorLighten);
 export const darken = lightenDarken(colorDarken);
 
-// export function darken(colour, amount) {
-//   var value = Number(amount.toSi());
-//
-//   if (!isNaN(value)) {
-//     return new Colour({ value: colour.value.darken(value) });
-//   } else {
-//     return null;
-//   }
-// }
-// export function lighten(colour, amount) {
-//   var value = Number(amount.toSi());
-//
-//   if (!isNaN(value)) {
-//     return new Colour({ value: colour.value.lighten(value) });
-//   } else {
-//     return null;
-//   }
-// }
-// export function mix(c1, c2, amount) {
-//   var value = NaN;
-//
-//   if (amount && amount.type === 'statement') {
-//     value = Number(amount.toSi());
-//   }
-//
-//   if (amount === undefined) {
-//     value = 0.5;
-//   }
-//
-//   if (c1 && c2 && !isNaN(value)) { // amount can default to 0.5
-//     return new Colour({ value: c1.value.mix(c2.value, value) });
-//   } else {
-//     return null;
-//   }
-// }
-// // add: reduceValuesByOperator('add'),
-// // subtract: reduceValuesByOperator('subtract'),
-// // multiply: reduceValuesByOperator('multiply'),
-// // divide: reduceValuesByOperator('divide'),
-// // screen: colourOperation('screen'),
-// // overlay: colourOperation('overlay'),
-// // dodge: colourOperation('dodge'),
-// // burn: colourOperation('burn'),
-//
-//
-//
-// function reduceValuesByOperator(operator) {
-//   return function(...values) {
-//     return _.reduce(values, function(out, value) {
-//       if (out !== null) {
-//         return out[operator](value);
-//       } else {
-//         return null;
-//       }
-//     });
-//   };
-// }
-//
-// function colourOperation(operation) {
-//   return function(c1, c2) {
-//     if (c1 && c1.type === 'colour' && c2 && c2.type === 'colour') {
-//       return new Colour({ value: c1.value[operation](c2.value) });
-//     } else {
-//       return null;
-//     }
-//   };
-// }
-//
-// function valueOfUnit(unit) {
-//   var unitObject = { [unit]: 1 };
-//
-//   return function(statement) {
-//     var value = statement.convert(unitObject);
-//
-//     if (value) {
-//       return value.value;
-//     } else {
-//       return null;
-//     }
-//   };
-// }
+
+export function mix(ctx, power, values) {
+  const length = values.length;
+  const [color1, color2, mixValue] = values;
+
+  if (power === 1 && (length === 3 || length === 2) && isColor(color1) && isColor(color2)) {
+    const mixPercent = mixValue ? asPercentage(ctx, mixValue) : 50;
+
+    if (mixPercent !== null) {
+      return { ...color, value: color1.value.mix(color2.value, mixPercent / 100) };
+    }
+  }
+
+  return null;
+}
+
+
+function colorOperation(fn) {
+  return function colorOperationFn(ctx, power, values) {
+    const [color1, color2] = values;
+
+    if (power === 1 && values.length === 2 && isColor(color1) && isColor(color2)) {
+      return { ...color, value: color1.value[fn](color2.value) };
+    }
+
+    return null;
+  };
+}
+
+export const screen = colorOperation('screen');
+export const overlay = colorOperation('overlay');
+export const dodge = colorOperation('dodge');
+export const burn = colorOperation('burn');

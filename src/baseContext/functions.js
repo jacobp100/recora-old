@@ -15,6 +15,7 @@ const equation = curry((inputFn, context, power, [entity]) => {
 const baseLog = equation(Math.log);
 
 const functions = {
+  // Add, subtract, multiply, divide?
   ...colorFunctions,
 
   sin: equation(x => (x % Math.PI !== 0) ? Math.sin(x) : 0), // Fix annoying sin values
