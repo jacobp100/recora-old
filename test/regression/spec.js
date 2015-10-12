@@ -172,6 +172,7 @@ export default [
   { "input": "hsl(0, 100%, 0.5)", "output": "#ff0000" },
   { "input": "hsl(0, 1, 0)", "output": "#000000" },
   { "input": "hsl(180 degrees, 1, 0.5)", "output": "#00ffff" },
+  { "input": "hsl(50%, 1, 0.5)", "output": "#00ffff" },
   { "input": "hsl(0, 0, 0.5)", "output": "#808080" },
   { "input": "hsl(210 degrees, 65%, 20%)", "output": "#123354" },
   // { "input": "#800000 to hsl", "output": "hsl(0°, 100%, 25%)" },

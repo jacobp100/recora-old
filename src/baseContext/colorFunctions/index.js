@@ -8,6 +8,7 @@ import { noneNil } from '../../util';
 
 const input = nthArg(1);
 const value = prop('value');
+const units = prop('units');
 const inputValue = pipe(input, value);
 
 const isNumberEntity = allPass([
@@ -17,7 +18,10 @@ const isNumberEntity = allPass([
 
 const isDegreesEntity = allPass([
   pipe(input, isEntity),
-  pipe(input, prop('units'), equals({ degree: 1 })),
+  pipe(input, units, anyPass([
+    equals({ degree: 1 }),
+    equals({ radian: 1 }),
+  ])),
 ]);
 
 const isPercent = pipe(input, isPercentage);
@@ -38,14 +42,15 @@ const asPercentage = cond([
 ]);
 
 const asDegrees = cond([
-  [isDegreesEntity, inputValue],
-  [isNumberEntity, pipe(inputValue, ifElse(lte(__, 1),
+  [isDegreesEntity, pipe(toSi, value, multiply(360 / (2 * Math.PI)))],
+  [isNumberEntity, pipe(toSi, value, ifElse(lte(__, 1),
     multiply(360),
     identity,
   ))], // NOT toSi, accept 180 degrees and 180
-  [isPercent, pipe(inputValue, multiply(100 / 360))],
+  [isPercent, pipe(inputValue, multiply(360 / 100))],
   [T, always(null)],
 ]);
+
 
 function colorConversion(space, functions) {
   return function colorConversionFunction(ctx, power, values) {
