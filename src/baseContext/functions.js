@@ -1,7 +1,7 @@
 import mathp from 'mathp';
 import { toSi, dimensions } from '../types/entity';
 import { objectEmpty } from '../util';
-import { rgb, hsl } from './colorFunctions';
+import * as colorFunctions from './colorFunctions';
 
 const equation = curry((inputFn, context, power, [entity]) => {
   if (objectEmpty(entity.symbols) && objectEmpty(dimensions(context, entity))) {
@@ -15,6 +15,8 @@ const equation = curry((inputFn, context, power, [entity]) => {
 const baseLog = equation(Math.log);
 
 const functions = {
+  ...colorFunctions,
+
   sin: equation(x => (x % Math.PI !== 0) ? Math.sin(x) : 0), // Fix annoying sin values
   cos: equation(Math.cos),
   tan: equation(Math.tan),
@@ -57,8 +59,5 @@ const functions = {
 
   cosc: equation(x => Math.cos(x) / x),
   tanc: equation(x => (x === 0) ? 1 : Math.tan(x) / x),
-
-  rgb,
-  hsl,
 };
 export default functions;

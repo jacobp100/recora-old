@@ -1,20 +1,26 @@
 import Color from 'color-forge';
 import { isNumber, toSi } from '../../types/entity';
-import { entity, percentage, color } from '../../types';
+import { lighten as colorLighten, darken as colorDarken } from '../../types/color';
+import { color } from '../../types';
+import { isEntity, isPercentage, isColor } from '../../types/util';
 import { noneNil } from '../../util';
 
 
 const input = nthArg(1);
 const value = prop('value');
 const inputValue = pipe(input, value);
-const inputType = pipe(input, prop('type'));
 
 const isNumberEntity = allPass([
-  pipe(inputType, equals(entity.type)),
+  pipe(input, isEntity),
   isNumber,
 ]);
 
-const isPercent = pipe(inputType, equals(percentage.type));
+const isDegreesEntity = allPass([
+  pipe(input, isEntity),
+  pipe(input, prop('units'), equals({ degree: 1 })),
+]);
+
+const isPercent = pipe(input, isPercentage);
 
 const as255Number = cond([
   [isNumberEntity, pipe(toSi, value)],
@@ -32,7 +38,11 @@ const asPercentage = cond([
 ]);
 
 const asDegrees = cond([
-  [isNumberEntity, inputValue], // NOT toSi, accept 180 degrees and 180
+  [isDegreesEntity, inputValue],
+  [isNumberEntity, pipe(inputValue, ifElse(lte(__, 1),
+    multiply(360),
+    identity,
+  ))], // NOT toSi, accept 180 degrees and 180
   [isPercent, pipe(inputValue, multiply(100 / 360))],
   [T, always(null)],
 ]);
@@ -41,7 +51,7 @@ function colorConversion(space, functions) {
   return function colorConversionFunction(ctx, power, values) {
     if (power === 1 && values.length === functions.length) {
       const functionValueZip = zip(functions, values);
-      const spaceValues = map(([fn, value]) => fn(ctx, value), functionValueZip);
+      const spaceValues = map(([fn, spaceValue]) => fn(ctx, spaceValue), functionValueZip);
 
       if (noneNil(spaceValues)) {
         return { ...color, value: Color[space](spaceValues) };
@@ -55,6 +65,23 @@ function colorConversion(space, functions) {
 export const rgb = colorConversion('rgb', [as255Number, as255Number, as255Number]);
 export const hsl = colorConversion('hsl', [asDegrees, asPercentage, asPercentage]);
 export const hsv = colorConversion('hsv', [asDegrees, asPercentage, asPercentage]);
+
+
+function lightenDarken(fn) {
+  return function lightenDarkenFunction(ctx, power, values) {
+    const colorValue = values[0];
+
+    if (power === 1 && values.length <= 2 && isColor(colorValue)) {
+      const shiftPercent = values[1] ? asPercentage(ctx, values[1]) : 10;
+      return fn(ctx, colorValue, shiftPercent / 100);
+    }
+
+    return null;
+  };
+}
+
+export const lighten = lightenDarken(colorLighten);
+export const darken = lightenDarken(colorDarken);
 
 // export function darken(colour, amount) {
 //   var value = Number(amount.toSi());
