@@ -1,7 +1,7 @@
 import { entity as entityDescriptor } from './index';
 import unitsDerived from '../data/unitsDerived';
 import { getUnitValue, getSiUnit, formatEntity } from '../environment';
-import { mapWithAccum, objectEmpty } from '../util';
+import { mapWithAccum, objectEmpty, nilValue } from '../util';
 
 
 const notNil = complement(isNil);
@@ -12,7 +12,7 @@ const sumLastElementsInPairs = pipe(map(last), sum);
 const getUnitType = pipe(
   getUnitValue,
   ifElse(isNil,
-    always(null),
+    nilValue,
     prop('type')
   ),
 );

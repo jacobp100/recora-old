@@ -4,16 +4,13 @@ import { operationsGroup, miscGroup, bracketGroup, entity, funcApplication } fro
 import { apply } from '../types/funcApplication'; // should this just be in math?
 import * as math from '../math';
 import { orderDirection } from '../math/operators';
-import { containsNil } from '../util';
+import { containsNil, nilValue } from '../util';
 
 const finalNil = always(reduced(null));
 
 const resolveBreakNil = fn => pipe(
   fn,
-  ifElse(isNil,
-    finalNil,
-    identity
-  )
+  when(isNil, finalNil)
 );
 
 const groupsResolver = (reducer) => (context, locals, group) => (
@@ -21,7 +18,7 @@ const groupsResolver = (reducer) => (context, locals, group) => (
     prop('groups'),
     map(partial(resolveWithLocals, [context, locals])),
     ifElse(containsNil,
-      always(null),
+      nilValue,
       partial(reducer, [context, group]),
     ),
   )(group)
@@ -66,7 +63,7 @@ const resolveMiscGroup = groupsResolver(resolveMiscGroupReducer);
 const resolveBracketGroupHasOneGroup = pipe(nthArg(2), prop('groups'), length, equals(1));
 const resolveBracketGroup = ifElse(resolveBracketGroupHasOneGroup,
   resolveMiscGroup,
-  always(null),
+  nilValue,
 );
 
 
@@ -91,7 +88,7 @@ const resolveEntity = (context, locals, value) => {
     values,
     ifElse(isEmpty,
       always(1),
-      sum
+      sum,
     ),
   )(locals);
 

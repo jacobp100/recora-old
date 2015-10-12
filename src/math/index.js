@@ -6,14 +6,14 @@ import * as colorMath from './color';
 import * as colorPercentageMath from './colorPercentage';
 import * as colorEntityMath from './colorEntity';
 import gamma from 'gamma';
+import { nilValue } from '../util';
 
 
 const negativeEntity = { ...entity, value: -1 };
 const entityNegate = (context, emptyValue, entityValue) => entityMath.multiply(context, negativeEntity, entityValue);
-const entityFactorial = ifElse(
-  isNumber,
+const entityFactorial = ifElse(isNumber,
   pipe(nthArg(1), evolve({ value: pipe(add(1), gamma) })),
-  always(null),
+  nilValue,
 );
 
 

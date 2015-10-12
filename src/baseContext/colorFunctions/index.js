@@ -32,20 +32,14 @@ const as255Number = cond([
 ]);
 
 const asPercentage = cond([
-  [isNumberEntity, pipe(siValue, ifElse(lte(__, 1),
-    multiply(100),
-    identity,
-  ))],
+  [isNumberEntity, pipe(siValue, when(lte(__, 1), multiply(100)))],
   [isPercent, inputValue],
   [T, always(null)],
 ]);
 
 const asDegrees = cond([
   [isDegreesEntity, pipe(siValue, multiply(360 / (2 * Math.PI)))],
-  [isNumberEntity, pipe(siValue, ifElse(lte(__, 1),
-    multiply(360),
-    identity,
-  ))], // NOT toSi, accept 180 degrees and 180
+  [isNumberEntity, pipe(siValue, when(lte(__, 1), multiply(360)))], // NOT toSi, accept 180 degrees and 180
   [isPercent, pipe(inputValue, multiply(360 / 100))],
   [T, always(null)],
 ]);

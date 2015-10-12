@@ -25,7 +25,7 @@ const groupRemainingTags = pipe(
   reduce((values, tag) => (
     (tagResolvers[tag.type] || tagResolvers.DEFAULT)(values, tag)
   ), [entity]),
-  map(ifElse(valueTypeHasNilValueButHasSymbols, assoc('value', 1), identity)),
+  map(when(valueTypeHasNilValueButHasSymbols, assoc('value', 1))),
   reject(valueTypeIsEmpty),
   cond([
     [isEmpty, always(empty)],
@@ -141,10 +141,7 @@ const splitTags = reduce((tags, tag) => {
 const resolveTagsWithoutBrackets = pipe(
   splitTags,
   map(resolveFunctions),
-  ifElse(containsNil,
-    nilValue,
-    identity,
-  ),
+  when(containsNil, nilValue),
 );
 
 const isOpenBracket = whereEq({ type: TAG_OPEN_BRACKET });
@@ -186,7 +183,7 @@ const createASTFromTags = pipe(
   resolveBrackets,
   ifElse(lengthIsOne,
     head,
-    always(null)
+    nilValue,
   ),
 );
 

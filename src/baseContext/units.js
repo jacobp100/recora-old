@@ -13,12 +13,11 @@ const unitFunctions = {
 };
 
 const getUnitFn = prop(__, unitFunctions);
-const resolveUnitFns = ifElse(has('forwardFn'),
+const resolveUnitFns = when(has('forwardFn'),
   evolve({
     forwardFn: getUnitFn,
     backwardFn: getUnitFn,
   }),
-  identity,
 );
 
 const units = mapObj(resolveUnitFns, jsonUnits);
