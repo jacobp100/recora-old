@@ -3,7 +3,7 @@ import { isNumber, toSi } from '../../types/entity';
 import { lighten as colorLighten, darken as colorDarken } from '../../types/color';
 import { color } from '../../types';
 import { isEntity, isPercentage, isColor } from '../../types/util';
-import { noneNil } from '../../util';
+import { noneNil, objectNotEmpty, objectEmpty } from '../../util';
 
 
 const input = nthArg(1);
@@ -18,10 +18,8 @@ const isNumberEntity = allPass([
 
 const isDegreesEntity = allPass([
   pipe(input, isEntity),
-  pipe(input, units, anyPass([
-    equals({ degree: 1 }),
-    equals({ radian: 1 }),
-  ])),
+  pipe(input, units, objectNotEmpty),
+  pipe(toSi, units, objectEmpty),
 ]);
 
 const isPercent = pipe(input, isPercentage);
