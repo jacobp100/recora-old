@@ -1,5 +1,5 @@
-export const mapWithAccum = pipe(mapAccum, last);
-export const mapWithAccumRight = pipe(mapAccumRight, last);
+export const mapWithAccum = curry((fn, initial, list) => last(mapAccum(fn, initial, list)));
+export const mapWithAccumRight = curry((fn, initial, list) => last(mapAccumRight(fn, initial, list)));
 export const rejectNil = reject(isNil);
 export const lengthIsOne = pipe(length, equals(1));
 export const notNil = complement(isNil);

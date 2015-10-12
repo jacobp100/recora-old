@@ -51,7 +51,7 @@ const getParseOptionSymbols = pipe(
 const getInlineSymbols = filter(isSymbol);
 const countSymbols = pipe(
   prop('tags'),
-  converge(concat, getParseOptionSymbols, getInlineSymbols),
+  converge(concat, [getParseOptionSymbols, getInlineSymbols]),
   countBy(prop('value')),
 );
 
@@ -70,7 +70,7 @@ export function getTagOptions(context) { // exported for testing
 
   return pipe(
     getParseOptions,
-    map(partial(transformParseOptions, context.tags)),
+    map(partial(transformParseOptions, [context.tags])),
     filter(noneOrAllSymbolsIncluded),
     map(tags => ({ ...context, tags })),
   )(context.tags);
@@ -93,8 +93,8 @@ const conversion = prop('conversion');
 const convertResult = over(
   lens(identity, assoc('result')),
   cond([
-    [hasCompositeConversion, converge(convertComposite, identity, conversion, result)],
-    [hasConversion, converge(convert, identity, conversion, result)],
+    [hasCompositeConversion, converge(convertComposite, [identity, conversion, result])],
+    [hasConversion, converge(convert, [identity, conversion, result])],
     [T, result],
   ]),
 );
@@ -102,7 +102,7 @@ const convertResult = over(
 
 const resultToString = over(
   lens(identity, assoc('resultToString')),
-  converge(toString, identity, result),
+  converge(toString, [identity, result]),
 );
 
 

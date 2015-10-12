@@ -11,7 +11,7 @@
   "dependencies": {
     "color-forge": "^1.0.17",
     "mathp": "^1.4.0",
-    "ramda": "^0.17.1"
+    "ramda": "^0.18.0"
   },
   "devDependencies": {
     "babel": "^5.8.23",

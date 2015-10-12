@@ -85,21 +85,21 @@ describe('parse', function() {
 
       assert.equal(tagOptions.length, 5);
 
-      assert.equal(tagOptions[0].tags[0], option2);
-      assert.equal(tagOptions[0].tags[1], option2);
-      assert.equal(tagOptions[0].tags[2], option2);
+      assert.equal(tagOptions[0].tags[0], option1);
+      assert.equal(tagOptions[0].tags[1], option1);
+      assert.equal(tagOptions[0].tags[2], noop);
 
       assert.equal(tagOptions[1].tags[0], option1);
       assert.equal(tagOptions[1].tags[1], option1);
       assert.equal(tagOptions[1].tags[2], option3);
 
-      assert.equal(tagOptions[2].tags[0], noop);
-      assert.equal(tagOptions[2].tags[1], noop);
-      assert.equal(tagOptions[2].tags[2], option3);
+      assert.equal(tagOptions[2].tags[0], option2);
+      assert.equal(tagOptions[2].tags[1], option2);
+      assert.equal(tagOptions[2].tags[2], option2);
 
-      assert.equal(tagOptions[3].tags[0], option1);
-      assert.equal(tagOptions[3].tags[1], option1);
-      assert.equal(tagOptions[3].tags[2], noop);
+      assert.equal(tagOptions[3].tags[0], noop);
+      assert.equal(tagOptions[3].tags[1], noop);
+      assert.equal(tagOptions[3].tags[2], option3);
 
       assert.equal(tagOptions[4].tags[0], noop);
       assert.equal(tagOptions[4].tags[1], noop);

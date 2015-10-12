@@ -15,6 +15,6 @@ function exponent(context, color, entity) {
   return null;
 }
 
-export const multiply = partial(abstractMultiply, 1);
-export const divide = partial(abstractMultiply, -1);
+export const multiply = partial(abstractMultiply, [1]);
+export const divide = partial(abstractMultiply, [-1]);
 export { exponent };

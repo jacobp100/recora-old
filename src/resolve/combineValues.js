@@ -19,21 +19,21 @@ const unitsLength = pipe(units, length);
 const baseDimensionsEmpty = pipe(baseDimensions, keys, isEmpty);
 
 const eitherBaseDimensionsEmpty = anyPass([
-  converge(baseDimensionsEmpty, context, lhs),
-  converge(baseDimensionsEmpty, context, rhs),
+  converge(baseDimensionsEmpty, [context, lhs]),
+  converge(baseDimensionsEmpty, [context, rhs]),
 ]);
-const baseDimensionsEqual = converge(equals,
-  converge(baseDimensions, context, lhs),
-  converge(baseDimensions, context, rhs),
-);
-const shouldDivide = converge(shouldDivideDimensions,
-  converge(dimensions, context, lhs),
-  converge(dimensions, context, rhs),
-);
-const lhsUnitsLengthLessThanRhsUnitsLength = converge(lt,
+const baseDimensionsEqual = converge(equals, [
+  converge(baseDimensions, [context, lhs]),
+  converge(baseDimensions, [context, rhs]),
+]);
+const shouldDivide = converge(shouldDivideDimensions, [
+  converge(dimensions, [context, lhs]),
+  converge(dimensions, [context, rhs]),
+]);
+const lhsUnitsLengthLessThanRhsUnitsLength = converge(lt, [
   pipe(lhs, unitsLength),
   pipe(rhs, unitsLength),
-);
+]);
 
 const combineEntities = cond([
   // Unitless values multiply: `2 sin(...)` etc

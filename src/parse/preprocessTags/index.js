@@ -1,7 +1,7 @@
 import * as processTagElement from './processTagElement';
 import { TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET } from '../tags';
 import { statementParts } from '../text';
-import * as locale from '../../environment';
+import { preprocessTags as environmentPreprocessTags } from '../../environment';
 import { mapWithAccum, notNil } from '../../util';
 
 
@@ -34,14 +34,14 @@ function resolveTagBracket(bracketLevel, tag) {
 }
 
 const preprocessTags = pipe(
-  locale.preprocessTags,
+  environmentPreprocessTags,
   over(
     lensProp('tags'),
     reject(isNil),
   ),
   over(
     lens(identity, assoc('tags')),
-    context => map(partial(processTag, context), context.tags),
+    context => map(partial(processTag, [context]), context.tags),
   ),
   over(
     lensProp('tags'),

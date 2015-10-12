@@ -30,7 +30,7 @@ function getNonLinearUnitPairs(context, units) {
   return pipe(
     toPairs,
     filter(
-      pipe(head, partial(isNonLinearUnit, context)),
+      pipe(head, partial(isNonLinearUnit, [context])),
     ),
   )(units);
 }
@@ -110,7 +110,7 @@ function getSiUnits(context, entity) {
   return pipe(
     dimensions,
     toPairs,
-    map(adjust(partial(getSiUnit, context), 0)),
+    map(adjust(partial(getSiUnit, [context]), 0)),
     fromPairs,
   )(context, entity);
 }
@@ -139,7 +139,7 @@ function convertValue(context, direction, units, value) {
   }
 
   return reduce(
-    partial(convertValueReducerFn, context, direction),
+    partial(convertValueReducerFn, [context, direction]),
     value,
     toPairs(units),
   );
@@ -157,8 +157,8 @@ export function convert(context, units, entity) {
   }
 
   const value = pipe(
-    partial(convertValue, context, -1, entity.units),
-    partial(convertValue, context, 1, units),
+    partial(convertValue, [context, -1, entity.units]),
+    partial(convertValue, [context, 1, units]),
   )(entity.value);
   return { ...entity, value, units };
 }
@@ -174,7 +174,7 @@ function floorEntityAccum(context, entity, units) {
 
 export function convertComposite(context, unitArray, entity) {
   const value = mapWithAccum(
-    partial(floorEntityAccum, context),
+    partial(floorEntityAccum, [context]),
     entity,
     unitArray
   );

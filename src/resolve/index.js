@@ -6,7 +6,7 @@ import * as math from '../math';
 import { orderDirection } from '../math/operators';
 import { containsNil } from '../util';
 
-const finalNil = pipe(always(reduced(null)));
+const finalNil = always(reduced(null));
 
 const resolveBreakNil = fn => pipe(
   fn,
@@ -19,10 +19,10 @@ const resolveBreakNil = fn => pipe(
 const groupsResolver = (reducer) => (context, locals, group) => (
   pipe(
     prop('groups'),
-    map(partial(resolveWithLocals, context, locals)),
+    map(partial(resolveWithLocals, [context, locals])),
     ifElse(containsNil,
       always(null),
-      partial(reducer, context, group),
+      partial(reducer, [context, group]),
     ),
   )(group)
 );
@@ -36,7 +36,7 @@ const groupIsBackwards = pipe(
 );
 const resolveOperationsGroup = (context, locals, group) => {
   const { groups: unresolvedGroups, operations } = group;
-  const groups = map(partial(resolveWithLocals, context, locals), unresolvedGroups); // FIXME: This is shitty
+  const groups = map(partial(resolveWithLocals, [context, locals]), unresolvedGroups); // FIXME: This is shitty
   const isBackwards = groupIsBackwards(group);
 
   if (containsNil(groups)) {
@@ -48,7 +48,7 @@ const resolveOperationsGroup = (context, locals, group) => {
   const resolveFn = isBackwards ? resolveOperationsGroupBackwardsFn : resolveOperationsGroupForwardsFn;
 
   return reduce(
-    partial(resolveFn, context),
+    partial(resolveFn, [context]),
     head(fixedGroups),
     zip(fixedOperations, tail(fixedGroups)),
   );
@@ -57,7 +57,7 @@ const resolveOperationsGroup = (context, locals, group) => {
 
 const resolveMiscGroupReduceFn = resolveBreakNil(combineValues);
 const resolveMiscGroupReducer = (context, locals, group) => reduce(
-  partial(resolveMiscGroupReduceFn, context),
+  partial(resolveMiscGroupReduceFn, [context]),
   head(group),
   tail(group),
 );
@@ -71,7 +71,7 @@ const resolveBracketGroup = ifElse(resolveBracketGroupHasOneGroup,
 
 
 const resolveFuncApplaction = (context, locals, value) => {
-  const groups = map(partial(resolveWithLocals, context, locals), value.groups);
+  const groups = map(partial(resolveWithLocals, [context, locals]), value.groups);
 
   if (containsNil(groups)) {
     return null;
@@ -125,6 +125,6 @@ export function resolveWithLocals(context, locals, value) {
 
 const resolve = over(
   lens(identity, assoc('result')),
-  converge(resolveWithLocals, identity, always({}), prop('ast')),
+  converge(resolveWithLocals, [identity, always({}), prop('ast')]),
 );
 export default resolve;

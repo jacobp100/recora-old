@@ -74,10 +74,10 @@ function resolveOperationsFn(startLevel, tags) {
       operations: [],
       level,
     }),
-    evolve({ groups: map(partial(resolveOperationsFn, level + 1)) }),
+    evolve({ groups: map(partial(resolveOperationsFn, [level + 1])) }),
   )(tags);
 }
-const resolveOperations = partial(resolveOperationsFn, 0);
+const resolveOperations = partial(resolveOperationsFn, [0]);
 
 
 const isFunction = whereEq({ type: TAG_FUNCTION });
@@ -207,7 +207,7 @@ const addConversionToContext = (context, conversionTagsWithNoop, tags) => {
   const units = pipe(
     reject(isNoop),
     reject(isComma),
-    map(converge(createMapEntry, prop('value'), prop('power'))),
+    map(converge(createMapEntry, [prop('value'), prop('power')])),
   )(conversionTagsWithNoop);
 
   const unitsLength = length(units);
@@ -221,7 +221,7 @@ const addConversionToContext = (context, conversionTagsWithNoop, tags) => {
 
   const allEqualDimensions = pipe(
     map(assoc('units', __, entity)), // Get entities
-    map(partial(baseDimensions, context)),
+    map(partial(baseDimensions, [context])),
     uniq,
     lengthIsOne,
   )(units);

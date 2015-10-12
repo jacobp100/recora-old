@@ -51,12 +51,12 @@ function formatEntityReducerFn(entity, out, [unit, value]) {
     return `${out} ${(value < 0) ? 'per ' : ''}${unitPlural}${powerString(Math.abs(value))}`;
   }
 }
-const formatEntityUnits = (entity, str) => reduce(partial(formatEntityReducerFn, entity), str, toPairs(entity.units));
+const formatEntityUnits = (entity, str) => reduce(partial(formatEntityReducerFn, [entity]), str, toPairs(entity.units));
 
 
 export function formatEntity(context, entity, formattingHints) {
   return pipe(
     formatEntityNumber,
-    partial(formatEntityUnits, entity),
+    partial(formatEntityUnits, [entity]),
   )(entity, formattingHints);
 }
