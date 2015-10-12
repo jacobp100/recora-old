@@ -127,8 +127,5 @@
 
   "litre"      : "liter",
   "millilitre" : "milliliter",
-  "centilitre" : "centiliter",
-
-  "rgb"        : "_rgb",
-  "hsl"        : "_hsl"
+  "centilitre" : "centiliter"
 }

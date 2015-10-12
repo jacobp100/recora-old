@@ -4,7 +4,7 @@ import { isNoop, isSymbol } from '../tags/util';
 import { orderOperations, operationsOrder, unaryOperators, NEGATE } from '../../math/operators';
 import { entity, funcApplication, func, miscGroup, empty, bracketGroup, operationsGroup } from '../../types';
 import { baseDimensions } from '../../types/entity';
-import { lengthIsOne, objectEmpty } from '../../util';
+import { lengthIsOne, objectEmpty, containsNil, nilValue } from '../../util';
 
 
 const valueTypeIsEmpty = where({
@@ -97,7 +97,7 @@ function resolveFunctions(tags) {
   const nextTag = tags[functionIndex + 1];
 
   if (!nextTag) {
-    return resolveOperations(dropLast(1, tags));
+    return null;
   }
 
   const newFunc = { ...func, name: funcTag.value, power: funcTag.power };
@@ -141,6 +141,10 @@ const splitTags = reduce((tags, tag) => {
 const resolveTagsWithoutBrackets = pipe(
   splitTags,
   map(resolveFunctions),
+  ifElse(containsNil,
+    nilValue,
+    identity,
+  ),
 );
 
 const isOpenBracket = whereEq({ type: TAG_OPEN_BRACKET });
@@ -180,7 +184,10 @@ function resolveBrackets(tags) {
 
 const createASTFromTags = pipe(
   resolveBrackets,
-  ifElse(pipe(length, equals(1)), head, always(null)),
+  ifElse(lengthIsOne,
+    head,
+    always(null)
+  ),
 );
 
 const notNoop = complement(isNoop);

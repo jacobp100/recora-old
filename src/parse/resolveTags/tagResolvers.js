@@ -1,4 +1,5 @@
 import { entity, percentage } from '../../types';
+import { isEntity } from '../../types/util';
 import { objectEmpty } from '../../util';
 import assert from 'assert';
 
@@ -8,7 +9,7 @@ function tagUnitSymbol(unitOrSymbol) {
   return function tagUnitOrSymbolFn(values, { value, power }) {
     const lastItem = last(values);
 
-    if (lastItem.type === entity.type) {
+    if (isEntity(lastItem)) {
       const addPowerToValue = over(
         lensProp(value),
         pipe(
@@ -30,7 +31,7 @@ export function TAG_NUMBER(values, { value }) {
   assert(typeof value === 'number');
   const lastItem = last(values);
 
-  if (lastItem.type === entity.type && lastItem.value === null) {
+  if (isEntity(lastItem) && lastItem.value === null) {
     return adjust(assoc('value', value), -1, values);
   }
 
@@ -52,7 +53,7 @@ export function TAG_PERCENTAGE(values) {
   const lastItem = last(values);
   let newValue = null;
 
-  if (lastItem.type === entity.type) {
+  if (isEntity(lastItem)) {
     newValue = entityToPercentage(lastItem);
   }
 
