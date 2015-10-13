@@ -3,6 +3,8 @@ import baseContext from './baseContext';
 
 // TODO: Functions for differentation, sum (sigma), and multiplication (pi)
 
+import parseDates from './parse/parseDates';
+
 export default class Recora {
   constructor(locale) {
     this.locale = locale || 'en';

@@ -5,6 +5,7 @@ import abbreviations from '../../../data/en/abbreviations';
 
 export { formatEntity } from './formatEntity';
 export { preprocessTags } from './preprocessTags';
+export { timeFormats } from './parseDates';
 
 
 export function getUnitName(context, unit) {
