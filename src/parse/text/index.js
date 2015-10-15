@@ -6,6 +6,7 @@ export const TEXT_SYMBOL_UNIT_EXPONENT = 'TEXT_SYMBOL_UNIT_EXPONENT';
 export const TEXT_NUMBER = 'TEXT_NUMBER';
 export const TEXT_COLOR = 'TEXT_COLOR';
 export const TEXT_OPERATOR = 'TEXT_OPERATOR';
+export const TEXT_MISC = 'TEXT_MISC';
 
 export const statementParts = [
   null, // full text
@@ -18,6 +19,7 @@ export const statementParts = [
   TEXT_COLOR,
   TEXT_OPERATOR,
   TAG_COMMA,
+  TEXT_MISC,
 ];
 export const partStatement = pipe(
   invert,

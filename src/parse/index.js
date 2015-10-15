@@ -1,6 +1,7 @@
 import { TAG_PARSE_OPTIONS } from './tags';
 import { isSymbol } from './tags/util';
 import parseText from './parseText';
+import parseDates from './parseDates';
 import preprocessTags from './preprocessTags';
 import postprocessTags from './postprocessTags';
 import resolveTags from './resolveTags';
@@ -134,6 +135,7 @@ const parseTagsWithOptions = pipe(
 const parse = pipe(
   parseText,
   getFormattingHints,
+  parseDates,
   preprocessTags,
   parseTagsWithOptions,
 );

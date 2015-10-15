@@ -1,4 +1,4 @@
-import { text, colon, h, mm, D } from '../../parse/parseDates/formats';
+import { text, colon, h, mm, D } from '../../../parse/parseDates/formats';
 
 export const amPm = anyPass([ // FIXME: Locale
   pipe(text, equals('am')),
@@ -24,7 +24,9 @@ const MMMMFormats = [
   /^dec(ember)?$/,
 ];
 
-const MMMM = pipe(text, anyPass(map(match, MMMMFormats)));
+const matchesMMMMFormats = map(match, MMMMFormats);
+
+const MMMM = pipe(text, anyPass(matchesMMMMFormats));
 
 
 const dateFormat = [D, MMMM];

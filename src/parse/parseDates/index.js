@@ -1,6 +1,6 @@
 import { dash, slash, colon, dot, t, ms, mm, h, hh, D, DD, MM, YY, YYYY, tzOffsetRange, tzShort } from './formats';
 import { getLocaleDateFormats, getLocaleTimeFormats, getLocaleDateTimeFormats } from '../../environment';
-import { findPatternIndex } from '../../util';
+import { findPatternIndexBy } from '../../util';
 
 
 const groupByPatternLength = pipe(
@@ -78,39 +78,56 @@ const baseDateTimeFormats = [
 ];
 
 
-const parsePattern = curry((context, patternGroup, tags) => {
-  function findSubPattern(index) {
-    const patterns = patternGroup[index];
+const splice = curry((start, count, value, array) => insert(start, value, remove(start, count, array)));
 
-    if (!patterns) {
-      return tags;
-    }
+function findSubPattern(context, patterns) {
+  const { tags } = context;
 
-    const availablePatterns = pipe(
-      map((pattern) => findPatternIndex(pattern.pattern, tags)),
-      reject(equals(-1)),
-    )(patterns);
+  const availablePatterns = pipe(
+    map((pattern) => ({
+      patternIndex: findPatternIndexBy(pattern.pattern, tags),
+      pattern,
+    })),
+    reject(whereEq({ patternIndex: -1 })),
+  )(patterns);
 
-    if (isEmpty(availablePatterns)) {
-      return findSubPattern(index + 1);
-    }
+  const availablePatternsLength = length(availablePatterns);
 
-    // Resolve ambiguities (euro/american)
-    // Slice pattern into tags
-    return tags;
+  // TODO: resolve ambiguities (euro/american, 24h time (isodate) vs 12h etc.)
+  // if (availablePatternsLength > 1) {
+  //   console.log(availablePatterns);
+  //   throw new Error('ambigious');
+  // }
+
+  if (availablePatternsLength >= 1) { // || availablePatternsLength === 1) {
+    const { pattern, patternIndex } = head(availablePatterns);
+    const value = {
+      type: 'TAG_DATE',
+      format: pattern.format,
+      start: tags[patternIndex].start,
+      end: tags[patternIndex + pattern.pattern.length - 1].end,
+    };
+    const spliceCount = pattern.pattern.length;
+    const newTags = splice(patternIndex, spliceCount, value, tags);
+
+    return findSubPattern({ ...context, tags: newTags }, patterns);
   }
 
-  return findSubPattern(0);
-});
+  return context;
+}
 
-export function parseDates(context, tags) {
+const parsePattern = flip(reduce(findSubPattern));
+
+export default function parseDates(context) {
   const dateFormats = groupByPatternLength([...baseDateFormats, ...getLocaleDateFormats(context)]);
   const timeFormats = groupByPatternLength([...baseTimeFormats, ...getLocaleTimeFormats(context)]);
   const dateTimeFormats = groupByPatternLength([...baseDateTimeFormats, ...getLocaleDateTimeFormats(context)]);
 
   return pipe(
-    parsePattern(context, dateFormats),
-    parsePattern(context, timeFormats),
-    parsePattern(context, dateTimeFormats),
-  )(tags);
+    parsePattern(dateFormats),
+    parsePattern(timeFormats),
+    print(''),
+    parsePattern(dateTimeFormats),
+    print(''),
+  )(context);
 }

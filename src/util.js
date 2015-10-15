@@ -8,9 +8,33 @@ export const noneNil = all(notNil);
 export const objectEmpty = pipe(keys, isEmpty);
 export const objectNotEmpty = complement(objectEmpty);
 export const nilValue = always(null);
+export function findPatternIndexBy(patterns, array) {
+  const patternsLength = patterns.length;
+  const to = array.length - patternsLength;
+
+  outerloop: for (let i = 0; i <= to; i += 1) {
+    let count = 0;
+
+    for (let j = 0; j < patternsLength; j += 1) {
+      const arrayIndex = i + count;
+
+      if (!patterns[j](array[arrayIndex])) {
+        continue outerloop;
+      }
+
+      count += 1;
+
+      if (count === patternsLength) {
+        return i;
+      }
+    }
+  }
+
+  return -1;
+}
 export function findPatternIndex(comparitor, subarray, array) {
   const subarrayLength = subarray.length;
-  const to = array.length;
+  const to = array.length - subarrayLength;
 
   outerloop: for (let i = 0; i < to; i += 1) {
     let count = 0;

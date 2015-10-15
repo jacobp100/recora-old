@@ -29,7 +29,7 @@ export const mm = allPass([
   textLength2,
   pipe(text, Number, allPass([
     notNaN,
-    gte(__, 1),
+    gte(__, 0),
     lte(__, 12),
   ])),
 ]);

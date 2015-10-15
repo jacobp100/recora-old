@@ -2,12 +2,12 @@ import * as processTagElement from './processTagElement';
 import { TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET } from '../tags';
 import { statementParts } from '../text';
 import { preprocessTags as environmentPreprocessTags } from '../../environment';
-import { mapWithAccum, notNil } from '../../util';
+import { mapWithAccum, noneNil } from '../../util';
 
 
 const findValueAndType = pipe(
   zip(statementParts),
-  filter(all(notNil)),
+  filter(noneNil),
   head,
 );
 
