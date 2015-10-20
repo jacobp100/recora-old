@@ -1,5 +1,5 @@
 import { text, plus, plusMinus, dash, slash, colon, dot, t, ms, s, mm, hh, hhmm, D, DD, MM, YY, YYYY } from './formats';
-import { getLocaleDateFormats, getLocaleTimeFormats, getLocaleTimezoneOffsetFormats, getLocaleDateTimeFormats } from '../../environment';
+import { getLocaleDateFormats, getLocaleTimeFormats, getLocaleTimezoneFormats, getLocaleTimezoneOffsetFormats, getLocaleDateTimeFormats } from '../../environment';
 import { findPatternIndexBy } from '../../util';
 
 
@@ -103,6 +103,11 @@ const baseTimezoneOffsetFormats = [
 ];
 
 
+// Timezones
+// TODO: Resolve Europe/London etc.
+const baseTimezoneFormats = [];
+
+
 // Find dates, times, and then try to combine
 const isIsoDate = whereEq({ format: 'ISO_DATE' });
 const isIsoTime = whereEq({ format: 'ISO_TIME' });
@@ -183,6 +188,7 @@ export default function parseDates(context) {
   const dateFormats = groupByPatternLength([...baseDateFormats, ...getLocaleDateFormats(context)]);
   const timeFormats = groupByPatternLength([...baseTimeFormats, ...getLocaleTimeFormats(context)]);
   const timezoneOffsetFormats = groupByPatternLength([...baseTimezoneOffsetFormats, ...getLocaleTimezoneOffsetFormats(context)]);
+  const timezoneFormats = groupByPatternLength([...baseTimezoneFormats, ...getLocaleTimezoneFormats(context)]);
   const dateTimeFormats = groupByPatternLength([...baseDateTimeFormats, ...getLocaleDateTimeFormats(context)]);
 
   return pipe(
@@ -190,7 +196,7 @@ export default function parseDates(context) {
     // Timezones before times because timezones can partially parse as times (+03:45 could be '+' and a time)
     parsePattern('TIMEZONE_OFFSET', timezoneOffsetFormats),
     parsePattern('TIME', timeFormats),
-    // TODO: Regular timezones (PST/PDT to timezone names)
+    parsePattern('TIMEZONE', timezoneFormats),
     parsePattern('DATE_TIME', dateTimeFormats),
     // TODO: Fill in missing information from current
     // year (make sure the date is in the future), month, day, timezone
