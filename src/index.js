@@ -2,6 +2,7 @@ import parse from './parse';
 import baseContext from './baseContext';
 
 // TODO: Functions for differentation, sum (sigma), and multiplication (pi)
+// TODO: mapObj -> map, createMapEntry -> objOf
 
 import parseDates from './parse/parseDates';
 

@@ -15,5 +15,6 @@ export const getUnitName = (context, name) => (locales[context.locale].getUnitNa
 export const preprocessTags = (context) => (locales[context.locale].preprocessTags(context));
 export const getLocaleDateFormats = (context) => (locales[context.locale].dateFormats || []);
 export const getLocaleTimeFormats = (context) => (locales[context.locale].timeFormats || []);
+export const getLocaleTimezoneOffsetFormats = (context) => (locales[context.locale].timezoneOffsetFormats || []);
 export const getLocaleDateTimeFormats = (context) => (locales[context.locale].dateTimeFormats || []);
 export const formatEntity = (context, entity, formattingHints) => (locales[context.locale].formatEntity(context, entity, formattingHints));
