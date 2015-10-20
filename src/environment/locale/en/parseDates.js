@@ -93,5 +93,6 @@ const tz = [pipe(text, has(__, timezoneAbbreviations))];
 const resolveTz = tags => prop(tags[0][0], timezoneAbbreviations);
 
 export const timezoneFormats = [
+  // FIXME: names
   { name: null, format: null, pattern: tz, resolve: resolveTz },
 ];
