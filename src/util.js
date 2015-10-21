@@ -8,7 +8,7 @@ export const noneNil = all(notNil);
 export const objectEmpty = pipe(keys, isEmpty);
 export const objectNotEmpty = complement(objectEmpty);
 export const nilValue = always(null);
-export function findPatternIndexBy(patterns, array) {
+export const findPatternIndexBy = curry((patterns, array) => {
   const patternsLength = patterns.length;
   const to = array.length - patternsLength;
 
@@ -31,8 +31,8 @@ export function findPatternIndexBy(patterns, array) {
   }
 
   return -1;
-}
-export function findPatternIndex(comparitor, subarray, array) {
+});
+export const findPatternIndex = curry((comparitor, subarray, array) => {
   const subarrayLength = subarray.length;
   const to = array.length - subarrayLength;
 
@@ -55,4 +55,4 @@ export function findPatternIndex(comparitor, subarray, array) {
   }
 
   return -1;
-}
+});

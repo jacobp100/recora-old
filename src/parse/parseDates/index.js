@@ -1,6 +1,8 @@
 import { text, plus, plusMinus, dash, slash, colon, dot, t, ms, s, mm, hh, hhmm, D, DD, MM, YY, YYYY } from './formats';
 import { getLocaleDateFormats, getLocaleTimeFormats, getLocaleTimezoneFormats, getLocaleTimezoneOffsetFormats, getLocaleDateTimeFormats } from '../../environment';
-import { findPatternIndexBy } from '../../util';
+import { datetime, timezone, timezoneOffset } from '../../types';
+import { isDatetime, isTimezone, isTimezoneOffset } from '../../types/util';
+import { findPatternIndexBy, nilValue } from '../../util';
 
 
 const groupByPatternLength = pipe(
@@ -48,19 +50,19 @@ const resolveAmericanLongYearDate = tags => ({ year: tagValue(tags[4]), month: t
 
 const baseDateFormats = [
   // FIXME: Should have resolvers too
-  { name: 'ISO_DATE', format: 'ISO_DATE', pattern: isoDate, resolve: resolveIsoDate },
-  { name: 'EURO_DATE_NO_YEAR_DASH', format: 'DATE', pattern: euroDateNoYearDash, resolve: resolveEuroNoYearDate },
-  { name: 'EURO_DATE_NO_YEAR_SLASH', format: 'DATE', pattern: euroDateNoYearSlash, resolve: resolveEuroNoYearDate },
-  { name: 'EURO_DATE_SHORT_YEAR_DASH', format: 'DATE', pattern: euroDateShortYearDash, resolve: resolveEuroShortYearDate },
-  { name: 'EURO_DATE_SHORT_YEAR_SLASH', format: 'DATE', pattern: euroDateShortYearSlash, resolve: resolveEuroShortYearDate },
-  { name: 'EURO_DATE_LONG_YEAR_DASH', format: 'DATE', pattern: euroDateLongYearDash, resolve: resolveEuroLongYearDate },
-  { name: 'EURO_DATE_LONG_YEAR_SLASH', format: 'DATE', pattern: euroDateLongYearSlash, resolve: resolveEuroLongYearDate },
-  { name: 'AMERICAN_DATE_NO_YEAR_DASH', format: 'DATE', pattern: americanDateNoYearDash, resolve: resolveAmericanNoYearDate },
-  { name: 'AMERICAN_DATE_NO_YEAR_SLASH', format: 'DATE', pattern: americanDateNoYearSlash, resolve: resolveAmericanNoYearDate },
-  { name: 'AMERICAN_DATE_SHORT_YEAR_DASH', format: 'DATE', pattern: americanDateShortYearDash, resolve: resolveAmericanShortYearDate },
-  { name: 'AMERICAN_DATE_SHORT_YEAR_SLASH', format: 'DATE', pattern: americanDateShortYearSlash, resolve: resolveAmericanShortYearDate },
-  { name: 'AMERICAN_DATE_LONG_YEAR_DASH', format: 'DATE', pattern: americanDateLongYearDash, resolve: resolveAmericanLongYearDate },
-  { name: 'AMERICAN_DATE_LONG_YEAR_SLASH', format: 'DATE', pattern: americanDateLongYearSlash, resolve: resolveAmericanLongYearDate },
+  { format: 'ISO_DATE', pattern: isoDate, resolve: resolveIsoDate },
+  { format: 'DATE', pattern: euroDateNoYearDash, resolve: resolveEuroNoYearDate },
+  { format: 'DATE', pattern: euroDateNoYearSlash, resolve: resolveEuroNoYearDate },
+  { format: 'DATE', pattern: euroDateShortYearDash, resolve: resolveEuroShortYearDate },
+  { format: 'DATE', pattern: euroDateShortYearSlash, resolve: resolveEuroShortYearDate },
+  { format: 'DATE', pattern: euroDateLongYearDash, resolve: resolveEuroLongYearDate },
+  { format: 'DATE', pattern: euroDateLongYearSlash, resolve: resolveEuroLongYearDate },
+  { format: 'DATE', pattern: americanDateNoYearDash, resolve: resolveAmericanNoYearDate },
+  { format: 'DATE', pattern: americanDateNoYearSlash, resolve: resolveAmericanNoYearDate },
+  { format: 'DATE', pattern: americanDateShortYearDash, resolve: resolveAmericanShortYearDate },
+  { format: 'DATE', pattern: americanDateShortYearSlash, resolve: resolveAmericanShortYearDate },
+  { format: 'DATE', pattern: americanDateLongYearDash, resolve: resolveAmericanLongYearDate },
+  { format: 'DATE', pattern: americanDateLongYearSlash, resolve: resolveAmericanLongYearDate },
 ];
 
 
@@ -73,9 +75,9 @@ const resolveIsoTimeFull = tags => ({ hour: tagValue(tags[0]), minute: tagValue(
 const resolveIsoTime = tags => ({ hour: tagValue(tags[0]), minute: tagValue(tags[2]) });
 
 const baseTimeFormats = [
-  { name: 'ISO_TIME_FULL_MS', format: 'ISO_TIME', pattern: isoTimeFullMs, resolve: resolveIsoTimeFullMs },
-  { name: 'ISO_TIME_FULL', format: 'ISO_TIME', pattern: isoTimeFull, resolve: resolveIsoTimeFull },
-  { name: 'ISO_TIME', format: 'ISO_TIME', pattern: isoTime, resolve: resolveIsoTime },
+  { format: 'ISO_TIME', pattern: isoTimeFullMs, resolve: resolveIsoTimeFullMs },
+  { format: 'ISO_TIME', pattern: isoTimeFull, resolve: resolveIsoTimeFull },
+  { format: 'ISO_TIME', pattern: isoTime, resolve: resolveIsoTime },
 ];
 
 
@@ -86,20 +88,18 @@ const isoTzOffsetShort = [plusMinus, hh];
 const isoTzOffsetUtc = [pipe(text, equals('z'))];
 
 const directionFromPm = ifElse(plus, always(1), always(-1));
-const resolveIsoTzFull = tags => ({ direction: directionFromPm(tags[0]), hour: tagValue(tags[1]), minute: tagValue(tags[3]) });
-const resolveIsoTzFullCompact = tags => ({
-  direction: directionFromPm(tags[0]),
-  hour: Number(tags[1][0].substring(0, 2)),
-  minute: Number(tags[1][0].substring(2, 4)),
+const resolveIsoOffsetTzFull = tags => ({ offset: directionFromPm(tags[0]) * (60 * tagValue(tags[1]) + tagValue(tags[3])) });
+const resolveIsoOffsetTzFullCompact = tags => ({
+  offset: directionFromPm(tags[0]) * (60 * Number(tags[1][0].substring(0, 2)) + Number(tags[1][0].substring(2, 4))),
 });
-const resolveIsoTzShort = tags => ({ direction: directionFromPm(tags[0]), hour: tagValue(tags[1]), minute: 0 });
-const resolveIsoTzUtc = always({ direction: 1, hour: 0, minute: 0 });
+const resolveIsoTzOffsetShort = tags => ({ offset: directionFromPm(tags[0]) * 60 * tagValue(tags[1]) });
+const resolveIsoTzOffsetUtc = always({ offset: 0 });
 
 const baseTimezoneOffsetFormats = [
-  { name: 'ISO_TIMEZONE_OFFSET_FULL', format: 'ISO_TIMEZONE_OFFSET', pattern: isoTzOffsetFull, resolve: resolveIsoTzFull },
-  { name: 'ISO_TIMEZONE_OFFSET_FULL_COMPACT', format: 'ISO_TIMEZONE_OFFSET', pattern: isoTzOffsetFullCompact, resolve: resolveIsoTzFullCompact },
-  { name: 'ISO_TIMEZONE_OFFSET_SHORT', format: 'ISO_TIMEZONE_OFFSET', pattern: isoTzOffsetShort, resolve: resolveIsoTzShort },
-  { name: 'ISO_TIMEZONE_OFFSET_UTC', format: 'ISO_TIMEZONE_OFFSET', pattern: isoTzOffsetUtc, resolve: resolveIsoTzUtc },
+  { format: 'ISO_TIMEZONE_OFFSET', pattern: isoTzOffsetFull, resolve: resolveIsoOffsetTzFull },
+  { format: 'ISO_TIMEZONE_OFFSET', pattern: isoTzOffsetFullCompact, resolve: resolveIsoOffsetTzFullCompact },
+  { format: 'ISO_TIMEZONE_OFFSET', pattern: isoTzOffsetShort, resolve: resolveIsoTzOffsetShort },
+  { format: 'ISO_TIMEZONE_OFFSET', pattern: isoTzOffsetUtc, resolve: resolveIsoTzOffsetUtc },
 ];
 
 
@@ -112,33 +112,26 @@ const baseTimezoneFormats = [];
 const isIsoDate = whereEq({ format: 'ISO_DATE' });
 const isIsoTime = whereEq({ format: 'ISO_TIME' });
 const isIsoTimezoneOffset = whereEq({ format: 'ISO_TIMEZONE_OFFSET' });
-const isDate = whereEq({ format: 'DATE' });
-const isTime = whereEq({ format: 'TIME' });
+const isDate = whereEq({ type: 'TAG_DATE' });
+const isTime = whereEq({ type: 'TAG_TIME' });
 
 const isoDateTime = [isIsoDate, t, isIsoTime];
-const isoDateTimeTz = [...isoDateTime, isIsoTimezoneOffset];
+const isoDateTimeTzOffset = [...isoDateTime, isIsoTimezoneOffset];
 const dateTime = [isTime, isDate]; // Maybe locale?
+const dateTimeTzOffset = [...dateTime, isTimezoneOffset];
+const dateTimeTz = [...dateTime, isTimezone];
 
-const resolveIsoDateTime = tags => ({ ...tags[0].value, ...tags[2].value });
-const resolveIsoDateTimeTz = tags => {
-  const date = tags[0].value;
-  const time = tags[2].value;
-  const timezone = tags[3].value;
-
-  return {
-    ...date,
-    ...time,
-    timezone: 'UTC',
-    hour: time.hour + timezone.direction * timezone.hour,
-    minute: time.minute + timezone.direction * timezone.minute,
-  };
-};
+const resolveIsoDateTime = tags => ({ ...tags[0].value, ...tags[2].value, timezone: 'UTC' });
+const resolveIsoDateTimeTzOffset = tags => ({ ...resolveIsoDateTime(tags), ...tags[3].value, timezone: 'UTC' });
 const resolveDateTime = tags => ({ ...tags[0].value, ...tags[1].value });
+const resolveDateTimeTzTzOffset = tags => ({ ...resolveDateTime(tags), ...tags[2].value });
 
 const baseDateTimeFormats = [
-  { name: 'ISO_DATE_TIME_TZ', format: 'ISO_DATE_TIME', pattern: isoDateTimeTz, resolve: resolveIsoDateTimeTz },
-  { name: 'ISO_DATE_TIME', format: 'ISO_DATE_TIME', pattern: isoDateTime, resolve: resolveIsoDateTime },
-  { name: 'DATE_TIME', format: 'DATE_TIME', pattern: dateTime, resolve: resolveDateTime },
+  { format: 'ISO_DATE_TIME', pattern: isoDateTimeTzOffset, resolve: resolveIsoDateTimeTzOffset },
+  { format: 'ISO_DATE_TIME', pattern: isoDateTime, resolve: resolveIsoDateTime },
+  { format: 'DATE_TIME', pattern: dateTimeTzOffset, resolve: resolveDateTimeTzTzOffset },
+  { format: 'DATE_TIME', pattern: dateTimeTz, resolve: resolveDateTimeTzTzOffset },
+  { format: 'DATE_TIME', pattern: dateTime, resolve: resolveDateTime },
 ];
 
 
@@ -184,6 +177,18 @@ function findSubPattern(type, context, patterns) {
 
 const parsePattern = (type, patterns) => reduce(partial(findSubPattern, [type]), __, patterns);
 
+const isDateOrTimeTag = anyPass([isDate, isTime]);
+const isDateValue = anyPass([isDatetime, isTimezoneOffset, isTimezone]);
+const containsAdjacentDateTags = pipe(findPatternIndexBy([isDateValue, isDateValue]), gte(__, 0));
+
+const formatDateTimeTags = over(
+  lensProp('tags'),
+  pipe(
+    map(when(isDateOrTimeTag, assoc('type', datetime.type))),
+    when(containsAdjacentDateTags, nilValue),
+  ),
+);
+
 export default function parseDates(context) {
   const dateFormats = groupByPatternLength([...baseDateFormats, ...getLocaleDateFormats(context)]);
   const timeFormats = groupByPatternLength([...baseTimeFormats, ...getLocaleTimeFormats(context)]);
@@ -192,14 +197,16 @@ export default function parseDates(context) {
   const dateTimeFormats = groupByPatternLength([...baseDateTimeFormats, ...getLocaleDateTimeFormats(context)]);
 
   return pipe(
-    parsePattern('DATE', dateFormats),
-    // Timezones before times because timezones can partially parse as times (+03:45 could be '+' and a time)
-    parsePattern('TIMEZONE_OFFSET', timezoneOffsetFormats),
-    parsePattern('TIME', timeFormats),
-    parsePattern('TIMEZONE', timezoneFormats),
-    parsePattern('DATE_TIME', dateTimeFormats),
-    // TODO: Fill in missing information from current
-    // year (make sure the date is in the future), month, day, timezone
+    // Dates before timezone offsets because dates can parse as multiple timezones (1992-12-12 is 1992 and two timezone offsets)
+    parsePattern('TAG_DATE', dateFormats),
+    // Timezones offsets before times because timezone offsets can parse as times (+03:45 could be '+' and a time)
+    parsePattern(timezoneOffset.type, timezoneOffsetFormats),
+    parsePattern('TAG_TIME', timeFormats),
+    parsePattern(timezone.type, timezoneFormats),
+    parsePattern(datetime.type, dateTimeFormats),
     print(''),
+    // TODO: Fill in data from locale (timezone, hour etc.)
+    formatDateTimeTags,
+    when(whereEq({ tags: null }), always(context)),
   )(context);
 }

@@ -32,9 +32,10 @@ const MMMM = pipe(text, anyPass(matchesMMMMFormats));
 const dateFormat = [D, MMMM];
 const dateFormatLonger = [D, ordinal, MMMM];
 
+// FIXME: Resolvers
 export const dateFormats = [
-  { name: 'DATE_FORMAT', format: 'DATE', pattern: dateFormat },
-  { name: 'DATE_FORMAT_LONGER', format: 'DATE', pattern: dateFormatLonger },
+  { format: 'DATE', pattern: dateFormat },
+  { format: 'DATE', pattern: dateFormatLonger },
 ];
 
 
@@ -42,12 +43,13 @@ const fullTime = [h, colon, mm, amPm];
 const shortTime = [h, amPm];
 
 export const timeFormats = [
-  { name: 'FULL_TIME', format: 'TIME', pattern: fullTime },
-  { name: 'SHORT_TIME', format: 'TIME', pattern: shortTime },
+  { format: 'TIME', pattern: fullTime },
+  { format: 'TIME', pattern: shortTime },
 ];
 
 
 // https://github.com/ericpp/hippyvm/blob/9e3921e3cfe41c260e65444d9097c2f298191930/hippy/module/date/lib/fallbackmap.h
+// This will change GMT to BST in summer---is this a good idea?
 const timezoneAbbreviations = {
   'sst': 'Pacific/Apia',
   'hst': 'Pacific/Honolulu',
@@ -90,9 +92,8 @@ const timezoneAbbreviations = {
 
 const tz = [pipe(text, has(__, timezoneAbbreviations))];
 
-const resolveTz = tags => prop(tags[0][0], timezoneAbbreviations);
+const resolveTz = tags => ({ timezone: timezoneAbbreviations[tags[0][0]] });
 
 export const timezoneFormats = [
-  // FIXME: names
-  { name: null, format: null, pattern: tz, resolve: resolveTz },
+  { format: 'TIMEZONE', pattern: tz, resolve: resolveTz },
 ];

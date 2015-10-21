@@ -16,6 +16,18 @@ export const color = {
   colorSpace: null,
 };
 
+export const datetime = {
+  type: 'DATETIME',
+};
+
+export const timezone = {
+  type: 'TIMEZONE',
+};
+
+export const timezoneOffset = {
+  type: 'TIMEZONE_OFFSET',
+};
+
 export const funcApplication = {
   type: 'FUNC_APPLICATION',
   func: null,
