@@ -204,7 +204,7 @@ export default function parseDates(context) {
     parsePattern('TAG_TIME', timeFormats),
     parsePattern(timezone.type, timezoneFormats),
     parsePattern(datetime.type, dateTimeFormats),
-    print(''),
+    // print(''),
     // TODO: Fill in data from locale (timezone, hour etc.)
     formatDateTimeTags,
     when(whereEq({ tags: null }), always(context)),

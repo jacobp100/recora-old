@@ -1,3 +1,5 @@
+import timezones from '../../../data/en/timezones';
+import timezoneOffsets from '../../../data/en/timezoneOffsets';
 import { text, colon, h, mm, D } from '../../../parse/parseDates/formats';
 
 export const amPm = anyPass([ // FIXME: Locale
@@ -48,52 +50,22 @@ export const timeFormats = [
 ];
 
 
-// https://github.com/ericpp/hippyvm/blob/9e3921e3cfe41c260e65444d9097c2f298191930/hippy/module/date/lib/fallbackmap.h
-// This will change GMT to BST in summer---is this a good idea?
-const timezoneAbbreviations = {
-  'sst': 'Pacific/Apia',
-  'hst': 'Pacific/Honolulu',
-  'akst': 'America/Anchorage',
-  'akdt': 'America/Anchorage',
-  'pst': 'America/Los_Angeles',
-  'pdt': 'America/Los_Angeles',
-  'mst': 'America/Denver',
-  'mdt': 'America/Denver',
-  'cst': 'America/Chicago',
-  'cdt': 'America/Chicago',
-  'est': 'America/New_York',
-  'edt': 'America/New_York',
-  'ast': 'America/Halifax',
-  'adt': 'America/Halifax',
-  'brt': 'America/Sao_Paulo',
-  'brst': 'America/Sao_Paulo',
-  'azost': 'Atlantic/Azores',
-  'azodt': 'Atlantic/Azores',
-  'gmt': 'Europe/London',
-  'bst': 'Europe/London',
-  'cet': 'Europe/Paris',
-  'cest': 'Europe/Paris',
-  'eet': 'Europe/Helsinki',
-  'eest': 'Europe/Helsinki',
-  'msk': 'Europe/Moscow',
-  'msd': 'Europe/Moscow',
-  'gst': 'Asia/Dubai',
-  'pkt': 'Asia/Karachi',
-  'ist': 'Asia/Kolkata',
-  'npt': 'Asia/Katmandu',
-  'yekt': 'Asia/Yekaterinburg',
-  'novst': 'Asia/Novosibirsk',
-  'krat': 'Asia/Krasnoyarsk',
-  'krast': 'Asia/Krasnoyarsk',
-  'jst': 'Asia/Tokyo',
-  'nzst': 'Pacific/Auckland',
-  'nzdt': 'Pacific/Auckland',
-};
+const isTimezoneOffset = pipe(text, has(__, timezoneOffsets));
+const timezoneOffset = [isTimezoneOffset];
 
-const tz = [pipe(text, has(__, timezoneAbbreviations))];
+const resolveTimezoneOffset = tags => ({ offset: timezoneOffsets[tags[0][0]] });
 
-const resolveTz = tags => ({ timezone: timezoneAbbreviations[tags[0][0]] });
-
-export const timezoneFormats = [
-  { format: 'TIMEZONE', pattern: tz, resolve: resolveTz },
+export const timezoneOffsetFormats = [
+  { format: 'TIMEZONE_OFFSET', pattern: timezoneOffset, resolve: resolveTimezoneOffset },
 ];
+
+
+const wordsToPattern = map(word => pipe(text, equals(word)));
+
+const timezoneFormatsFromIana = map(({ timezone, words }) => ({
+  format: 'TIMEZONE',
+  pattern: wordsToPattern(words),
+  resolve: always({ timezone }),
+}), timezones);
+
+export const timezoneFormats = timezoneFormatsFromIana;

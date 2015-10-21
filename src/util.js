@@ -34,7 +34,7 @@ export const findPatternIndexBy = curry((patterns, array) => {
 });
 export const findPatternIndex = curry((comparitor, subarray, array) => {
   const subarrayLength = subarray.length;
-  const to = array.length - subarrayLength;
+  const to = array.length - subarrayLength + 1;
 
   outerloop: for (let i = 0; i < to; i += 1) {
     let count = 0;

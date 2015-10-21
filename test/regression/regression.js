@@ -11,7 +11,7 @@ describe('regression', function() {
   }
 
   spec.forEach(({ description = 'resolve', input, output }) => {
-    it(`Should ${description} "${input}"`, function() {
+    it(`should ${description} "${input}"`, function() {
       const result = recora.parse(input);
       const resultOutput = result.resultToString;
 

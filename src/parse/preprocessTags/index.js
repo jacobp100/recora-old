@@ -1,4 +1,4 @@
-import * as processTagElement from './processTagElement';
+import processTagElement from './processTagElement';
 import { TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET } from '../tags';
 import { statementParts } from '../text';
 import { preprocessTags as environmentPreprocessTags } from '../../environment';
@@ -21,7 +21,7 @@ function processTag(context, captureGroup) {
 
   const newTag = { start, end, value, type };
 
-  return (processTagElement[type] || processTagElement.DEFAULT)(context, newTag, captureGroup);
+  return (processTagElement[type] || processTagElement.default)(context, newTag, captureGroup);
 }
 
 function resolveTagBracket(bracketLevel, tag) {

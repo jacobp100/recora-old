@@ -1,10 +1,10 @@
-import * as tagResolvers from './tagResolvers';
+import tagResolvers from './tagResolvers';
 import { TAG_NOOP, TAG_COMMA, TAG_UNIT, TAG_OPERATOR, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_NUMBER, TAG_FUNCTION } from '../tags';
 import { isNoop, isSymbol } from '../tags/util';
 import { orderOperations, operationsOrder, unaryOperators, NEGATE } from '../../math/operators';
 import { entity, funcApplication, func, miscGroup, empty, bracketGroup, operationsGroup } from '../../types';
 import { baseDimensions } from '../../types/entity';
-import { lengthIsOne, objectEmpty, containsNil, nilValue } from '../../util';
+import { lengthIsOne, objectEmpty, containsNil, nilValue, notNil } from '../../util';
 
 
 const valueTypeIsEmpty = where({
@@ -21,10 +21,7 @@ const valueTypeHasNilValueButHasSymbols = where({
 });
 
 
-const groupRemainingTags = pipe(
-  reduce((values, tag) => (
-    (tagResolvers[tag.type] || tagResolvers.DEFAULT)(values, tag)
-  ), [entity]),
+const groupRemainingTagsNotNil = pipe(
   map(when(valueTypeHasNilValueButHasSymbols, assoc('value', 1))),
   reject(valueTypeIsEmpty),
   cond([
@@ -32,6 +29,13 @@ const groupRemainingTags = pipe(
     [lengthIsOne, head],
     [T, assoc('groups', __, miscGroup)], // Only wrap in value group iff groups.length > 1
   ]),
+);
+
+const groupRemainingTags = pipe(
+  reduce((values, tag) => (
+    (tagResolvers[tag.type] || tagResolvers.default)(values, tag)
+  ), [entity]),
+  when(notNil, groupRemainingTagsNotNil)
 );
 
 

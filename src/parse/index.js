@@ -119,6 +119,7 @@ const irrelevantResults = anyPass([
 const resultIsIrrelevant = where({ result: irrelevantResults });
 
 const parseTagsWithOptions = pipe(
+  preprocessTags,
   getTagOptions,
   map(resolveTagOptions),
   reject(resultIsNil),
@@ -132,11 +133,15 @@ const parseTagsWithOptions = pipe(
 );
 
 
+const parseWithDates = pipe(
+  parseDates,
+  parseTagsWithOptions,
+);
+
 const parse = pipe(
   parseText,
   getFormattingHints,
-  parseDates,
-  preprocessTags,
-  parseTagsWithOptions,
+  // FIXME: Allow context to skip this step
+  context => (parseWithDates(context) || parseTagsWithOptions(context)),
 );
 export default parse;

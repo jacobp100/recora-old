@@ -17,110 +17,109 @@ const charToOperator = {
   '!': FACTORIAL,
 };
 
-export function TEXT_SYMBOL_UNIT(context, tag, captureGroup) {
-  const { value, start, end } = tag;
-  let canNoop = false;
-  const options = [];
+const preprocessTagElement = {
+  TEXT_SYMBOL_UNIT(context, tag, captureGroup) {
+    const { value, start, end } = tag;
+    let canNoop = false;
+    const options = [];
 
-  const power = Number(captureGroup[4] || 1);
+    const power = Number(captureGroup[4] || 1);
 
-  if (functions[value]) {
-    options.push({
-      ...tag,
-      type: TAG_FUNCTION,
-      value,
-      power,
-    });
-  }
-
-  if (power === 1) {
-    const colour = Color.css(value);
-
-    if (colour !== null) {
+    if (functions[value]) {
       options.push({
-        ...color,
-        value: colour,
+        ...tag,
+        type: TAG_FUNCTION,
+        value,
+        power,
       });
     }
-  }
 
-  const unit = getUnitName(context, value);
+    if (power === 1) {
+      const colour = Color.css(value);
 
-  if (unit !== null) {
-    options.push({
-      ...tag,
-      type: TAG_UNIT,
-      value: unit,
-      power,
-    });
-  }
+      if (colour !== null) {
+        options.push({
+          ...color,
+          value: colour,
+        });
+      }
+    }
 
-  if (options.length === 0) {
-    // Why is this above getting constants?
-    // If we move this below, it makes the code easier
-    // Maybe it's in the flow that you define a constant, x = 3, then when you try to redefine it, it might fail?
-    // But shouldn't the = operator return null if that was the case?
-    options.push({
-      ...tag,
-      type: TAG_SYMBOL,
-      value,
-      power,
-    });
-    // TODO: If more than one symbol can be solved, make xy and xy^2 work
-    canNoop = true;
-  }
+    const unit = getUnitName(context, value);
 
-  const constant = getConstant(context, value);
-  if (constant) {
-    options.push(exponent(context, constant, { ...entity, value: power }));
-  }
+    if (unit !== null) {
+      options.push({
+        ...tag,
+        type: TAG_UNIT,
+        value: unit,
+        power,
+      });
+    }
 
-  if (canNoop) {
-    options.push({
-      ...tag,
-      type: TAG_NOOP,
-    });
-  }
+    if (options.length === 0) {
+      // Why is this above getting constants?
+      // If we move this below, it makes the code easier
+      // Maybe it's in the flow that you define a constant, x = 3, then when you try to redefine it, it might fail?
+      // But shouldn't the = operator return null if that was the case?
+      options.push({
+        ...tag,
+        type: TAG_SYMBOL,
+        value,
+        power,
+      });
+      // TODO: If more than one symbol can be solved, make xy and xy^2 work
+      canNoop = true;
+    }
 
-  if (options.length > 1) {
+    const constant = getConstant(context, value);
+    if (constant) {
+      options.push(exponent(context, constant, { ...entity, value: power }));
+    }
+
+    if (canNoop) {
+      options.push({
+        ...tag,
+        type: TAG_NOOP,
+      });
+    }
+
+    if (options.length > 1) {
+      return {
+        type: TAG_PARSE_OPTIONS,
+        value: map(of, options), // wrap all option values to arrays
+      };
+    } else if (options.length === 1) {
+      return options[0];
+    }
+
     return {
-      type: TAG_PARSE_OPTIONS,
-      value: map(of, options), // wrap all option values to arrays
+      type: TAG_NOOP,
+      start,
+      end,
     };
-  } else if (options.length === 1) {
-    return options[0];
-  }
-
-  return {
-    type: TAG_NOOP,
-    start,
-    end,
-  };
-}
-
-export function TEXT_COLOR(context, { value }) {
-  return {
-    ...color,
-    value: Color.hex(value),
-  };
-}
-
-export function TEXT_OPERATOR(context, tag) {
-  return {
-    ...tag,
-    type: TAG_OPERATOR,
-    value: charToOperator[tag.value],
-  };
-}
-
-export function TEXT_NUMBER(context, tag) {
-  return {
-    ...tag,
-    type: TAG_NUMBER,
-    value: parseNumber(context, tag.value),
-  };
-}
-
-export function DEFAULT(context, tag) {
-  return tag;
-}
+  },
+  TEXT_COLOR(context, { value }) {
+    return {
+      ...color,
+      value: Color.hex(value),
+    };
+  },
+  TEXT_OPERATOR(context, tag) {
+    return {
+      ...tag,
+      type: TAG_OPERATOR,
+      value: charToOperator[tag.value],
+    };
+  },
+  TEXT_NUMBER(context, tag) {
+    return {
+      ...tag,
+      type: TAG_NUMBER,
+      value: parseNumber(context, tag.value),
+    };
+  },
+  default(context, tag) {
+    return tag;
+  },
+};
+export default preprocessTagElement;

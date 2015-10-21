@@ -50,7 +50,7 @@ function resolveUnitPowersAndAmbiguitiesMapFn(tag) {
 }
 const resolveUnitPowersAndAmbiguities = map(resolveUnitPowersAndAmbiguitiesMapFn);
 
-function resolveSeparatedUnitsReducerFn(tags, { unit, words }) {
+function resolveSeparatedUnitsReducerFn(tags, { value, words }) {
   const ind = findPatternIndex((word, tag) => (
     tag && tag[0] && (singularize(tag[0]).toLowerCase() === word.toLowerCase())
   ), words, tags);
@@ -62,7 +62,7 @@ function resolveSeparatedUnitsReducerFn(tags, { unit, words }) {
   const unitDescriptor = {
     type: 'TAG_UNIT',
     power: 1,
-    value: unit,
+    value,
     start: tags[ind].start,
     end: tags[ind + words.length - 1].end,
   };
@@ -70,14 +70,16 @@ function resolveSeparatedUnitsReducerFn(tags, { unit, words }) {
   return pipe(
     remove(ind, words.length),
     insert(ind, unitDescriptor),
+    // partialRight(resolveSeparatedUnitsReducerFn, [{ value, words }]),
   )(tags);
 }
 const resolveSeparatedUnits = reduce(resolveSeparatedUnitsReducerFn, __, separatedUnits);
 
-export const preprocessTags = over(
+const preprocessTags = over(
   lensProp('tags'),
   pipe(
     resolveUnitPowersAndAmbiguities,
     resolveSeparatedUnits,
   ),
 );
+export default preprocessTags;
