@@ -5,6 +5,7 @@ export const lengthIsOne = pipe(length, equals(1));
 export const notNil = complement(isNil);
 export const containsNil = any(isNil);
 export const noneNil = all(notNil);
+export const notNaN = complement(isNaN);
 export const objectEmpty = pipe(keys, isEmpty);
 export const objectNotEmpty = complement(objectEmpty);
 export const nilValue = always(null);

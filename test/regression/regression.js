@@ -2,7 +2,7 @@ import spec from './spec';
 import Recora from '../../src/';
 
 describe('regression', function() {
-  this.slow(4);
+  this.slow(8);
 
   const recora = new Recora();
 

@@ -1,13 +1,12 @@
 import timezones from '../../../data/en/timezones';
 import timezoneOffsets from '../../../data/en/timezoneOffsets';
-import { text, colon, h, mm, D } from '../../../parse/parseDates/formats';
-import { lengthIsOne } from '../../../util';
+import { text, textNumber, colon, mm, D } from '../../../parse/parseDates/formats';
+import { lengthIsOne, notNaN } from '../../../util';
 
 
-export const amPm = anyPass([
-  pipe(text, equals('am')),
-  pipe(text, equals('pm')),
-]);
+const am = pipe(text, equals('am'));
+const pm = pipe(text, equals('pm'));
+const amPm = anyPass([am, pm]);
 
 const ordinal = pipe(
   text,
@@ -42,26 +41,37 @@ export const dateFormats = [
   { format: 'DATE', pattern: dateFormatLonger },
 ];
 
+const h12 = pipe(textNumber, allPass([
+  notNaN,
+  gt(__, 1),
+  lte(__, 12),
+]));
+const fullTime = [h12, colon, mm, amPm];
+const shortTime = [h12, amPm];
 
-const fullTime = [h, colon, mm, amPm];
-const shortTime = [h, amPm];
+const resolveFullTime = ifElse(pipe(head, am),
+  tags => ({ hour: textNumber(tags[0]), minute: textNumber(tags[2]) }),
+  tags => ({ hour: textNumber(tags[0]) + 12, minute: textNumber(tags[2]) }),
+);
+
+const resolveShortTime = ifElse(pipe(head, am),
+  tags => ({ hour: textNumber(tags[0]), minute: 0 }),
+  tags => ({ hour: textNumber(tags[0]) + 12, minute: 0 }),
+);
 
 export const timeFormats = [
-  { format: 'TIME', pattern: fullTime },
-  { format: 'TIME', pattern: shortTime },
+  { format: 'TIME', pattern: fullTime, resolve: resolveFullTime },
+  { format: 'TIME', pattern: shortTime, resolve: resolveShortTime },
 ];
 
 
+// Timezone offsets
 const isTimezoneOffset = pipe(text, has(__, timezoneOffsets));
 const timezoneOffset = [isTimezoneOffset];
 
-const resolveTimezoneOffset = tags => ({ offset: timezoneOffsets[tags[0][0]] });
+const resolveTimezoneOffset = tags => ({ offset: timezoneOffsets[tags[0][0]], timezone: 'UTC' });
 
-export const timezoneOffsetFormats = [
-  { format: 'TIMEZONE_OFFSET', pattern: timezoneOffset, resolve: resolveTimezoneOffset },
-];
-
-
+// Timezones
 const wordsToPattern = map(word => pipe(text, equals(word)));
 
 const propWords = prop('words');
@@ -71,17 +81,18 @@ const singleWordTimezonesMap = zipObj(
   map(prop('timezone'), singleWordTimezones),
 );
 
+// This is done for perf
 const singleWordTimezone = [pipe(text, has(__, singleWordTimezonesMap))];
-
-const resolveSingleWordTimezone = tags => ({ timezone: singleWordTimezonesMap[tags[0][0]] });
+const resolveSingleWordTimezone = tags => ({ timezone: singleWordTimezonesMap[tags[0][0]], utcOffset: 0 });
 
 const splitWordTimezonesFromIana = map(({ timezone, words }) => ({
   format: 'TIMEZONE',
   pattern: wordsToPattern(words),
-  resolve: always({ timezone }),
+  resolve: always({ timezone, utcOffset: 0 }),
 }), splitWordTimezones);
 
 export const timezoneFormats = [
   ...splitWordTimezonesFromIana,
   { format: 'TIMEZONE', pattern: singleWordTimezone, resolve: resolveSingleWordTimezone },
+  { format: 'TIMEZONE_OFFSET', pattern: timezoneOffset, resolve: resolveTimezoneOffset },
 ];

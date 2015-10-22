@@ -1,4 +1,4 @@
-import { entity, color, datetime, timezone, timezoneOffset, percentage, funcApplication, bracketGroup } from '../../types';
+import { entity, color, datetime, timezone, percentage, funcApplication, bracketGroup } from '../../types';
 import { TAG_NUMBER, TAG_SYMBOL, TAG_UNIT, TAG_PERCENTAGE, TAG_NOOP } from '../tags';
 import { isEntity } from '../../types/util';
 import { objectEmpty } from '../../util';
@@ -64,7 +64,6 @@ const tagResolvers = {
   [color.type]: appendValue,
   [datetime.type]: appendValue,
   [timezone.type]: appendValue,
-  [timezoneOffset.type]: appendValue,
   [funcApplication.type]: appendValue,
   [bracketGroup.type]: appendValue,
   default: identity,

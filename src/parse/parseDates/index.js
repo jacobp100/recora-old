@@ -1,7 +1,8 @@
-import { text, plus, plusMinus, dash, slash, colon, dot, t, ms, s, mm, hh, hhmm, D, DD, MM, YY, YYYY } from './formats';
-import { getLocaleDateFormats, getLocaleTimeFormats, getLocaleTimezoneFormats, getLocaleTimezoneOffsetFormats, getLocaleDateTimeFormats } from '../../environment';
-import { datetime, timezone, timezoneOffset } from '../../types';
-import { isDatetime, isTimezone, isTimezoneOffset } from '../../types/util';
+import { text, textNumber, plus, plusMinus, dash, slash, colon, dot, t, ms, s, mm, hh, hhmm, D, DD, MM, YY, YYYY } from './formats';
+import { getLocaleDateFormats, getLocaleTimeFormats, getLocaleTimezoneFormats, getLocaleDateTimeFormats } from '../../environment';
+import utcTime from '../../baseContext/utcTime';
+import { datetime, timezone } from '../../types';
+import { isDatetime, isTimezone } from '../../types/util';
 import { findPatternIndexBy, nilValue } from '../../util';
 
 
@@ -12,7 +13,6 @@ const groupByPatternLength = pipe(
   map(last),
   reverse,
 );
-const tagValue = tag => ((tag && tag[0]) ? Number(tag[0]) : NaN);
 
 
 const isoDate = [YYYY, dash, MM, dash, DD];
@@ -33,20 +33,20 @@ const americanDateLongYearSlash = [...americanDateNoYearSlash, slash, YYYY];
 
 
 const shortYear = pipe(
-  tagValue,
+  textNumber,
   ifElse(lt(__, 50),
     add(2000),
     add(1900),
   ),
 );
 
-const resolveIsoDate = tags => ({ year: tagValue(tags[0]), month: tagValue(tags[2][0]), day: tagValue(tags[4]) });
-const resolveEuroNoYearDate = tags => ({ month: tagValue(tags[2]), day: tagValue(tags[4]) });
-const resolveEuroShortYearDate = tags => ({ year: shortYear(tags[4]), month: tagValue(tags[2]), day: tagValue(tags[4]) });
-const resolveEuroLongYearDate = tags => ({ year: tagValue(tags[4]), month: tagValue(tags[2]), day: tagValue(tags[0]) });
-const resolveAmericanNoYearDate = tags => ({ month: tagValue(tags[0]), day: tagValue(tags[2]) });
-const resolveAmericanShortYearDate = tags => ({ year: shortYear(tags[4]), month: tagValue(tags[0]), day: tagValue(tags[2]) });
-const resolveAmericanLongYearDate = tags => ({ year: tagValue(tags[4]), month: tagValue(tags[0]), day: tagValue(tags[2]) });
+const resolveIsoDate = tags => ({ year: textNumber(tags[0]), month: textNumber(tags[2][0]), date: textNumber(tags[4]) });
+const resolveEuroNoYearDate = tags => ({ month: textNumber(tags[2]), date: textNumber(tags[4]) });
+const resolveEuroShortYearDate = tags => ({ year: shortYear(tags[4]), month: textNumber(tags[2]), date: textNumber(tags[4]) });
+const resolveEuroLongYearDate = tags => ({ year: textNumber(tags[4]), month: textNumber(tags[2]), date: textNumber(tags[0]) });
+const resolveAmericanNoYearDate = tags => ({ month: textNumber(tags[0]), date: textNumber(tags[2]) });
+const resolveAmericanShortYearDate = tags => ({ year: shortYear(tags[4]), month: textNumber(tags[0]), date: textNumber(tags[2]) });
+const resolveAmericanLongYearDate = tags => ({ year: textNumber(tags[4]), month: textNumber(tags[0]), date: textNumber(tags[2]) });
 
 const baseDateFormats = [
   // FIXME: Should have resolvers too
@@ -70,9 +70,9 @@ const isoTimeFullMs = [hh, colon, mm, colon, s, dot, ms];
 const isoTimeFull = [hh, colon, mm, colon, s];
 const isoTime = [hh, colon, mm];
 
-const resolveIsoTimeFullMs = tags => ({ hour: tagValue(tags[0]), minute: tagValue(tags[2]), second: tagValue(tags[4]), millisecond: tagValue(tags[6]) });
-const resolveIsoTimeFull = tags => ({ hour: tagValue(tags[0]), minute: tagValue(tags[2]), second: tagValue(tags[4]) });
-const resolveIsoTime = tags => ({ hour: tagValue(tags[0]), minute: tagValue(tags[2]) });
+const resolveIsoTimeFullMs = tags => ({ hour: textNumber(tags[0]), minute: textNumber(tags[2]), second: textNumber(tags[4]), millisecond: textNumber(tags[6]) });
+const resolveIsoTimeFull = tags => ({ hour: textNumber(tags[0]), minute: textNumber(tags[2]), second: textNumber(tags[4]) });
+const resolveIsoTime = tags => ({ hour: textNumber(tags[0]), minute: textNumber(tags[2]) });
 
 const baseTimeFormats = [
   { format: 'ISO_TIME', pattern: isoTimeFullMs, resolve: resolveIsoTimeFullMs },
@@ -81,31 +81,30 @@ const baseTimeFormats = [
 ];
 
 
-// Timezone offsets only (fixed offsets from utc), not an actual timezones (which vary by date)
+// Timezones
 const isoTzOffsetFull = [plusMinus, hh, colon, mm];
 const isoTzOffsetFullCompact = [plusMinus, hhmm];
 const isoTzOffsetShort = [plusMinus, hh];
 const isoTzOffsetUtc = [pipe(text, equals('z'))];
 
 const directionFromPm = ifElse(plus, always(1), always(-1));
-const resolveIsoOffsetTzFull = tags => ({ offset: directionFromPm(tags[0]) * (60 * tagValue(tags[1]) + tagValue(tags[3])) });
+const resolveIsoOffsetTzFull = tags => ({
+  offset: directionFromPm(tags[0]) * (60 * textNumber(tags[1]) + textNumber(tags[3])),
+  timezone: 'UTC',
+});
 const resolveIsoOffsetTzFullCompact = tags => ({
   offset: directionFromPm(tags[0]) * (60 * Number(tags[1][0].substring(0, 2)) + Number(tags[1][0].substring(2, 4))),
+  timezone: 'UTC',
 });
-const resolveIsoTzOffsetShort = tags => ({ offset: directionFromPm(tags[0]) * 60 * tagValue(tags[1]) });
-const resolveIsoTzOffsetUtc = always({ offset: 0 });
+const resolveIsoTzOffsetShort = tags => ({ offset: directionFromPm(tags[0]) * 60 * textNumber(tags[1]), timezone: 'UTC' });
+const resolveIsoTzOffsetUtc = always({ offset: 0, timezone: 'UTC' });
 
-const baseTimezoneOffsetFormats = [
+const baseTimezoneFormats = [
   { format: 'ISO_TIMEZONE_OFFSET', pattern: isoTzOffsetFull, resolve: resolveIsoOffsetTzFull },
   { format: 'ISO_TIMEZONE_OFFSET', pattern: isoTzOffsetFullCompact, resolve: resolveIsoOffsetTzFullCompact },
   { format: 'ISO_TIMEZONE_OFFSET', pattern: isoTzOffsetShort, resolve: resolveIsoTzOffsetShort },
   { format: 'ISO_TIMEZONE_OFFSET', pattern: isoTzOffsetUtc, resolve: resolveIsoTzOffsetUtc },
 ];
-
-
-// Timezones
-// TODO: Resolve Europe/London etc.
-const baseTimezoneFormats = [];
 
 
 // Find dates, times, and then try to combine
@@ -117,20 +116,23 @@ const isTime = whereEq({ type: 'TAG_TIME' });
 
 const isoDateTime = [isIsoDate, t, isIsoTime];
 const isoDateTimeTzOffset = [...isoDateTime, isIsoTimezoneOffset];
+const timeTz = [isTime, isTimezone];
+const dateTz = [isDate, isTimezone];
 const dateTime = [isTime, isDate]; // Maybe locale?
-const dateTimeTzOffset = [...dateTime, isTimezoneOffset];
 const dateTimeTz = [...dateTime, isTimezone];
 
 const resolveIsoDateTime = tags => ({ ...tags[0].value, ...tags[2].value, timezone: 'UTC' });
 const resolveIsoDateTimeTzOffset = tags => ({ ...resolveIsoDateTime(tags), ...tags[3].value, timezone: 'UTC' });
+const resolveDateTzTimeTz = tags => ({ ...tags[0].value, ...tags[1].value });
 const resolveDateTime = tags => ({ ...tags[0].value, ...tags[1].value });
-const resolveDateTimeTzTzOffset = tags => ({ ...resolveDateTime(tags), ...tags[2].value });
+const resolveDateTimeTz = tags => ({ ...resolveDateTime(tags), ...tags[2].value });
 
 const baseDateTimeFormats = [
   { format: 'ISO_DATE_TIME', pattern: isoDateTimeTzOffset, resolve: resolveIsoDateTimeTzOffset },
   { format: 'ISO_DATE_TIME', pattern: isoDateTime, resolve: resolveIsoDateTime },
-  { format: 'DATE_TIME', pattern: dateTimeTzOffset, resolve: resolveDateTimeTzTzOffset },
-  { format: 'DATE_TIME', pattern: dateTimeTz, resolve: resolveDateTimeTzTzOffset },
+  { format: 'DATE_TIME', pattern: dateTz, resolve: resolveDateTzTimeTz },
+  { format: 'DATE_TIME', pattern: timeTz, resolve: resolveDateTzTimeTz },
+  { format: 'DATE_TIME', pattern: dateTimeTz, resolve: resolveDateTimeTz },
   { format: 'DATE_TIME', pattern: dateTime, resolve: resolveDateTime },
 ];
 
@@ -178,7 +180,7 @@ function findSubPattern(type, context, patterns) {
 const parsePattern = (type, patterns) => reduce(partial(findSubPattern, [type]), __, patterns);
 
 const isDateOrTimeTag = anyPass([isDate, isTime]);
-const isDateValue = anyPass([isDatetime, isTimezoneOffset, isTimezone]);
+const isDateValue = anyPass([isDatetime, isTimezone]);
 const containsAdjacentDateTags = pipe(findPatternIndexBy([isDateValue, isDateValue]), gte(__, 0));
 
 const formatDateTimeTags = over(
@@ -192,7 +194,6 @@ const formatDateTimeTags = over(
 export default function parseDates(context) {
   const dateFormats = groupByPatternLength([...baseDateFormats, ...getLocaleDateFormats(context)]);
   const timeFormats = groupByPatternLength([...baseTimeFormats, ...getLocaleTimeFormats(context)]);
-  const timezoneOffsetFormats = groupByPatternLength([...baseTimezoneOffsetFormats, ...getLocaleTimezoneOffsetFormats(context)]);
   const timezoneFormats = groupByPatternLength([...baseTimezoneFormats, ...getLocaleTimezoneFormats(context)]);
   const dateTimeFormats = groupByPatternLength([...baseDateTimeFormats, ...getLocaleDateTimeFormats(context)]);
 
@@ -200,13 +201,13 @@ export default function parseDates(context) {
     // Dates before timezone offsets because dates can parse as multiple timezones (1992-12-12 is 1992 and two timezone offsets)
     parsePattern('TAG_DATE', dateFormats),
     // Timezones offsets before times because timezone offsets can parse as times (+03:45 could be '+' and a time)
-    parsePattern(timezoneOffset.type, timezoneOffsetFormats),
-    parsePattern('TAG_TIME', timeFormats),
     parsePattern(timezone.type, timezoneFormats),
+    parsePattern('TAG_TIME', timeFormats),
     parsePattern(datetime.type, dateTimeFormats),
-    // print(''),
-    // TODO: Fill in data from locale (timezone, hour etc.)
     formatDateTimeTags,
     when(whereEq({ tags: null }), always(context)),
+    evolve({
+      tags: map(when(isDatetime, value => ({ ...value, value: { ...utcTime, ...context.utcTime, ...value.value }}))),
+    }),
   )(context);
 }

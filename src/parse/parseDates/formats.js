@@ -1,6 +1,7 @@
-export const notNaN = complement(isNaN);
+import { notNil, notNaN } from '../../util';
 
-export const text = nth(0);
+export const text = when(notNil, nth(0));
+export const textNumber = pipe(text, Number);
 export const textLengthEq = val => pipe(text, length, equals(val));
 export const textLength2 = textLengthEq(2);
 
@@ -14,13 +15,13 @@ export const dot = pipe(text, equals('.'));
 export const t = pipe(text, equals('t'));
 
 
-export const ms = pipe(text, Number, allPass([
+export const ms = pipe(textNumber, allPass([
   notNaN,
   gte(__, 0),
   lte(__, 999),
 ]));
 
-export const s = pipe(text, Number, allPass([
+export const s = pipe(textNumber, allPass([
   notNaN,
   gte(__, 0),
   lte(__, 59),
@@ -28,14 +29,14 @@ export const s = pipe(text, Number, allPass([
 
 export const mm = allPass([
   textLength2,
-  pipe(text, Number, allPass([
+  pipe(textNumber, allPass([
     notNaN,
     gte(__, 0),
     lte(__, 59),
   ])),
 ]);
 
-export const h = pipe(text, Number, allPass([
+export const h = pipe(textNumber, allPass([
   notNaN,
   gte(__, 0),
   lte(__, 23),
@@ -49,7 +50,7 @@ export const hhmm = allPass([
   pipe(text, slice(2, 4), of, mm),
 ]);
 
-export const D = pipe(text, Number, allPass([
+export const D = pipe(textNumber, allPass([
   notNaN,
   gte(__, 1),
   lte(__, 31),
@@ -59,7 +60,7 @@ export const DD = allPass([textLength2, D]);
 
 export const MM = allPass([
   textLength2,
-  pipe(text, Number, allPass([
+  pipe(textNumber, allPass([
     notNaN,
     gte(__, 1),
     lte(__, 12),
@@ -68,14 +69,14 @@ export const MM = allPass([
 
 export const YY = allPass([
   pipe(text, length, equals(2)),
-  pipe(text, Number, allPass([
+  pipe(textNumber, allPass([
     notNaN,
     gte(__, 50),
     lte(__, 0),
   ])),
 ]);
 
-export const YYYY = pipe(text, Number, allPass([
+export const YYYY = pipe(textNumber, allPass([
   notNaN,
   gte(__, 1900),
   lte(__, 2100),
