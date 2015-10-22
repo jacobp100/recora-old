@@ -1,8 +1,10 @@
 import timezones from '../../../data/en/timezones';
 import timezoneOffsets from '../../../data/en/timezoneOffsets';
 import { text, colon, h, mm, D } from '../../../parse/parseDates/formats';
+import { lengthIsOne } from '../../../util';
 
-export const amPm = anyPass([ // FIXME: Locale
+
+export const amPm = anyPass([
   pipe(text, equals('am')),
   pipe(text, equals('pm')),
 ]);
@@ -62,10 +64,24 @@ export const timezoneOffsetFormats = [
 
 const wordsToPattern = map(word => pipe(text, equals(word)));
 
-const timezoneFormatsFromIana = map(({ timezone, words }) => ({
+const propWords = prop('words');
+const [singleWordTimezones, splitWordTimezones] = partition(pipe(propWords, lengthIsOne), timezones);
+const singleWordTimezonesMap = zipObj(
+  map(pipe(propWords, head), singleWordTimezones),
+  map(prop('timezone'), singleWordTimezones),
+);
+
+const singleWordTimezone = [pipe(text, has(__, singleWordTimezonesMap))];
+
+const resolveSingleWordTimezone = tags => ({ timezone: singleWordTimezonesMap[tags[0][0]] });
+
+const splitWordTimezonesFromIana = map(({ timezone, words }) => ({
   format: 'TIMEZONE',
   pattern: wordsToPattern(words),
   resolve: always({ timezone }),
-}), timezones);
+}), splitWordTimezones);
 
-export const timezoneFormats = timezoneFormatsFromIana;
+export const timezoneFormats = [
+  ...splitWordTimezonesFromIana,
+  { format: 'TIMEZONE', pattern: singleWordTimezone, resolve: resolveSingleWordTimezone },
+];
