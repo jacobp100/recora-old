@@ -50,13 +50,13 @@ const fullTime = [h12, colon, mm, amPm];
 const shortTime = [h12, amPm];
 
 const resolveFullTime = ifElse(pipe(head, am),
-  tags => ({ hour: textNumber(tags[0]), minute: textNumber(tags[2]) }),
-  tags => ({ hour: textNumber(tags[0]) + 12, minute: textNumber(tags[2]) }),
+  tags => ({ hours: textNumber(tags[0]), minutes: textNumber(tags[2]) }),
+  tags => ({ hours: textNumber(tags[0]) + 12, minutes: textNumber(tags[2]) }),
 );
 
 const resolveShortTime = ifElse(pipe(head, am),
-  tags => ({ hour: textNumber(tags[0]), minute: 0 }),
-  tags => ({ hour: textNumber(tags[0]) + 12, minute: 0 }),
+  tags => ({ hours: textNumber(tags[0]), minutes: 0 }),
+  tags => ({ hours: textNumber(tags[0]) + 12, minutes: 0 }),
 );
 
 export const timeFormats = [

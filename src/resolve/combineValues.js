@@ -1,6 +1,8 @@
-import { entity } from '../types';
+import { entity, datetime, timezone } from '../types';
 import { dimensions, baseDimensions } from '../types/entity';
+import { convert as datetimeConvert } from '../types/datetime';
 import * as entityMath from '../math/entity';
+import * as datetimeMath from '../math/datetime';
 
 
 function shouldDivideDimensions(lhsDimensions, rhsDimensions) {
@@ -13,6 +15,7 @@ function shouldDivideDimensions(lhsDimensions, rhsDimensions) {
 const context = nthArg(0);
 const lhs = nthArg(1);
 const rhs = nthArg(2);
+const flipArgs = (fn) => (ctx, a, b) => fn(ctx, b, a);
 
 const units = prop('units');
 const unitsLength = pipe(units, length);
@@ -44,8 +47,8 @@ const combineEntities = cond([
   // Divide the statement with the most units by the unit with the least
   // I.e. `$5 at $3 per kilo` gives the same answer as `$3 per kilo using $5`
   [shouldDivide, ifElse(lhsUnitsLengthLessThanRhsUnitsLength,
-    (ctx, a, b) => entityMath.divide(ctx, b, a),
-    entityMath.divide
+    flipArgs(entityMath.divide),
+    entityMath.divide,
   )],
   // No idea, just mulitply
   [T, entityMath.multiply],
@@ -55,6 +58,10 @@ const combineEntities = cond([
 const combineValueMap = {
   [entity.type]: {
     [entity.type]: combineEntities,
+  },
+  [datetime.type]: {
+    [datetime.type]: datetimeMath.add,
+    [timezone.type]: flipArgs(datetimeConvert),
   },
 };
 

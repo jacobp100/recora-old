@@ -4,5 +4,4 @@ const Recora = require('./src');
 
 const recora = new Recora();
 
-// console.log(JSON.stringify(recora.parse('2015-12-12T12:00:00.000+01:15 and also 12:00 28/12/1992 BST')));
-console.log(JSON.stringify(recora.parse('3pm london')));
+console.log(JSON.stringify(recora.parse('1992/12/4 until 1993/6/18')));

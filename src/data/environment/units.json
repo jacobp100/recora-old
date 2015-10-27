@@ -6,7 +6,7 @@
   "second"            : { "type": "time",           "base": 1                 },
   "minute"            : { "type": "time",           "base": 60                },
   "hour"              : { "type": "time",           "base": 3600              },
-  "day"               : {  "type": "time",           "base": 86400             },
+  "day"               : { "type": "time",           "base": 86400             },
   "weekday"           : { "type": "time",           "base": 120960            },
   "week"              : { "type": "time",           "base": 604800            },
   "fortnight"         : { "type": "time",           "base": 1209600           },

@@ -5,26 +5,27 @@ import utcTime from './baseContext/utcTime';
 // TODO: Functions for differentation, sum (sigma), and multiplication (pi)
 // TODO: mapObj -> map, createMapEntry -> objOf
 
-import parseDates from './parse/parseDates';
-
 export default class Recora {
   constructor(locale, config = {}) {
     this.locale = locale || 'en';
 
     const now = new Date();
 
+    const configUtcTime = config.utcTime || {};
+
     this.config = {
       ...config,
       utcTime: {
         ...utcTime,
         // FIXME: Pass this in properly
-        year: now.getUTCFullYear(),
-        month: now.getUTCMonth(),
+        years: now.getUTCFullYear(),
+        months: now.getUTCMonth(),
         date: now.getUTCDate(),
-        hour: now.getUTCHours(),
-        minute: now.getUTCMinutes(),
+        hours: now.getUTCHours(),
+        minutes: now.getUTCMinutes(),
         timezone: 'Europe/London',
         utcOffset: 0,
+        ...configUtcTime,
       },
     };
   }

@@ -58,13 +58,15 @@ export const D = pipe(textNumber, allPass([
 
 export const DD = allPass([textLength2, D]);
 
+export const M = pipe(textNumber, allPass([
+  notNaN,
+  gte(__, 1),
+  lte(__, 12),
+]));
+
 export const MM = allPass([
   textLength2,
-  pipe(textNumber, allPass([
-    notNaN,
-    gte(__, 1),
-    lte(__, 12),
-  ])),
+  M,
 ]);
 
 export const YY = allPass([

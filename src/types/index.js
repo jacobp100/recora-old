@@ -18,21 +18,12 @@ export const color = {
 
 export const timezone = {
   type: 'TIMEZONE',
-  timezone: 'UTC',
-  utcOffset: 0, // Only appliciable when timezone = 'UTC'
+  value: {},
 };
 
 export const datetime = {
   type: 'DATETIME',
-  ...timezone,
-  // TODO: parseDates will need to know what to default
-  // date: 1,
-  // month: 0,
-  // year: 0,
-  // hour: 0,
-  // minute: 0,
-  // second: 0,
-  // millisecond: 0,
+  value: {},
 };
 
 export const funcApplication = {

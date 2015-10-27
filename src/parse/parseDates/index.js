@@ -1,4 +1,4 @@
-import { text, textNumber, plus, plusMinus, dash, slash, colon, dot, t, ms, s, mm, hh, hhmm, D, DD, MM, YY, YYYY } from './formats';
+import { text, textNumber, plus, plusMinus, dash, slash, colon, dot, t, ms, s, mm, hh, hhmm, D, DD, M, MM, YY, YYYY } from './formats';
 import { getLocaleDateFormats, getLocaleTimeFormats, getLocaleTimezoneFormats, getLocaleDateTimeFormats } from '../../environment';
 import utcTime from '../../baseContext/utcTime';
 import { datetime, timezone } from '../../types';
@@ -16,6 +16,9 @@ const groupByPatternLength = pipe(
 
 
 const isoDate = [YYYY, dash, MM, dash, DD];
+
+const isolikeDateDash = [YYYY, dash, M, dash, D];
+const isolikeDateSlash = [YYYY, slash, M, slash, D];
 
 const euroDateNoYearDash = [D, dash, MM];
 const euroDateNoYearSlash = [D, slash, MM];
@@ -40,17 +43,19 @@ const shortYear = pipe(
   ),
 );
 
-const resolveIsoDate = tags => ({ year: textNumber(tags[0]), month: textNumber(tags[2][0]), date: textNumber(tags[4]) });
-const resolveEuroNoYearDate = tags => ({ month: textNumber(tags[2]), date: textNumber(tags[4]) });
-const resolveEuroShortYearDate = tags => ({ year: shortYear(tags[4]), month: textNumber(tags[2]), date: textNumber(tags[4]) });
-const resolveEuroLongYearDate = tags => ({ year: textNumber(tags[4]), month: textNumber(tags[2]), date: textNumber(tags[0]) });
-const resolveAmericanNoYearDate = tags => ({ month: textNumber(tags[0]), date: textNumber(tags[2]) });
-const resolveAmericanShortYearDate = tags => ({ year: shortYear(tags[4]), month: textNumber(tags[0]), date: textNumber(tags[2]) });
-const resolveAmericanLongYearDate = tags => ({ year: textNumber(tags[4]), month: textNumber(tags[0]), date: textNumber(tags[2]) });
+const resolveIsoDate = tags => ({ years: textNumber(tags[0]), months: textNumber(tags[2]) - 1, date: textNumber(tags[4]) });
+const resolveEuroNoYearDate = tags => ({ months: textNumber(tags[2]) - 1, date: textNumber(tags[4]) });
+const resolveEuroShortYearDate = tags => ({ years: shortYear(tags[4]), months: textNumber(tags[2]) - 1, date: textNumber(tags[4]) });
+const resolveEuroLongYearDate = tags => ({ years: textNumber(tags[4]), months: textNumber(tags[2]) - 1, date: textNumber(tags[0]) });
+const resolveAmericanNoYearDate = tags => ({ months: textNumber(tags[0]) - 1, date: textNumber(tags[2]) });
+const resolveAmericanShortYearDate = tags => ({ years: shortYear(tags[4]), months: textNumber(tags[0]) - 1, date: textNumber(tags[2]) });
+const resolveAmericanLongYearDate = tags => ({ years: textNumber(tags[4]), months: textNumber(tags[0]) - 1, date: textNumber(tags[2]) });
 
 const baseDateFormats = [
   // FIXME: Should have resolvers too
   { format: 'ISO_DATE', pattern: isoDate, resolve: resolveIsoDate },
+  { format: 'DATE', pattern: isolikeDateDash, resolve: resolveIsoDate },
+  { format: 'DATE', pattern: isolikeDateSlash, resolve: resolveIsoDate },
   { format: 'DATE', pattern: euroDateNoYearDash, resolve: resolveEuroNoYearDate },
   { format: 'DATE', pattern: euroDateNoYearSlash, resolve: resolveEuroNoYearDate },
   { format: 'DATE', pattern: euroDateShortYearDash, resolve: resolveEuroShortYearDate },
@@ -70,9 +75,9 @@ const isoTimeFullMs = [hh, colon, mm, colon, s, dot, ms];
 const isoTimeFull = [hh, colon, mm, colon, s];
 const isoTime = [hh, colon, mm];
 
-const resolveIsoTimeFullMs = tags => ({ hour: textNumber(tags[0]), minute: textNumber(tags[2]), second: textNumber(tags[4]), millisecond: textNumber(tags[6]) });
-const resolveIsoTimeFull = tags => ({ hour: textNumber(tags[0]), minute: textNumber(tags[2]), second: textNumber(tags[4]) });
-const resolveIsoTime = tags => ({ hour: textNumber(tags[0]), minute: textNumber(tags[2]) });
+const resolveIsoTimeFullMs = tags => ({ hours: textNumber(tags[0]), minutes: textNumber(tags[2]), seconds: textNumber(tags[4]), milliseconds: textNumber(tags[6]) });
+const resolveIsoTimeFull = tags => ({ hours: textNumber(tags[0]), minutes: textNumber(tags[2]), seconds: textNumber(tags[4]) });
+const resolveIsoTime = tags => ({ hours: textNumber(tags[0]), minutes: textNumber(tags[2]) });
 
 const baseTimeFormats = [
   { format: 'ISO_TIME', pattern: isoTimeFullMs, resolve: resolveIsoTimeFullMs },

@@ -1,10 +1,11 @@
-import { entity, percentage, color, empty } from '../types';
+import { entity, percentage, color, datetime, empty } from '../types';
 import { isNumber } from '../types/entity';
 import * as entityMath from './entity';
 import * as entityPercentageMath from './entityPercentage';
 import * as colorMath from './color';
 import * as colorPercentageMath from './colorPercentage';
 import * as colorEntityMath from './colorEntity';
+import * as datetimeEntityMath from './datetimeEntity';
 import gamma from 'gamma';
 import { nilValue } from '../util';
 
@@ -21,20 +22,28 @@ const addValueMap = {
   [entity.type]: {
     [entity.type]: entityMath.add,
     [percentage.type]: entityPercentageMath.add,
+    [datetime.type]: datetimeEntityMath.addFlip,
   },
   [color.type]: {
     [color.type]: colorMath.add,
     [percentage.type]: colorPercentageMath.add,
+  },
+  [datetime.type]: {
+    [entity.type]: datetimeEntityMath.add,
   },
 };
 const subtractValueMap = {
   [entity.type]: {
     [entity.type]: entityMath.subtract,
     [percentage.type]: entityPercentageMath.subtract,
+    [datetime.type]: datetimeEntityMath.subtractFlip,
   },
   [color.type]: {
     [color.type]: colorMath.subtract,
     [percentage.type]: colorPercentageMath.subtract,
+  },
+  [datetime.type]: {
+    [entity.type]: datetimeEntityMath.subtract,
   },
 };
 const multiplyValueMap = {
