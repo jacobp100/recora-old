@@ -14,6 +14,14 @@ export const colon = pipe(text, equals(':'));
 export const dot = pipe(text, equals('.'));
 export const t = pipe(text, equals('t'));
 
+export const shortYear = pipe(
+  textNumber,
+  ifElse(lt(__, 50),
+    add(2000),
+    add(1900),
+  ),
+);
+
 
 export const ms = pipe(textNumber, allPass([
   notNaN,

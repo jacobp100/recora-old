@@ -4,4 +4,4 @@ const Recora = require('./src');
 
 const recora = new Recora();
 
-console.log(JSON.stringify(recora.parse('1992/12/4 until 1993/6/18')));
+console.log(JSON.stringify(recora.parse('5th jan 2015')));

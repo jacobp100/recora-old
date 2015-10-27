@@ -1,4 +1,4 @@
-import { text, textNumber, plus, plusMinus, dash, slash, colon, dot, t, ms, s, mm, hh, hhmm, D, DD, M, MM, YY, YYYY } from './formats';
+import { text, textNumber, shortYear, plus, plusMinus, dash, slash, colon, dot, t, ms, s, mm, hh, hhmm, D, DD, M, MM, YY, YYYY } from './formats';
 import { getLocaleDateFormats, getLocaleTimeFormats, getLocaleTimezoneFormats, getLocaleDateTimeFormats } from '../../environment';
 import utcTime from '../../baseContext/utcTime';
 import { datetime, timezone } from '../../types';
@@ -34,14 +34,6 @@ const americanDateShortYearSlash = [...americanDateNoYearSlash, slash, YY];
 const americanDateLongYearDash = [...americanDateNoYearDash, dash, YYYY];
 const americanDateLongYearSlash = [...americanDateNoYearSlash, slash, YYYY];
 
-
-const shortYear = pipe(
-  textNumber,
-  ifElse(lt(__, 50),
-    add(2000),
-    add(1900),
-  ),
-);
 
 const resolveIsoDate = tags => ({ years: textNumber(tags[0]), months: textNumber(tags[2]) - 1, date: textNumber(tags[4]) });
 const resolveEuroNoYearDate = tags => ({ months: textNumber(tags[2]) - 1, date: textNumber(tags[4]) });
