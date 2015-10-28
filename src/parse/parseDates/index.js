@@ -1,4 +1,5 @@
-import { text, textNumber, shortYear, plus, plusMinus, dash, slash, colon, dot, t, ms, s, mm, hh, hhmm, D, DD, M, MM, YY, YYYY } from './formats';
+import { shortYear, plus, plusMinus, dash, slash, colon, dot, t, ms, s, mm, hh, hhmm, D, DD, M, MM, YY, YYYY } from './formats';
+import { text, textNumber } from '../tags/util';
 import { getLocaleDateFormats, getLocaleTimeFormats, getLocaleTimezoneFormats, getLocaleDateTimeFormats } from '../../environment';
 import utcTime from '../../baseContext/utcTime';
 import { datetime, timezone } from '../../types';

@@ -7,11 +7,21 @@ import { objectEmpty } from '../../../util';
 const isSpecialUnit = pipe(head, equals('_'));
 const noSymbols = pipe(prop('symbols'), objectEmpty);
 
-function formatEntityNumber(entity, formattingHints) {
+const baseNames = {
+  2: '0b',
+  8: '0o',
+  10: '',
+  16: '0x',
+};
+
+function formatEntityNumber(context, formattingHints, entity) {
+  const { base } = context.hints;
+
   if (entity.value === 1 && !noSymbols(entity)) {
     return '';
-  } else if (formattingHints.base) {
-    return entity.value.toString(entity.formattingHints.base);
+  } else if (base) {
+    const prefix = propOr(`(base ${base}) `, base, baseNames);
+    return prefix + entity.value.toString(base);
   } else if (formattingHints.currency) {
     return entity.value.toFixed(2);
   }
@@ -54,9 +64,9 @@ function formatEntityReducerFn(entity, out, [unit, value]) {
 const formatEntityUnits = (entity, str) => reduce(partial(formatEntityReducerFn, [entity]), str, toPairs(entity.units));
 
 
-export function formatEntity(context, entity, formattingHints) {
+export default function formatEntity(context, entity, formattingHints) {
   return pipe(
-    formatEntityNumber,
+    partialRight(formatEntityNumber, [entity]),
     partial(formatEntityUnits, [entity]),
-  )(entity, formattingHints);
+  )(context, formattingHints);
 }

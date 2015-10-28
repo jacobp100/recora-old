@@ -1,7 +1,6 @@
 import { notNil, notNaN } from '../../util';
+import { text, textNumber } from '../tags/util';
 
-export const text = when(notNil, nth(0));
-export const textNumber = pipe(text, Number);
 export const textLengthEq = val => pipe(text, length, equals(val));
 export const textLength2 = textLengthEq(2);
 

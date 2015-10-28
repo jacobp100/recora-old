@@ -7,7 +7,7 @@ const locales = { en };
 
 export const getNumberFormat = always('\\d+(?:\\.\\d+)?'); // FIXME
 export const parseNumber = (context, value) => Number(value.replace(',', '')); // FIXME
-export const getFormattingHints = merge({ hints: [] }); // FIXME
+export const getFormattingHints = (context) => ((locales[context.locale].getFormattingHints || identity)(context));
 export const getSiUnit = (context, name) => (path(['si', name], context) || si[name] || name);
 export const getUnitValue = (context, name) => (path(['units', name], context) || units[name]);
 export const getConstant = (context, name) => (path(['constants', name], context) || constants[name]);

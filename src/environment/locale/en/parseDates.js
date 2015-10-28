@@ -1,6 +1,7 @@
 import timezones from '../../../data/en/timezones';
 import timezoneOffsets from '../../../data/en/timezoneOffsets';
-import { text, textNumber, shortYear, colon, mm, D, YY, YYYY } from '../../../parse/parseDates/formats';
+import { shortYear, colon, mm, D, YY, YYYY } from '../../../parse/parseDates/formats';
+import { text, textNumber } from '../../../parse/tags/util';
 import { lengthIsOne, notNaN } from '../../../util';
 
 

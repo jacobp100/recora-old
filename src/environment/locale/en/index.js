@@ -3,7 +3,8 @@ import units from '../../../baseContext/units';
 import abbreviations from '../../../data/en/abbreviations';
 
 
-export { formatEntity } from './formatEntity';
+export formatEntity from './formatEntity';
+export getFormattingHints from './getFormattingHints';
 export preprocessTags from './preprocessTags';
 export { dateFormats, timeFormats, timezoneFormats } from './parseDates';
 

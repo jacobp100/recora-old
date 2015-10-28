@@ -142,6 +142,6 @@ const parse = pipe(
   parseText,
   getFormattingHints,
   // FIXME: Allow context to skip this step
-  context => (parseWithDates(context) || parseTagsWithOptions(context)),
+  context => (((!context.skipDates) ? parseWithDates(context) :  null) || parseTagsWithOptions(context)),
 );
 export default parse;
