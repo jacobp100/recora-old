@@ -5,17 +5,9 @@ describe('regression', function() {
   this.slow(8);
 
   const recora = new Recora('en', {
-    utcTime: {
-      years: 1970,
-      months: 0,
-      date: 1,
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-      milliseconds: 0,
-      timezone: 'UTC',
-      timezoneOffset: 0,
-    },
+    currentYears: 1970,
+    currentMonths: 0,
+    currentDate: 1,
   });
 
   function shittyFixOutputUntilIIncludeRealNumberFormatting(resultToString) {

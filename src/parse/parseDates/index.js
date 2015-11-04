@@ -205,7 +205,7 @@ export default function parseDates(context) {
     formatDateTimeTags,
     when(whereEq({ tags: null }), always(context)),
     evolve({
-      tags: map(when(isDatetime, value => ({ ...value, value: { ...utcTime, ...context.utcTime, ...value.value }}))),
+      tags: map(when(isDatetime, value => ({ ...value, value: { ...utcTime, ...context.currentTime, ...value.value }}))),
     }),
   )(context);
 }
