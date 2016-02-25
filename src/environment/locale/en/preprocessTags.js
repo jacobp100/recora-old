@@ -1,3 +1,4 @@
+import { map, pipe, remove, insert, reduce, __, over, lensProp } from 'ramda';
 import { singularize } from './pluralization';
 import { TAG_OPERATOR, TAG_SYMBOL, TAG_NUMBER, TAG_NOOP } from '../../../parse/tags';
 import { MULTIPLY_COND_DIMENSIONS_LENGTH_ONLY } from '../../../math/operators';
@@ -69,7 +70,7 @@ function resolveSeparatedUnitsReducerFn(tags, { value, words }) {
 
   return pipe(
     remove(ind, words.length),
-    insert(ind, unitDescriptor),
+    insert(ind, unitDescriptor)
     // partialRight(resolveSeparatedUnitsReducerFn, [{ value, words }]),
   )(tags);
 }
@@ -79,7 +80,7 @@ const preprocessTags = over(
   lensProp('tags'),
   pipe(
     resolveUnitPowersAndAmbiguities,
-    resolveSeparatedUnits,
-  ),
+    resolveSeparatedUnits
+  )
 );
 export default preprocessTags;

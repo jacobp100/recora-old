@@ -1,3 +1,4 @@
+import { pipe, ifElse, nthArg, evolve, add, path } from 'ramda';
 import { entity, percentage, color, datetime, empty } from '../types';
 import { isNumber } from '../types/entity';
 import * as entityMath from './entity';
@@ -11,10 +12,11 @@ import { nilValue } from '../util';
 
 
 const negativeEntity = { ...entity, value: -1 };
-const entityNegate = (context, emptyValue, entityValue) => entityMath.multiply(context, negativeEntity, entityValue);
+const entityNegate = (context, emptyValue, entityValue) =>
+  entityMath.multiply(context, negativeEntity, entityValue);
 const entityFactorial = ifElse(isNumber,
   pipe(nthArg(1), evolve({ value: pipe(add(1), gamma) })),
-  nilValue,
+  nilValue
 );
 
 
@@ -98,7 +100,8 @@ const createOperation = (valueMap) => (context, lhs, rhs) => {
 export const ADD = createOperation(addValueMap);
 export const SUBTRACT = createOperation(subtractValueMap);
 export const MULTIPLY = createOperation(multiplyValueMap);
-export const MULTIPLY_COND_DIMENSIONS_LENGTH_ONLY = createOperation(multiplyCondDimensionsLengthOnly);
+export const MULTIPLY_COND_DIMENSIONS_LENGTH_ONLY =
+  createOperation(multiplyCondDimensionsLengthOnly);
 export const DIVIDE = createOperation(divideValueMap);
 export const NEGATE = createOperation(negateValueMap);
 export const EXPONENT = createOperation(exponentValueMap);

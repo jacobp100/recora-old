@@ -1,3 +1,4 @@
+import { pipe, invert, toPairs, sortBy, head, map, last } from 'ramda';
 export const EQUATE = 'EQUATE';
 export const ADD = 'ADD';
 export const SUBTRACT = 'SUBTRACT';

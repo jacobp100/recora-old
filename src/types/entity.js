@@ -1,3 +1,8 @@
+import {
+  complement, isNil, pipe, map, last, sum, ifElse, prop, has, always, filter, toPairs, head,
+  partial, where, keys, pickBy, reduce, evolve, multiply, omit, groupBy, mapObj, equals, __,
+  chain, adjust, fromPairs, propEq,
+} from 'ramda';
 import { entity as entityDescriptor } from './index';
 import unitsDerived from '../data/unitsDerived';
 import { getUnitValue, getSiUnit, formatEntity } from '../environment';
@@ -14,7 +19,7 @@ const getUnitType = pipe(
   ifElse(isNil,
     nilValue,
     prop('type')
-  ),
+  )
 );
 
 // (context, name: string) -> bool
@@ -22,16 +27,16 @@ const isNonLinearUnit = pipe(
   getUnitValue,
   ifElse(notNil,
     has('forwardFn'),
-    always(false),
-  ),
+    always(false)
+  )
 );
 
 function getNonLinearUnitPairs(context, units) {
   return pipe(
     toPairs,
     filter(
-      pipe(head, partial(isNonLinearUnit, [context])),
-    ),
+      pipe(head, partial(isNonLinearUnit, [context]))
+    )
   )(units);
 }
 
@@ -67,13 +72,13 @@ export const resolveDimensionlessUnits = (context, entity) => pipe(
   pickBy((power, unit) => !getUnitType(context, unit)),
   toPairs,
   reduce((out, [unit, power]) => {
-    const unitValue = getUnitValue(context, unit).base ** power;
+    const unitValue = Math.pow(getUnitValue(context, unit).base, power);
 
     return evolve({
       value: multiply(unitValue),
       units: omit([unit]),
     }, out);
-  }, entity),
+  }, entity)
 )(entity);
 
 
@@ -86,7 +91,7 @@ export const dimensions = (context, entity) => pipe(
   }),
   omit(['undefined']),
   mapObj(sumLastElementsInPairs),
-  pickBy(complement(equals(0))),
+  pickBy(complement(equals(0)))
 )(entity);
 
 const derivedUnitsForType = ifElse(has(__, unitsDerived),
@@ -103,7 +108,7 @@ export const baseDimensions = pipe(
   )),
   groupBy(head),
   mapObj(sumLastElementsInPairs),
-  pickBy(complement(equals(0))),
+  pickBy(complement(equals(0)))
 );
 
 function getSiUnits(context, entity) {
@@ -111,7 +116,7 @@ function getSiUnits(context, entity) {
     dimensions,
     toPairs,
     map(adjust(partial(getSiUnit, [context]), 0)),
-    fromPairs,
+    fromPairs
   )(context, entity);
 }
 
@@ -119,7 +124,7 @@ function convertValueReducerFn(context, direction, value, [name, power]) {
   const unit = getUnitValue(context, name);
 
   if (unit) {
-    return value * (unit.base) ** (-direction * power);
+    return value * Math.pow(unit.base, -direction * power);
   }
   return value;
 }
@@ -130,7 +135,7 @@ function convertValue(context, direction, units, value) {
 
   if (nonLinearUnit) {
     const fn = {
-      '1': 'forwardFn',
+      1: 'forwardFn',
       '-1': 'backwardFn',
     }[direction];
 
@@ -141,7 +146,7 @@ function convertValue(context, direction, units, value) {
   return reduce(
     partial(convertValueReducerFn, [context, direction]),
     value,
-    toPairs(units),
+    toPairs(units)
   );
 }
 
@@ -158,7 +163,7 @@ export function convert(context, units, entity) {
 
   const value = pipe(
     partial(convertValue, [context, -1, entity.units]),
-    partial(convertValue, [context, 1, units]),
+    partial(convertValue, [context, 1, units])
   )(entity.value);
   return { ...entity, value, units };
 }

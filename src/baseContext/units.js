@@ -1,3 +1,4 @@
+import { findIndex, last, prop, when, has, evolve, mapObj, __ } from 'ramda';
 import jsonUnits from '../data/environment/units';
 
 const gasMarkToK = [380.4, 394.3, 408.2, 422.0, 435.9, 453.2, 463.7, 477.6, 491.5, 505.4, 519.3];
@@ -8,8 +9,10 @@ const unitFunctions = {
   celsiusBackwardFn: a => a + 273.15,
   fahrenheitForwardFn: a => (a - 273.15) * 1.8 + 32,
   fahrenheitBackwardFn: a => (a - 32) / 1.8 + 273.15,
-  gasmarkForwardFn: a => (kToGasMark[findIndex(k => k >= a, gasMarkToK)] || last(kToGasMark)),
-  gasmarkBackwardFn: a => (gasMarkToK[findIndex(gasMark => gasMark >= a, kToGasMark)] || last(gasMarkToK)),
+  gasmarkForwardFn: a =>
+    (kToGasMark[findIndex(k => k >= a, gasMarkToK)] || last(kToGasMark)),
+  gasmarkBackwardFn: a =>
+    (gasMarkToK[findIndex(gasMark => gasMark >= a, kToGasMark)] || last(gasMarkToK)),
 };
 
 const getUnitFn = prop(__, unitFunctions);
@@ -17,7 +20,7 @@ const resolveUnitFns = when(has('forwardFn'),
   evolve({
     forwardFn: getUnitFn,
     backwardFn: getUnitFn,
-  }),
+  })
 );
 
 const units = mapObj(resolveUnitFns, jsonUnits);

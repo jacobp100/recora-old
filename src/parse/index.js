@@ -1,3 +1,8 @@
+import {
+  commute, of, pipe, pluck, map, sum, whereEq, pickBy, toPairs, sortBy, addIndex, chain, filter,
+  flatten, prop, converge, concat, countBy, all, partial, where, over, lens, identity, assoc, cond,
+  T, equals, isNil, anyPass, reject, uniqWith, head, find,
+} from 'ramda';
 import { TAG_PARSE_OPTIONS } from './tags';
 import { isSymbol } from './tags/util';
 import parseText from './parseText';
@@ -16,8 +21,8 @@ const cartesian = commute(of);
 
 const indexSquaredDistance = pipe(
   pluck('index'),
-  map(x => x ** 2),
-  sum,
+  map(x => Math.pow(x, 2)),
+  sum
 );
 
 const isParseOption = whereEq({ type: TAG_PARSE_OPTIONS });
@@ -28,7 +33,7 @@ const getParseOptions = pipe(
     map(tags => ({ index: Number(index), tags }), parseOption.value)
   )),
   cartesian,
-  sortBy(indexSquaredDistance),
+  sortBy(indexSquaredDistance)
 );
 
 const chainIndexed = addIndex(chain);
@@ -47,13 +52,13 @@ const getParseOptionSymbols = pipe(
   filter(isParseOption),
   pluck('value'),
   flatten,
-  filter(isSymbol),
+  filter(isSymbol)
 );
 const getInlineSymbols = filter(isSymbol);
 const countSymbols = pipe(
   prop('tags'),
   converge(concat, [getParseOptionSymbols, getInlineSymbols]),
-  countBy(prop('value')),
+  countBy(prop('value'))
 );
 
 export function getTagOptions(context) { // exported for testing
@@ -66,14 +71,14 @@ export function getTagOptions(context) { // exported for testing
     filter(isSymbol),
     countBy(prop('value')),
     toPairs,
-    all(([symbol, count]) => (count === 0 || count === symbolCount[symbol])),
+    all(([symbol, count]) => (count === 0 || count === symbolCount[symbol]))
   );
 
   return pipe(
     getParseOptions,
     map(partial(transformParseOptions, [context.tags])),
     filter(noneOrAllSymbolsIncluded),
-    map(tags => ({ ...context, tags })),
+    map(tags => ({ ...context, tags }))
   )(context.tags);
 }
 
@@ -81,7 +86,7 @@ export function getTagOptions(context) { // exported for testing
 const resolveTagOptions = pipe(
   postprocessTags,
   resolveTags,
-  resolve,
+  resolve
 );
 
 
@@ -97,13 +102,13 @@ const convertResult = over(
     [hasCompositeConversion, converge(convertComposite, [identity, conversion, result])],
     [hasConversion, converge(convert, [identity, conversion, result])],
     [T, result],
-  ]),
+  ])
 );
 
 
 const resultToString = over(
   lens(identity, assoc('resultToString')),
-  converge(toString, [identity, result]),
+  converge(toString, [identity, result])
 );
 
 
@@ -129,19 +134,20 @@ const parseTagsWithOptions = pipe(
   reject(resultIsNil),
   uniqWith((a, b) => equals(a.result, b.result)),
   map(resultToString),
-  head,
+  head
 );
 
 
 const parseWithDates = pipe(
   parseDates,
-  parseTagsWithOptions,
+  parseTagsWithOptions
 );
 
 const parse = pipe(
   parseText,
   getFormattingHints,
   // FIXME: Allow context to skip this step
-  context => (((!context.skipDates && context.currentTime) ? parseWithDates(context) :  null) || parseTagsWithOptions(context)),
+  context => (((!context.skipDates && context.currentTime) ?
+    parseWithDates(context) : null) || parseTagsWithOptions(context))
 );
 export default parse;

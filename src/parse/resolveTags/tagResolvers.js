@@ -1,4 +1,10 @@
-import { entity, color, datetime, timezone, percentage, funcApplication, bracketGroup } from '../../types';
+import {
+  last, over, lensProp, pipe, defaultTo, add, createMapEntry, evolve, adjust, append, assocPath,
+  flip, update, reduced, identity, assoc,
+} from 'ramda';
+import {
+  entity, color, datetime, timezone, percentage, funcApplication, bracketGroup,
+} from '../../types';
 import { TAG_NUMBER, TAG_SYMBOL, TAG_UNIT, TAG_PERCENTAGE, TAG_NOOP } from '../tags';
 import { isEntity } from '../../types/util';
 import { objectEmpty } from '../../util';
@@ -14,8 +20,8 @@ function tagUnitSymbol(unitOrSymbol) {
         lensProp(value),
         pipe(
           defaultTo(0),
-          add(power),
-        ),
+          add(power)
+        )
       );
       const evolveArg = createMapEntry(unitOrSymbol, addPowerToValue);
       const updateValuePower = evolve(evolveArg);

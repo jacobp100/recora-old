@@ -1,5 +1,8 @@
+import { map, of } from 'ramda';
 import Color from 'color-forge';
-import { TAG_PARSE_OPTIONS, TAG_NOOP, TAG_UNIT, TAG_SYMBOL, TAG_OPERATOR, TAG_NUMBER, TAG_FUNCTION } from '../tags';
+import {
+  TAG_PARSE_OPTIONS, TAG_NOOP, TAG_UNIT, TAG_OPERATOR, TAG_NUMBER, TAG_FUNCTION,
+} from '../tags';
 import { getUnitName, parseNumber, getConstant } from '../../environment';
 import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE, FACTORIAL } from '../../math/operators';
 import { exponent } from '../../math/entity';
@@ -20,7 +23,7 @@ const charToOperator = {
 const preprocessTagElement = {
   TEXT_SYMBOL_UNIT(context, tag, captureGroup) {
     const { value, start, end } = tag;
-    let canNoop = false;
+    // let canNoop = false;
     const options = [];
 
     const power = Number(captureGroup[4] || 1);
@@ -56,32 +59,33 @@ const preprocessTagElement = {
       });
     }
 
-    if (options.length === 0) {
-      // Why is this above getting constants?
-      // If we move this below, it makes the code easier
-      // Maybe it's in the flow that you define a constant, x = 3, then when you try to redefine it, it might fail?
-      // But shouldn't the = operator return null if that was the case?
-      options.push({
-        ...tag,
-        type: TAG_SYMBOL,
-        value,
-        power,
-      });
-      // TODO: If more than one symbol can be solved, make xy and xy^2 work
-      canNoop = true;
-    }
+    // if (options.length === 0) {
+    //   // Why is this above getting constants?
+    //   // If we move this below, it makes the code easier
+    //   // Maybe it's in the flow that you define a constant, x = 3,
+    //   // then when you try to redefine it, it might fail?
+    //   // But shouldn't the = operator return null if that was the case?
+    //   options.push({
+    //     ...tag,
+    //     type: TAG_SYMBOL,
+    //     value,
+    //     power,
+    //   });
+    //   // TODO: If more than one symbol can be solved, make xy and xy^2 work
+    //   canNoop = true;
+    // }
 
     const constant = getConstant(context, value);
     if (constant) {
       options.push(exponent(context, constant, { ...entity, value: power }));
     }
 
-    if (canNoop) {
-      options.push({
-        ...tag,
-        type: TAG_NOOP,
-      });
-    }
+    // if (canNoop) {
+    //   options.push({
+    //     ...tag,
+    //     type: TAG_NOOP,
+    //   });
+    // }
 
     if (options.length > 1) {
       return {

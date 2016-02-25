@@ -1,3 +1,7 @@
+import {
+  pipe, equals, nth, always, takeLast, zip, all, dropLast, reduced, evolve, assoc, reduce, __,
+  length,
+} from 'ramda';
 import { text, textNumber } from '../../../parse/tags/util';
 import { notNaN } from '../../../util';
 
@@ -24,7 +28,7 @@ function parseFormattingBaseFn(context, format) {
   const lastTags = takeLast(formatPatternLength, context.tags);
   const patternMatchers = zip(
     format.pattern,
-    lastTags,
+    lastTags
   );
   const matches = all(([fn, tag]) => fn(tag), patternMatchers);
 
@@ -44,6 +48,6 @@ const parseFormattingBase = reduce(parseFormattingBaseFn, __, formattingBaseForm
 
 const getFormattingHints = pipe(
   assoc('hints', {}),
-  parseFormattingBase,
+  parseFormattingBase
 );
 export default getFormattingHints;

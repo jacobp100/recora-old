@@ -1,3 +1,4 @@
+import { partial } from 'ramda';
 import { convert } from '../types/entity';
 import { normalize } from '../types/datetime';
 
@@ -17,7 +18,8 @@ const abstractAdd = (direction, context, datetime, entity) => {
   });
 };
 
-const abstractAddFlip = (direction, context, entity, datetime) => abstractAdd(direction, context, datetime, entity);
+const abstractAddFlip = (direction, context, entity, datetime) =>
+  abstractAdd(direction, context, datetime, entity);
 
 export const add = partial(abstractAdd, [1]);
 export const subtract = partial(abstractAdd, [-1]);

@@ -1,3 +1,6 @@
+import {
+  pipe, zip, filter, head, over, lensProp, reject, isNil, lens, identity, assoc, map, partial,
+} from 'ramda';
 import processTagElement from './processTagElement';
 import { TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET } from '../tags';
 import { statementParts } from '../text';
@@ -8,7 +11,7 @@ import { mapWithAccum, noneNil } from '../../util';
 const findValueAndType = pipe(
   zip(statementParts),
   filter(noneNil),
-  head,
+  head
 );
 
 function processTag(context, captureGroup) {
@@ -37,15 +40,15 @@ const preprocessTags = pipe(
   environmentPreprocessTags,
   over(
     lensProp('tags'),
-    reject(isNil),
+    reject(isNil)
   ),
   over(
     lens(identity, assoc('tags')),
-    context => map(partial(processTag, [context]), context.tags),
+    context => map(partial(processTag, [context]), context.tags)
   ),
   over(
     lensProp('tags'),
-    mapWithAccum(resolveTagBracket, 0),
-  ),
+    mapWithAccum(resolveTagBracket, 0)
+  )
 );
 export default preprocessTags;

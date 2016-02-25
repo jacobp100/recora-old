@@ -1,4 +1,7 @@
-import { TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_OPERATOR, TAG_FUNCTION, TAG_UNIT } from './tags';
+import { pipe, curry, over, lensProp } from 'ramda';
+import {
+  TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_OPERATOR, TAG_FUNCTION, TAG_UNIT,
+} from './tags';
 import { trimNoop } from './tags/util';
 import { SUBTRACT, DIVIDE, NEGATE } from '../math/operators';
 import { mapWithAccum, mapWithAccumRight, rejectNil } from '../util';
@@ -9,7 +12,8 @@ const tagNegate = { type: TAG_OPERATOR, value: NEGATE };
 function fixNaturalNotationWithPrevious(previous, tag) {
   let newTag = tag;
 
-  if (tag.value === SUBTRACT && (!previous || previous.type === TAG_OPERATOR || previous.type === TAG_FUNCTION)) {
+  if (tag.value === SUBTRACT &&
+    (!previous || previous.type === TAG_OPERATOR || previous.type === TAG_FUNCTION)) {
     // Fix negative signs at start of input (-1 meters) and after operators (3 * -1 meters)
     newTag = { ...tag, ...tagNegate };
   }
@@ -33,10 +37,11 @@ function fixNotationWithNext(next, tag) {
   return [tag, newTag];
 }
 
-// Can the two tag negatives be found by looking at all subtractions, and converting to a negative iff there are only unit tags between the subtract and the next number
+// Can the two tag negatives be found by looking at all subtractions, and converting to a negative
+// iff there are only unit tags between the subtract and the next number
 const fixNaturalMathNotation = pipe(
   mapWithAccum(fixNaturalNotationWithPrevious, null),
-  mapWithAccumRight(fixNotationWithNext, null),
+  mapWithAccumRight(fixNotationWithNext, null)
 );
 
 const resolveUnitPowerType = curry((type, power, tag) => {
@@ -51,19 +56,19 @@ const resolveUnitPowerType = curry((type, power, tag) => {
 
 const resolveUnitPowerPrefixes = pipe(
   mapWithAccum(resolveUnitPowerType(TAG_UNIT_POWER_PREFIX), 1),
-  rejectNil,
+  rejectNil
 );
 
 const resolveUnitPowerSuffixes = pipe(
   mapWithAccumRight(resolveUnitPowerType(TAG_UNIT_POWER_SUFFIX), 1),
-  rejectNil,
+  rejectNil
 );
 
 const resolveUnitPowers = pipe(
   // Resolve 3 meters squared, 3 square meters, 3 meters per second etc.
   // Also resolves 1 meter / second when used in after fixNaturalMathNotation
   resolveUnitPowerPrefixes,
-  resolveUnitPowerSuffixes,
+  resolveUnitPowerSuffixes
 );
 
 const postprocessTags = over(
@@ -71,7 +76,7 @@ const postprocessTags = over(
   pipe(
     fixNaturalMathNotation,
     resolveUnitPowers,
-    trimNoop,
-  ),
+    trimNoop
+  )
 );
 export default postprocessTags;

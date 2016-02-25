@@ -1,4 +1,9 @@
 /* eslint no-use-before-define: [1, "nofunc"] */
+import {
+  always, reduced, pipe, when, isNil, prop, map, partial, ifElse, __, propEq, reverse, reduce,
+  head, zip, tail, nthArg, equals, mapObj, propOr, values, isEmpty, sum, multiply, evolve, omit,
+  keys, over, lens, identity, assoc, converge, length,
+} from 'ramda';
 import combineValues from './combineValues';
 import { operationsGroup, miscGroup, bracketGroup, entity, funcApplication } from '../types';
 import { apply } from '../types/funcApplication'; // should this just be in math?
@@ -19,21 +24,24 @@ const groupsResolver = (reducer) => (context, locals, group) => (
     map(partial(resolveWithLocals, [context, locals])),
     ifElse(containsNil,
       nilValue,
-      partial(reducer, [context, group]),
-    ),
+      partial(reducer, [context, group])
+    )
   )(group)
 );
 
 
-const resolveOperationsGroupBackwardsFn = resolveBreakNil((context, b, [operation, a]) => math[operation](context, a, b));
-const resolveOperationsGroupForwardsFn = resolveBreakNil((context, a, [operation, b]) => math[operation](context, a, b));
+const resolveOperationsGroupBackwardsFn =
+  resolveBreakNil((context, b, [operation, a]) => math[operation](context, a, b));
+const resolveOperationsGroupForwardsFn =
+  resolveBreakNil((context, a, [operation, b]) => math[operation](context, a, b));
 const groupIsBackwards = pipe(
   prop('level'),
-  propEq(__, 'backwards', orderDirection),
+  propEq(__, 'backwards', orderDirection)
 );
 const resolveOperationsGroup = (context, locals, group) => {
   const { groups: unresolvedGroups, operations } = group;
-  const groups = map(partial(resolveWithLocals, [context, locals]), unresolvedGroups); // FIXME: This is shitty
+  // FIXME: This is shitty
+  const groups = map(partial(resolveWithLocals, [context, locals]), unresolvedGroups);
   const isBackwards = groupIsBackwards(group);
 
   if (containsNil(groups)) {
@@ -42,12 +50,13 @@ const resolveOperationsGroup = (context, locals, group) => {
 
   const fixedOperations = isBackwards ? reverse(operations) : operations;
   const fixedGroups = isBackwards ? reverse(groups) : groups;
-  const resolveFn = isBackwards ? resolveOperationsGroupBackwardsFn : resolveOperationsGroupForwardsFn;
+  const resolveFn = isBackwards ?
+    resolveOperationsGroupBackwardsFn : resolveOperationsGroupForwardsFn;
 
   return reduce(
     partial(resolveFn, [context]),
     head(fixedGroups),
-    zip(fixedOperations, tail(fixedGroups)),
+    zip(fixedOperations, tail(fixedGroups))
   );
 };
 
@@ -56,14 +65,14 @@ const resolveMiscGroupReduceFn = resolveBreakNil(combineValues);
 const resolveMiscGroupReducer = (context, locals, group) => reduce(
   partial(resolveMiscGroupReduceFn, [context]),
   head(group),
-  tail(group),
+  tail(group)
 );
 const resolveMiscGroup = groupsResolver(resolveMiscGroupReducer);
 
 const resolveBracketGroupHasOneGroup = pipe(nthArg(2), prop('groups'), length, equals(1));
 const resolveBracketGroup = ifElse(resolveBracketGroupHasOneGroup,
   resolveMiscGroup,
-  nilValue,
+  nilValue
 );
 
 
@@ -88,8 +97,8 @@ const resolveEntity = (context, locals, value) => {
     values,
     ifElse(isEmpty,
       always(1),
-      sum,
-    ),
+      sum
+    )
   )(locals);
 
   return evolve({
@@ -105,23 +114,23 @@ export function resolveWithLocals(context, locals, value) {
   }
 
   switch (value.type) {
-  case operationsGroup.type:
-    return resolveOperationsGroup(context, locals, value);
-  case miscGroup.type:
-    return resolveMiscGroup(context, locals, value);
-  case funcApplication.type:
-    return resolveFuncApplaction(context, locals, value);
-  case bracketGroup.type:
-    return resolveBracketGroup(context, locals, value);
-  case entity.type:
-    return resolveEntity(context, locals, value);
-  default:
-    return value;
+    case operationsGroup.type:
+      return resolveOperationsGroup(context, locals, value);
+    case miscGroup.type:
+      return resolveMiscGroup(context, locals, value);
+    case funcApplication.type:
+      return resolveFuncApplaction(context, locals, value);
+    case bracketGroup.type:
+      return resolveBracketGroup(context, locals, value);
+    case entity.type:
+      return resolveEntity(context, locals, value);
+    default:
+      return value;
   }
 }
 
 const resolve = over(
   lens(identity, assoc('result')),
-  converge(resolveWithLocals, [identity, always({}), prop('ast')]),
+  converge(resolveWithLocals, [identity, always({}), prop('ast')])
 );
 export default resolve;

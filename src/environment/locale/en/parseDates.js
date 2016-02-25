@@ -1,3 +1,8 @@
+/* eslint max-len: [0] */
+import {
+  pipe, equals, anyPass, test, map, findIndex, __, allPass, gt, lte, ifElse, head, has, prop,
+  partition, zipObj, always,
+} from 'ramda';
 import timezones from '../../../data/en/timezones';
 import timezoneOffsets from '../../../data/en/timezoneOffsets';
 import { shortYear, colon, mm, D, YY, YYYY } from '../../../parse/parseDates/formats';
@@ -11,7 +16,7 @@ const amPm = anyPass([am, pm]);
 
 const ordinal = pipe(
   text,
-  test(/^(st|nd|rd|th)$/),
+  test(/^(st|nd|rd|th)$/)
 );
 
 const MMMMFormats = [
@@ -47,18 +52,30 @@ const dateFormatReversedLongerShortYear = [MMMM, D, ordinal, YY];
 const dateFormatReversedFullYear = [MMMM, D, YYYY];
 const dateFormatReversedLongerFullYear = [MMMM, D, ordinal, YYYY];
 
-const resolveDateFormat = tags => ({ months: mmmmIndex(tags[1]), date: textNumber(tags[0]) });
-const resolveDateFormatLonger = tags => ({ months: mmmmIndex(tags[2]), date: textNumber(tags[0]) });
-const resolveDateFormatShortYear = tags => ({ years: shortYear(tags[2]), months: mmmmIndex(tags[1]), date: textNumber(tags[0]) });
-const resolveDateFormatLongerShortYear = tags => ({ years: shortYear(tags[3]), months: mmmmIndex(tags[2]), date: textNumber(tags[0]) });
-const resolveDateFormatFullYear = tags => ({ years: textNumber(tags[2]), months: mmmmIndex(tags[1]), date: textNumber(tags[0]) });
-const resolveDateFormatLongerFullYear = tags => ({ years: textNumber(tags[3]), months: mmmmIndex(tags[2]), date: textNumber(tags[0]) });
-const resolveDateFormatReversed = tags => ({ months: mmmmIndex(tags[0]), date: textNumber(tags[1]) });
-const resolveDateFormatReversedLonger = tags => ({ months: mmmmIndex(tags[0]), date: textNumber(tags[1]) });
-const resolveDateFormatReversedShortYear = tags => ({ years: shortYear(tags[2]), months: mmmmIndex(tags[0]), date: textNumber(tags[1]) });
-const resolveDateFormatReversedLongerShortYear = tags => ({ years: shortYear(tags[3]), months: mmmmIndex(tags[0]), date: textNumber(tags[1]) });
-const resolveDateFormatReversedFullYear = tags => ({ years: textNumber(tags[2]), months: mmmmIndex(tags[0]), date: textNumber(tags[1]) });
-const resolveDateFormatReversedLongerFullYear = tags => ({ years: textNumber(tags[3]), months: mmmmIndex(tags[0]), date: textNumber(tags[1]) });
+const resolveDateFormat = tags =>
+  ({ months: mmmmIndex(tags[1]), date: textNumber(tags[0]) });
+const resolveDateFormatLonger = tags =>
+  ({ months: mmmmIndex(tags[2]), date: textNumber(tags[0]) });
+const resolveDateFormatShortYear = tags =>
+  ({ years: shortYear(tags[2]), months: mmmmIndex(tags[1]), date: textNumber(tags[0]) });
+const resolveDateFormatLongerShortYear = tags =>
+  ({ years: shortYear(tags[3]), months: mmmmIndex(tags[2]), date: textNumber(tags[0]) });
+const resolveDateFormatFullYear = tags =>
+  ({ years: textNumber(tags[2]), months: mmmmIndex(tags[1]), date: textNumber(tags[0]) });
+const resolveDateFormatLongerFullYear = tags =>
+  ({ years: textNumber(tags[3]), months: mmmmIndex(tags[2]), date: textNumber(tags[0]) });
+const resolveDateFormatReversed = tags =>
+  ({ months: mmmmIndex(tags[0]), date: textNumber(tags[1]) });
+const resolveDateFormatReversedLonger = tags =>
+  ({ months: mmmmIndex(tags[0]), date: textNumber(tags[1]) });
+const resolveDateFormatReversedShortYear = tags =>
+  ({ years: shortYear(tags[2]), months: mmmmIndex(tags[0]), date: textNumber(tags[1]) });
+const resolveDateFormatReversedLongerShortYear = tags =>
+  ({ years: shortYear(tags[3]), months: mmmmIndex(tags[0]), date: textNumber(tags[1]) });
+const resolveDateFormatReversedFullYear = tags =>
+  ({ years: textNumber(tags[2]), months: mmmmIndex(tags[0]), date: textNumber(tags[1]) });
+const resolveDateFormatReversedLongerFullYear = tags =>
+  ({ years: textNumber(tags[3]), months: mmmmIndex(tags[0]), date: textNumber(tags[1]) });
 
 export const dateFormats = [
   { format: 'DATE', pattern: dateFormat, resolve: resolveDateFormat },
@@ -85,12 +102,12 @@ const shortTime = [h12, amPm];
 
 const resolveFullTime = ifElse(pipe(head, am),
   tags => ({ hours: textNumber(tags[0]), minutes: textNumber(tags[2]) }),
-  tags => ({ hours: textNumber(tags[0]) + 12, minutes: textNumber(tags[2]) }),
+  tags => ({ hours: textNumber(tags[0]) + 12, minutes: textNumber(tags[2]) })
 );
 
 const resolveShortTime = ifElse(pipe(head, am),
   tags => ({ hours: textNumber(tags[0]), minutes: 0 }),
-  tags => ({ hours: textNumber(tags[0]) + 12, minutes: 0 }),
+  tags => ({ hours: textNumber(tags[0]) + 12, minutes: 0 })
 );
 
 export const timeFormats = [
@@ -109,15 +126,17 @@ const resolveTimezoneOffset = tags => ({ offset: timezoneOffsets[tags[0][0]], ti
 const wordsToPattern = map(word => pipe(text, equals(word)));
 
 const propWords = prop('words');
-const [singleWordTimezones, splitWordTimezones] = partition(pipe(propWords, lengthIsOne), timezones);
+const [singleWordTimezones, splitWordTimezones] =
+  partition(pipe(propWords, lengthIsOne), timezones);
 const singleWordTimezonesMap = zipObj(
   map(pipe(propWords, head), singleWordTimezones),
-  map(prop('timezone'), singleWordTimezones),
+  map(prop('timezone'), singleWordTimezones)
 );
 
 // This is done for perf
 const singleWordTimezone = [pipe(text, has(__, singleWordTimezonesMap))];
-const resolveSingleWordTimezone = tags => ({ timezone: singleWordTimezonesMap[tags[0][0]], utcOffset: 0 });
+const resolveSingleWordTimezone = tags =>
+  ({ timezone: singleWordTimezonesMap[tags[0][0]], utcOffset: 0 });
 
 const splitWordTimezonesFromIana = map(({ timezone, words }) => ({
   format: 'TIMEZONE',

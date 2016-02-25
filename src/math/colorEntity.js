@@ -1,3 +1,4 @@
+import { partial } from 'ramda';
 import { channelMultiply, exponent as colorExponent } from '../types/color';
 import { isNumber } from '../types/entity';
 

@@ -1,3 +1,7 @@
+import {
+  intersection, keys, pick, nthArg, prop, equals, pipe, isEmpty, anyPass, converge, lt, cond,
+  ifElse, T, path, length,
+} from 'ramda';
 import { entity, datetime, timezone } from '../types';
 import { dimensions, baseDimensions } from '../types/entity';
 import { convert as datetimeConvert } from '../types/datetime';
@@ -48,7 +52,7 @@ const combineEntities = cond([
   // I.e. `$5 at $3 per kilo` gives the same answer as `$3 per kilo using $5`
   [shouldDivide, ifElse(lhsUnitsLengthLessThanRhsUnitsLength,
     flipArgs(entityMath.divide),
-    entityMath.divide,
+    entityMath.divide
   )],
   // No idea, just mulitply
   [T, entityMath.multiply],

@@ -1,3 +1,6 @@
+import {
+  nthArg, prop, pipe, allPass, cond, multiply, T, always, when, lte, __, zip, map,
+} from 'ramda';
 import Color from 'color-forge';
 import { isNumber, toSi } from '../../types/entity';
 import { lighten as colorLighten, darken as colorDarken } from '../../types/color';
@@ -39,7 +42,8 @@ const asPercentage = cond([
 
 const asDegrees = cond([
   [isDegreesEntity, pipe(siValue, multiply(360 / (2 * Math.PI)))],
-  [isNumberEntity, pipe(siValue, when(lte(__, 1), multiply(360)))], // NOT toSi, accept 180 degrees and 180
+  // NOT toSi, accept 180 degrees and 180
+  [isNumberEntity, pipe(siValue, when(lte(__, 1), multiply(360)))],
   [isPercent, pipe(inputValue, multiply(360 / 100))],
   [T, always(null)],
 ]);

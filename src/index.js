@@ -1,9 +1,9 @@
+import { pick, all, propOr } from 'ramda';
 import parse from './parse';
 import baseContext from './baseContext';
 import utcTime from './baseContext/utcTime';
 import { notNil } from './util';
 
-// TODO: Functions for differentation, sum (sigma), and multiplication (pi)
 // TODO: mapObj -> map, createMapEntry -> objOf
 
 export default class Recora {

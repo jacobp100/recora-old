@@ -1,3 +1,8 @@
+import {
+  converge, complement, equals, pipe, map, always, propEq, propSatisfies, nthArg, toPairs, isEmpty,
+  last, sum, isNil, prop, keys, anyPass, cond, allPass, intersection, concat, groupBy, head,
+  mapObj, T, pickBy, multiply, partial, length,
+} from 'ramda';
 import { entity } from '../types';
 import { dimensions, baseDimensions, toSi, resolveDimensionlessUnits } from '../types/entity';
 
@@ -49,8 +54,10 @@ const unitsMatch = converge(equals, [lhsUnits, rhsUnits]);
 const baseDimensionsMatch = converge(equals, [lhsBaseDimensions, rhsBaseDimensions]);
 
 
-const flipRhsBySign = (direction, ctx, left, right) => ({ ...right, value: right.value * direction });
-const performAddMath = (direction, ctx, left, right) => ({ ...left, value: left.value + right.value * direction });
+const flipRhsBySign = (direction, ctx, left, right) =>
+  ({ ...right, value: right.value * direction });
+const performAddMath = (direction, ctx, left, right) =>
+  ({ ...left, value: left.value + right.value * direction });
 // (sign: (1, -1), context: Context, lhs: Entity, rhs: Entity) => Entity
 const abstractMathAdd = cond([
   [eitherValueNil, toNil],
@@ -81,7 +88,7 @@ const mergeMultiplicationUnitSymbols = pipe(
   converge(concat, [mergeMultiplicationLhsUnitPairs, mergeMultiplicationRhsUnitPairs]),
   groupBy(head),
   mapObj(sumLastElementsInPairs),
-  pickBy(notZero),
+  pickBy(notZero)
 );
 
 const performMultiplyMath = (direction, ctx, left, right) => {
@@ -89,7 +96,7 @@ const performMultiplyMath = (direction, ctx, left, right) => {
 
   const value = {
     ...entity,
-    value: left.value * (right.value ** direction),
+    value: left.value * Math.pow(right.value, direction),
     units: mergeMultiplicationUnitSymbols(left.units, byDirection(right.units)),
     symbols: mergeMultiplicationUnitSymbols(left.symbols, byDirection(right.symbols)),
   };
@@ -112,7 +119,7 @@ const performExponentMath = (direction, ctx, left, right) => {
 
   return {
     ...entity,
-    value: left.value ** (right.value * direction),
+    value: Math.pow(left.value, right.value * direction),
     units: byExponent(left.units),
     symbols: byExponent(left.symbols),
   };
@@ -139,7 +146,8 @@ const abstractMathmultiplyCondDimensionsLengthOnly = cond([
 const valueAdd = partial(abstractMathAdd, [1]);
 const valueSubtract = partial(abstractMathAdd, [-1]);
 const valueMultiply = partial(abstractMathMultiply, [1]);
-const valuemultiplyCondDimensionsLengthOnly = partial(abstractMathmultiplyCondDimensionsLengthOnly, [1]);
+const valuemultiplyCondDimensionsLengthOnly =
+  partial(abstractMathmultiplyCondDimensionsLengthOnly, [1]);
 const valueDivide = partial(abstractMathMultiply, [-1]);
 const valueExponent = partial(abstractMathExponent, [1]);
 // No inverse exponent

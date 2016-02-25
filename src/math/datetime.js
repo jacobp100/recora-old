@@ -1,3 +1,4 @@
+import { pipe, partial } from 'ramda';
 import { entity } from '../types';
 import { convert } from '../types/entity';
 import { toUtc, timestamp } from '../types/datetime';

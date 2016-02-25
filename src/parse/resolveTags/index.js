@@ -1,8 +1,20 @@
+import {
+  whereEq, where, equals, isNil, complement, pipe, map, when, assoc, reject, cond, isEmpty, always,
+  head, T, __, reduce, evolve, append, adjust, any, drop, indexOf, partial, anyPass, contains,
+  findIndex, slice, takeWhile, ifElse, converge, createMapEntry, prop, uniq, mergeAll,
+  dropLastWhile, last, takeLastWhile, dropWhile, dropLast, over, lens, filter, pluck, gt, length,
+  find,
+} from 'ramda';
 import tagResolvers from './tagResolvers';
-import { TAG_NOOP, TAG_COMMA, TAG_UNIT, TAG_OPERATOR, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_NUMBER, TAG_FUNCTION } from '../tags';
+import {
+  TAG_NOOP, TAG_COMMA, TAG_UNIT, TAG_OPERATOR, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET,
+  TAG_UNIT_POWER_PREFIX, TAG_UNIT_POWER_SUFFIX, TAG_NUMBER, TAG_FUNCTION,
+} from '../tags';
 import { isNoop, isSymbol } from '../tags/util';
 import { orderOperations, operationsOrder, unaryOperators, NEGATE } from '../../math/operators';
-import { entity, funcApplication, func, miscGroup, empty, bracketGroup, operationsGroup } from '../../types';
+import {
+  entity, funcApplication, func, miscGroup, empty, bracketGroup, operationsGroup,
+} from '../../types';
 import { baseDimensions } from '../../types/entity';
 import { lengthIsOne, objectEmpty, containsNil, nilValue, notNil } from '../../util';
 
@@ -28,7 +40,7 @@ const groupRemainingTagsNotNil = pipe(
     [isEmpty, always(empty)],
     [lengthIsOne, head],
     [T, assoc('groups', __, miscGroup)], // Only wrap in value group iff groups.length > 1
-  ]),
+  ])
 );
 
 const groupRemainingTags = pipe(
@@ -57,12 +69,12 @@ const tagOperatorMatchesValue = value => whereEq({ type: TAG_OPERATOR, value });
 function resolveOperationsFn(startLevel, tags) {
   const tagsContainOperation = pipe(
     tagOperatorMatchesValue,
-    any(__, tags),
+    any(__, tags)
   );
 
   const operations = pipe(
     drop(startLevel),
-    find(any(tagsContainOperation)),
+    find(any(tagsContainOperation))
   )(operationsOrder);
 
   if (!operations) {
@@ -78,7 +90,7 @@ function resolveOperationsFn(startLevel, tags) {
       operations: [],
       level,
     }),
-    evolve({ groups: map(partial(resolveOperationsFn, [level + 1])) }),
+    evolve({ groups: map(partial(resolveOperationsFn, [level + 1])) })
   )(tags);
 }
 const resolveOperations = partial(resolveOperationsFn, [0]);
@@ -145,7 +157,7 @@ const splitTags = reduce((tags, tag) => {
 const resolveTagsWithoutBrackets = pipe(
   splitTags,
   map(resolveFunctions),
-  when(containsNil, nilValue),
+  when(containsNil, nilValue)
 );
 
 const isOpenBracket = whereEq({ type: TAG_OPEN_BRACKET });
@@ -187,8 +199,8 @@ const createASTFromTags = pipe(
   resolveBrackets,
   ifElse(lengthIsOne,
     head,
-    nilValue,
-  ),
+    nilValue
+  )
 );
 
 const notNoop = complement(isNoop);
@@ -208,7 +220,7 @@ const addConversionToContext = (context, conversionTagsWithNoop, tags) => {
   const units = pipe(
     reject(isNoop),
     reject(isComma),
-    map(converge(createMapEntry, [prop('value'), prop('power')])),
+    map(converge(createMapEntry, [prop('value'), prop('power')]))
   )(conversionTagsWithNoop);
 
   const unitsLength = length(units);
@@ -224,7 +236,7 @@ const addConversionToContext = (context, conversionTagsWithNoop, tags) => {
     map(assoc('units', __, entity)), // Get entities
     map(partial(baseDimensions, [context])),
     uniq,
-    lengthIsOne,
+    lengthIsOne
   )(units);
 
   if (allEqualDimensions) {
@@ -242,7 +254,7 @@ export function findLeftConversion(context) {
 
   const conversionTags = pipe(
     takeWhile(isConversionStatement),
-    dropLastWhile(notNoop),
+    dropLastWhile(notNoop)
   )(context.tags);
   const remainingTags = drop(length(conversionTags), context.tags);
 
@@ -280,8 +292,8 @@ const resolveTags = pipe(
   findRightConversion,
   over(
     lens(prop('tags'), assoc('ast')),
-    createASTFromTags,
-  ),
+    createASTFromTags
+  )
 );
 
 const hasMoreThanOneTag = pipe(
@@ -290,10 +302,10 @@ const hasMoreThanOneTag = pipe(
   pluck('value'),
   uniq,
   length,
-  gt(__, 0), // FIXME: Update to 1 (or more) when we use symbols
+  gt(__, 0) // FIXME: Update to 1 (or more) when we use symbols
 );
 const quickResolveTags = ifElse(hasMoreThanOneTag,
   assoc('result', null),
-  resolveTags,
+  resolveTags
 );
 export default quickResolveTags;

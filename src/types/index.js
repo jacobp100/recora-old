@@ -10,7 +10,8 @@ export const percentage = {
   value: null,
 };
 
-// FIXME: color shouldn't contain a color-forge instance, only the data required to instantiate it so the context is always serializable
+// FIXME: color shouldn't contain a color-forge instance, only the data required to instantiate it
+// so the context is always serializable
 export const color = {
   type: 'COLOR',
   value: null,

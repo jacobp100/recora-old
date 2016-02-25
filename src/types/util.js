@@ -1,4 +1,8 @@
-import { entity, percentage, color, datetime, timezone, funcApplication, func, compositeEntity, operationsGroup, bracketGroup, miscGroup, empty } from '.';
+import { whereEq } from 'ramda';
+import {
+  entity, percentage, color, datetime, timezone, funcApplication, func, compositeEntity,
+  operationsGroup, bracketGroup, miscGroup, empty,
+} from '.';
 
 export const isEntity = whereEq({ type: entity.type });
 export const isPercentage = whereEq({ type: percentage.type });

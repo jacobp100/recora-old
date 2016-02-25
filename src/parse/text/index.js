@@ -1,3 +1,4 @@
+import { pipe, invert, mapObj, head } from 'ramda';
 import { TAG_COMMA, TAG_OPEN_BRACKET, TAG_CLOSE_BRACKET, TAG_PERCENTAGE } from '../tags';
 
 export const TEXT_SYMBOL_UNIT = 'TEXT_SYMBOL_UNIT';
@@ -22,5 +23,5 @@ export const statementParts = [
 ];
 export const partStatement = pipe(
   invert,
-  mapObj(head),
+  mapObj(head)
 )(statementParts);

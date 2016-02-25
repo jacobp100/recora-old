@@ -1,3 +1,4 @@
+import { keys, head, map } from 'ramda';
 import { getUnitValue } from '../environment';
 
 export function lighten(context, color, value) {
@@ -47,11 +48,11 @@ export function toString(context, color) {
   const convertedValue = value.convert(colorSpace);
 
   switch (colorSpace) {
-  case 'rgb':
-    return rgbFormat(convertedValue);
-  case 'hsl':
-    return hslFormat(convertedValue);
-  default:
-    return convertedValue.toHex();
+    case 'rgb':
+      return rgbFormat(convertedValue);
+    case 'hsl':
+      return hslFormat(convertedValue);
+    default:
+      return convertedValue.toHex();
   }
 }

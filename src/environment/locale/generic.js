@@ -1,3 +1,5 @@
+import { ifElse, pipe, equals, always, replace } from 'ramda';
+
 export const powerString = ifElse(pipe(Number, equals(1)),
   always(''),
   pipe(
@@ -14,6 +16,6 @@ export const powerString = ifElse(pipe(Number, equals(1)),
     replace('8', '⁸'),
     replace('9', '⁹'),
     replace('.', ' '),
-    replace('-', '⁻'),
-  ),
+    replace('-', '⁻')
+  )
 );

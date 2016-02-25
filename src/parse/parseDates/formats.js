@@ -1,4 +1,7 @@
-import { notNil, notNaN } from '../../util';
+import {
+  pipe, equals, anyPass, ifElse, lt, __, add, allPass, gte, lte, slice, of, length,
+} from 'ramda';
+import { notNaN } from '../../util';
 import { text, textNumber } from '../tags/util';
 
 export const textLengthEq = val => pipe(text, length, equals(val));
@@ -17,8 +20,8 @@ export const shortYear = pipe(
   textNumber,
   ifElse(lt(__, 50),
     add(2000),
-    add(1900),
-  ),
+    add(1900)
+  )
 );
 
 

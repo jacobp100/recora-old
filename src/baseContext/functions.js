@@ -1,3 +1,4 @@
+import { curry } from 'ramda';
 import mathp from 'mathp';
 import { toSi, dimensions } from '../types/entity';
 import { objectEmpty } from '../util';

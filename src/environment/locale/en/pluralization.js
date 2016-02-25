@@ -1,12 +1,14 @@
+import { pipe, mapObj, invert, head, last, init } from 'ramda';
+
 const pluralMap = {
-  'century': 'centuries',
-  'inch': 'inches',
-  'foot': 'feet',
-  'us': 'us',
-  'kelvin': 'kelvin',
-  'celsius': 'celsius',
-  'fahrenheit': 'fahrenheit',
-  'gas': 'gas',
+  century: 'centuries',
+  inch: 'inches',
+  foot: 'feet',
+  us: 'us',
+  kelvin: 'kelvin',
+  celsius: 'celsius',
+  fahrenheit: 'fahrenheit',
+  gas: 'gas',
 };
 const singularMap = pipe(invert, mapObj(head))(pluralMap);
 
@@ -23,5 +25,5 @@ export function singularize(word) {
 
 export function pluralize(word) {
   const singular = word.trim();
-  return pluralMap[singular] || (singular + 's');
+  return pluralMap[singular] || `${singular}s`;
 }

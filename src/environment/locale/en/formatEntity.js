@@ -1,3 +1,4 @@
+import { pipe, head, equals, prop, propOr, reduce, partial, toPairs, partialRight } from 'ramda';
 import { pluralize } from './pluralization';
 import { powerString } from '../generic';
 import unitFormatting from '../../../data/en/unitFormatting';
@@ -55,18 +56,18 @@ function formatEntityReducerFn(entity, out, [unit, value]) {
     } else if (specialUnit.suffix) {
       return out + specialUnit.suffix;
     }
-  } else {
-    const unitPlural = (value >= 1 && entity.value !== 1) ? pluralize(unit) : unit;
-
-    return `${out} ${(value < 0) ? 'per ' : ''}${unitPlural}${powerString(Math.abs(value))}`;
   }
+  const unitPlural = (value >= 1 && entity.value !== 1) ? pluralize(unit) : unit;
+
+  return `${out} ${(value < 0) ? 'per ' : ''}${unitPlural}${powerString(Math.abs(value))}`;
 }
-const formatEntityUnits = (entity, str) => reduce(partial(formatEntityReducerFn, [entity]), str, toPairs(entity.units));
+const formatEntityUnits = (entity, str) =>
+  reduce(partial(formatEntityReducerFn, [entity]), str, toPairs(entity.units));
 
 
 export default function formatEntity(context, entity, formattingHints) {
   return pipe(
     partialRight(formatEntityNumber, [entity]),
-    partial(formatEntityUnits, [entity]),
+    partial(formatEntityUnits, [entity])
   )(context, formattingHints);
 }
