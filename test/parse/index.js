@@ -1,10 +1,13 @@
-import { TAG_UNIT, TAG_PARSE_OPTIONS, TAG_NUMBER, TAG_SYMBOL, TAG_NOOP } from '../../src/parse/tags';
+import { sortBy, prop } from 'ramda';
+import {
+  TAG_UNIT, TAG_PARSE_OPTIONS, TAG_NUMBER, TAG_SYMBOL, TAG_NOOP,
+} from '../../src/parse/tags';
 import { getTagOptions } from '../../src/parse';
 import assert from 'assert';
 
-describe('parse', function() {
-  describe('get tag options', function() {
-    it('should return all options in order for parse options', function() {
+describe('parse', () => {
+  describe('get tag options', () => {
+    it('should return all options in order for parse options', () => {
       const option1 = { type: TAG_SYMBOL, value: 'to' };
       const option2 = { type: TAG_NOOP };
 
@@ -26,7 +29,7 @@ describe('parse', function() {
       assert.equal(tagOptions[1].tags[1], option2);
     });
 
-    it('should return all options for parse options sorted by least depth', function() {
+    it('should return all options for parse options sorted by least depth', () => {
       const option1 = { type: TAG_UNIT, value: 'meter', power: 1 };
       const option2 = { type: TAG_NOOP };
 
@@ -59,7 +62,7 @@ describe('parse', function() {
       assert.equal(tagOptions[3].tags[1], option2);
     });
 
-    it('should either include all of a type of symbol or none', function() {
+    it('should either include all of a type of symbol or none', () => {
       const option1 = { type: TAG_SYMBOL, value: 'a' };
       const option2 = { type: TAG_SYMBOL, value: 'b' };
       const option3 = { type: TAG_SYMBOL, value: 'c' };

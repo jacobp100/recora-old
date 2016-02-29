@@ -1,7 +1,7 @@
 import {
   complement, isNil, pipe, map, last, sum, ifElse, prop, has, always, filter, toPairs, head,
   partial, where, keys, pickBy, reduce, evolve, multiply, omit, groupBy, mapObj, equals, __,
-  chain, adjust, fromPairs, propEq,
+  chain, adjust, fromPairs, propEq, length,
 } from 'ramda';
 import { entity as entityDescriptor } from './index';
 import unitsDerived from '../data/unitsDerived';

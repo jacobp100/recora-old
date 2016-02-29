@@ -1,4 +1,4 @@
-import { keys, head, map } from 'ramda';
+import { keys, head, map, length } from 'ramda';
 import { getUnitValue } from '../environment';
 
 export function lighten(context, color, value) {
