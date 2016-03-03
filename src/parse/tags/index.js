@@ -13,6 +13,7 @@ export const TAG_PARSE_OPTIONS = 'TAG_PARSE_OPTIONS';
 export const TAG_PERCENTAGE = 'TAG_PERCENTAGE';
 export const TAG_SYMBOL = 'TAG_SYMBOL';
 export const TAG_TIME = 'TAG_TIME';
+export const TAG_TIMEZONE = 'TAG_TIMEZONE';
 export const TAG_UNIT = 'TAG_UNIT';
 export const TAG_UNIT_POWER_PREFIX = 'TAG_UNIT_POWER_PREFIX';
 export const TAG_UNIT_POWER_SUFFIX = 'TAG_UNIT_POWER_SUFFIX';

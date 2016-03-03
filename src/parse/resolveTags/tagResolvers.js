@@ -3,11 +3,11 @@ import {
   flip, update, reduced, identity, assoc,
 } from 'ramda';
 import {
-  entity, color, timezone, percentage, funcApplication, bracketGroup,
+  entity, percentage, funcApplication, bracketGroup,
 } from '../../types';
 import {
   TAG_NUMBER, TAG_SYMBOL, TAG_UNIT, TAG_PERCENTAGE, TAG_NOOP, TAG_COLOR, TAG_CONSTANT,
-  TAG_DATETIME,
+  TAG_DATETIME, TAG_TIMEZONE,
 } from '../tags';
 import { isEntity } from '../../types/util';
 import { objectEmpty } from '../../util';
@@ -72,7 +72,7 @@ const tagResolvers = {
   [TAG_COLOR]: appendValue,
   [TAG_CONSTANT]: appendValue,
   [TAG_DATETIME]: appendValue,
-  [timezone.type]: appendSelf,
+  [TAG_TIMEZONE]: appendValue,
   [funcApplication.type]: appendSelf,
   [bracketGroup.type]: appendSelf,
   [TAG_NOOP]: append(entity),

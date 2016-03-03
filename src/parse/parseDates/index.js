@@ -2,13 +2,13 @@
 import {
   pipe, groupBy, toPairs, sortBy, head, map, prop, last, reverse, equals, ifElse, always, whereEq,
   curry, insert, remove, reject, slice, reduce, partial, __, anyPass, gte, over, lensProp, when,
-  assoc, evolve, length,
+  assoc, evolve, length, cond,
 } from 'ramda';
 import {
   shortYear, plus, plusMinus, dash, slash, colon, dot, t, ms, s, mm, hh, hhmm, D, DD, M, MM, YY,
   YYYY,
 } from './formats';
-import { TAG_DATETIME, TAG_DATE, TAG_TIME } from '../tags';
+import { TAG_DATETIME, TAG_DATE, TAG_TIME, TAG_TIMEZONE } from '../tags';
 import { text, textNumber } from '../tags/util';
 import {
   getLocaleDateFormats, getLocaleTimeFormats, getLocaleTimezoneFormats, getLocaleDateTimeFormats,
@@ -234,16 +234,28 @@ export default function parseDates(context) {
     formatDateTimeTags,
     when(whereEq({ tags: null }), always(context)),
     evolve({
-      tags: map(when(isDatetime, datetimeValue => ({
-        type: TAG_DATETIME,
-        start: datetimeValue.start,
-        end: datetimeValue.end,
-        value: {
-          type: datetimeValue.type,
-          format: datetimeValue.format,
-          value: { ...utcTime, ...context.currentTime, ...datetimeValue.value },
-        },
-      }))),
+      tags: map(cond([
+        [isDatetime, datetimeValue => ({
+          type: TAG_DATETIME,
+          start: datetimeValue.start,
+          end: datetimeValue.end,
+          value: {
+            type: datetimeValue.type,
+            format: datetimeValue.format,
+            value: { ...utcTime, ...context.currentTime, ...datetimeValue.value },
+          },
+        })],
+        [isTimezone, timezoneValue => ({
+          type: TAG_TIMEZONE,
+          start: timezoneValue.start,
+          end: timezoneValue.end,
+          value: {
+            type: timezoneValue.type,
+            format: timezoneValue.format,
+            value: timezoneValue.value,
+          },
+        })],
+      ])),
     })
   )(context);
 }

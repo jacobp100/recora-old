@@ -1,8 +1,7 @@
-import { pick, all, propOr } from 'ramda';
+import { __, has, all, propOr } from 'ramda';
 import parse from './parse';
 import baseContext from './baseContext';
 import utcTime from './baseContext/utcTime';
-import { notNil } from './util';
 
 // TODO: mapObj -> map, createMapEntry -> objOf
 
@@ -12,17 +11,16 @@ export default class Recora {
 
     let currentTime = null;
 
-    const importantTimeValues = pick([
-      'currentYears',
-      'currentYonths',
-      'currentYate',
-    ], config);
-    const importantTimeValuesSatisfied = all(notNil, importantTimeValues);
+    const importantTimeValuesSatisfied = all(has(__, config), [
+      'currentYear',
+      'currentMonth',
+      'currentDate',
+    ]);
 
     if (importantTimeValuesSatisfied) {
       currentTime = {
-        years: propOr(utcTime.years, 'currentYears', config),
-        months: propOr(utcTime.months, 'currentMonths', config),
+        years: propOr(utcTime.years, 'currentYear', config),
+        months: propOr(utcTime.months, 'currentMonth', config),
         date: propOr(utcTime.date, 'currentDate', config),
         hours: propOr(utcTime.hours, 'currentHours', config),
         minutes: propOr(utcTime.minutes, 'currentMinutes', config),
