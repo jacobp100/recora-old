@@ -2,6 +2,7 @@ import { map, of } from 'ramda';
 import Color from 'color-forge';
 import {
   TAG_PARSE_OPTIONS, TAG_NOOP, TAG_UNIT, TAG_OPERATOR, TAG_NUMBER, TAG_FUNCTION, TAG_SYMBOL,
+  TAG_COLOR, TAG_CONSTANT,
 } from '../tags';
 import { getUnitName, parseNumber, getConstant } from '../../environment';
 import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE, FACTORIAL } from '../../math/operators';
@@ -38,12 +39,16 @@ const preprocessTagElement = {
     }
 
     if (power === 1) {
-      const colour = Color.css(value);
+      const colorValue = Color.css(value);
 
-      if (colour !== null) {
+      if (colorValue !== null) {
         options.push({
-          ...color,
-          value: colour,
+          ...tag,
+          type: TAG_COLOR,
+          value: {
+            ...color,
+            value: colorValue,
+          },
         });
       }
     }
@@ -77,7 +82,11 @@ const preprocessTagElement = {
 
     const constant = getConstant(context, value);
     if (constant) {
-      options.push(exponent(context, constant, { ...entity, value: power }));
+      options.push({
+        ...tag,
+        type: TAG_CONSTANT,
+        value: exponent(context, constant, { ...entity, value: power }),
+      });
     }
 
     if (canNoop) {
@@ -97,15 +106,20 @@ const preprocessTagElement = {
     }
 
     return {
+      ...tag,
       type: TAG_NOOP,
       start,
       end,
     };
   },
-  TEXT_COLOR(context, { value }) {
+  TEXT_COLOR(context, tag) {
     return {
-      ...color,
-      value: Color.hex(value),
+      ...tag,
+      type: TAG_COLOR,
+      value: {
+        ...color,
+        value: Color.hex(tag.value),
+      },
     };
   },
   TEXT_OPERATOR(context, tag) {

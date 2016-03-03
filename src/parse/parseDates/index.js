@@ -8,6 +8,7 @@ import {
   shortYear, plus, plusMinus, dash, slash, colon, dot, t, ms, s, mm, hh, hhmm, D, DD, M, MM, YY,
   YYYY,
 } from './formats';
+import { TAG_DATETIME, TAG_DATE, TAG_TIME } from '../tags';
 import { text, textNumber } from '../tags/util';
 import {
   getLocaleDateFormats, getLocaleTimeFormats, getLocaleTimezoneFormats, getLocaleDateTimeFormats,
@@ -129,8 +130,8 @@ const baseTimezoneFormats = [
 const isIsoDate = whereEq({ format: 'ISO_DATE' });
 const isIsoTime = whereEq({ format: 'ISO_TIME' });
 const isIsoTimezoneOffset = whereEq({ format: 'ISO_TIMEZONE_OFFSET' });
-const isDate = whereEq({ type: 'TAG_DATE' });
-const isTime = whereEq({ type: 'TAG_TIME' });
+const isDate = whereEq({ type: TAG_DATE });
+const isTime = whereEq({ type: TAG_TIME });
 
 const isoDateTime = [isIsoDate, t, isIsoTime];
 const isoDateTimeTzOffset = [...isoDateTime, isIsoTimezoneOffset];
@@ -224,18 +225,25 @@ export default function parseDates(context) {
   return pipe(
     // Dates before timezone offsets because dates can parse as multiple timezones
     // (1992-12-12 is 1992 and two timezone offsets)
-    parsePattern('TAG_DATE', dateFormats),
+    parsePattern(TAG_DATE, dateFormats),
     // Timezones offsets before times because timezone offsets can parse as times
     // (+03:45 could be '+' and a time)
     parsePattern(timezone.type, timezoneFormats),
-    parsePattern('TAG_TIME', timeFormats),
+    parsePattern(TAG_TIME, timeFormats),
     parsePattern(datetime.type, dateTimeFormats),
     formatDateTimeTags,
     when(whereEq({ tags: null }), always(context)),
     evolve({
-      tags: map(when(isDatetime, value =>
-        ({ ...value, value: { ...utcTime, ...context.currentTime, ...value.value } })
-      )),
+      tags: map(when(isDatetime, datetimeValue => ({
+        type: TAG_DATETIME,
+        start: datetimeValue.start,
+        end: datetimeValue.end,
+        value: {
+          type: datetimeValue.type,
+          format: datetimeValue.format,
+          value: { ...utcTime, ...context.currentTime, ...datetimeValue.value },
+        },
+      }))),
     })
   )(context);
 }

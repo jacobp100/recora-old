@@ -39,14 +39,18 @@ export default class Recora {
     };
   }
 
-  parse(text) {
+  getContext(text) {
     const { locale, config } = this;
-    const context = {
+    return {
       ...baseContext,
       ...config,
       locale,
       text,
     };
+  }
+
+  parse(text) {
+    const context = this.getContext(text);
     return parse(context) || context;
   }
 }

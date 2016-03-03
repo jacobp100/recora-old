@@ -25,6 +25,7 @@ export const normalize = (context, datetime) => ({
   ...datetime,
   value: {
     ...datetime.value,
+    // THERE IS A BUG HERE
     ...datetimeToMoment(datetime).toObject(),
   },
 });

@@ -3,9 +3,12 @@ import {
   flip, update, reduced, identity, assoc,
 } from 'ramda';
 import {
-  entity, color, datetime, timezone, percentage, funcApplication, bracketGroup,
+  entity, color, timezone, percentage, funcApplication, bracketGroup,
 } from '../../types';
-import { TAG_NUMBER, TAG_SYMBOL, TAG_UNIT, TAG_PERCENTAGE, TAG_NOOP } from '../tags';
+import {
+  TAG_NUMBER, TAG_SYMBOL, TAG_UNIT, TAG_PERCENTAGE, TAG_NOOP, TAG_COLOR, TAG_CONSTANT,
+  TAG_DATETIME,
+} from '../tags';
 import { isEntity } from '../../types/util';
 import { objectEmpty } from '../../util';
 import assert from 'assert';
@@ -39,7 +42,8 @@ function entityToPercentage(value) {
   return null;
 }
 
-const appendValue = flip(append);
+const appendSelf = flip(append);
+const appendValue = (values, { value }) => append(value, values);
 
 
 const tagResolvers = {
@@ -65,13 +69,13 @@ const tagResolvers = {
 
     return reduced(null);
   },
+  [TAG_COLOR]: appendValue,
+  [TAG_CONSTANT]: appendValue,
+  [TAG_DATETIME]: appendValue,
+  [timezone.type]: appendSelf,
+  [funcApplication.type]: appendSelf,
+  [bracketGroup.type]: appendSelf,
   [TAG_NOOP]: append(entity),
-  [entity.type]: appendValue,
-  [color.type]: appendValue,
-  [datetime.type]: appendValue,
-  [timezone.type]: appendValue,
-  [funcApplication.type]: appendValue,
-  [bracketGroup.type]: appendValue,
   default: identity,
 };
 export default tagResolvers;

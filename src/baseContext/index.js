@@ -1,5 +1,5 @@
 const baseContext = {
-  hints: null,
+  hints: {},
   tags: null,
   ast: null,
   conversion: null,
