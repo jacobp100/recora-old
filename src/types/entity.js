@@ -1,7 +1,7 @@
 import {
   complement, isNil, pipe, map, last, sum, ifElse, prop, has, always, filter, toPairs, head,
   partial, where, keys, pickBy, reduce, evolve, multiply, omit, groupBy, mapObj, equals, __,
-  chain, adjust, fromPairs, propEq, length,
+  chain, adjust, fromPairs, propEq, length, when,
 } from 'ramda';
 import { entity as entityDescriptor } from './index';
 import unitsDerived from '../data/unitsDerived';
@@ -169,7 +169,12 @@ export function convert(context, units, entity) {
 }
 
 function floorEntityAccum(context, entity, units) {
-  const exactEntity = convert(context, units, entity);
+  const exactEntity = entity ? convert(context, units, entity) : null;
+
+  if (!exactEntity) {
+    return [NaN, null];
+  }
+
   // Add small amount to account for rounding errors
   const compositeEntity = { ...exactEntity, value: Math.floor(exactEntity.value + 1E-6) };
   const remainder = { ...exactEntity, value: exactEntity.value - compositeEntity.value };
@@ -178,16 +183,16 @@ function floorEntityAccum(context, entity, units) {
 }
 
 export function convertComposite(context, unitArray, entity) {
-  const value = mapWithAccum(
+  const compositeEntity = mapWithAccum(
     partial(floorEntityAccum, [context]),
     entity,
     unitArray
   );
-  return {
+  return when(compositeEntity, value => ({
     type: 'COMPOSITE_ENTITY',
     entity,
     value,
-  };
+  }));
 }
 
 export function toSi(context, entity) {

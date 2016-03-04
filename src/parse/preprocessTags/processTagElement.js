@@ -4,7 +4,7 @@ import {
   TAG_PARSE_OPTIONS, TAG_NOOP, TAG_UNIT, TAG_OPERATOR, TAG_NUMBER, TAG_FUNCTION, TAG_SYMBOL,
   TAG_COLOR, TAG_CONSTANT,
 } from '../tags';
-import { getUnitName, parseNumber, getConstant } from '../../environment';
+import { getUnitName, unitNameIsAbbreviation, parseNumber, getConstant } from '../../environment';
 import { ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, EQUATE, FACTORIAL } from '../../math/operators';
 import { exponent } from '../../math/entity';
 import { entity, color } from '../../types';
@@ -62,6 +62,8 @@ const preprocessTagElement = {
         value: unit,
         power,
       });
+
+      canNoop = canNoop || unitNameIsAbbreviation(context, unit);
     }
 
     if (options.length === 0) {

@@ -19,6 +19,8 @@ export const getConstant = (context, name) =>
   (path(['constants', name], context) || constants[name]);
 export const getUnitName = (context, name) =>
   (locales[context.locale].getUnitName(context, name));
+export const unitNameIsAbbreviation = (context, name) =>
+  (locales[context.locale].unitNameIsAbbreviation(context, name));
 export const preprocessTags = (context) =>
   (locales[context.locale].preprocessTags(context));
 export const getLocaleDateFormats = (context) =>

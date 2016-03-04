@@ -73,9 +73,10 @@ const tagResolvers = {
   [TAG_CONSTANT]: appendValue,
   [TAG_DATETIME]: appendValue,
   [TAG_TIMEZONE]: appendValue,
-  [funcApplication.type]: appendSelf,
-  [bracketGroup.type]: appendSelf,
   [TAG_NOOP]: append(entity),
   default: identity,
+  // TODO: Why do these show up!? Or do they...
+  [funcApplication.type]: appendSelf,
+  [bracketGroup.type]: appendSelf,
 };
 export default tagResolvers;
