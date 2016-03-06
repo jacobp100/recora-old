@@ -1,10 +1,11 @@
-import { entity, compositeEntity, color, datetime } from './index';
+import { entity, compositeEntity, color, datetime, valueAssignment } from './index';
 import {
   toString as entityToString, convert as entityConvert, convertComposite as entityConvertComposite,
 } from './entity';
 import { toString as compositeEntityToString } from './compositeEntity';
 import { toString as colorToString, convert as colorConvert } from './color';
 import { toString as datetimeEntityToString } from './datetime';
+import { toString as valueAssignmentToString } from './valueAssignment';
 
 
 export function convert(context, units, value) {
@@ -37,6 +38,8 @@ export function toString(context, value) {
       return colorToString(context, value);
     case datetime.type:
       return datetimeEntityToString(context, value);
+    case valueAssignment.type:
+      return valueAssignmentToString(context, value);
     default:
       return `[type ${value.type}]`;
   }

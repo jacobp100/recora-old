@@ -53,6 +53,12 @@ export const operationsGroup = {
   level: -1,
 };
 
+export const valueAssignment = {
+  type: 'VALUE_ASSIGNMENT',
+  key: null,
+  value: null,
+};
+
 export const bracketGroup = {
   type: 'BRACKET_GROUP',
   groups: [],

@@ -1,5 +1,6 @@
-import { pipe, ifElse, nthArg, evolve, add, path } from 'ramda';
-import { entity, percentage, color, datetime, empty } from '../types';
+import { pipe, ifElse, nthArg, evolve, add, path, equals, values, keys, head, where } from 'ramda';
+import { entity, percentage, color, datetime, empty, valueAssignment } from '../types';
+import { isEntity } from '../types/util';
 import { isNumber } from '../types/entity';
 import * as entityMath from './entity';
 import * as entityPercentageMath from './entityPercentage';
@@ -9,6 +10,9 @@ import * as colorEntityMath from './colorEntity';
 import * as datetimeEntityMath from './datetimeEntity';
 import gamma from 'gamma';
 import { nilValue } from '../util';
+
+
+const firstKey = pipe(keys, head);
 
 
 const negativeEntity = { ...entity, value: -1 };
@@ -106,3 +110,7 @@ export const DIVIDE = createOperation(divideValueMap);
 export const NEGATE = createOperation(negateValueMap);
 export const EXPONENT = createOperation(exponentValueMap);
 export const FACTORIAL = createOperation(factorialValueMap);
+export const EQUATE = (context, lhs, rhs) =>
+  (isEntity(lhs) && where({ value: equals(1), symbols: pipe(values, equals([1])) }, lhs))
+  ? ({ ...valueAssignment, key: firstKey(lhs.symbols), value: rhs })
+  : null;

@@ -302,7 +302,7 @@ const hasMoreThanOneTag = pipe(
   pluck('value'),
   uniq,
   length,
-  gt(__, 0) // FIXME: Update to 1 (or more) when we use symbols
+  gt(__, 1) // FIXME: Update to 1 (or more) when we use symbols
 );
 const quickResolveTags = ifElse(hasMoreThanOneTag,
   assoc('result', null),
