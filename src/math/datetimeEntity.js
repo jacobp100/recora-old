@@ -1,6 +1,6 @@
 import { partial } from 'ramda';
 import { convert } from '../types/entity';
-import { normalize } from '../types/datetime';
+import { normalize, datetimeToMoment } from '../types/datetime';
 
 const abstractAdd = (direction, context, datetime, entity) => {
   const seconds = convert(context, { second: 1 }, entity);
@@ -9,11 +9,15 @@ const abstractAdd = (direction, context, datetime, entity) => {
     return null;
   }
 
+  const momentValues = datetimeToMoment(datetime)
+    .add(seconds.value * direction, 's')
+    .toObject();
+
   return normalize(context, {
     ...datetime,
     value: {
       ...datetime.value,
-      seconds: datetime.value.seconds + direction * seconds.value,
+      ...momentValues,
     },
   });
 };

@@ -1,6 +1,6 @@
 import moment from 'moment-timezone';
 
-const datetimeToMoment = datetime =>
+export const datetimeToMoment = datetime =>
   moment.tz(datetime.value, datetime.value.timezone).utcOffset(datetime.value.utcOffset);
 
 export const toUtc = (context, datetime) => ({

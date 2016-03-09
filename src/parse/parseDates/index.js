@@ -2,7 +2,7 @@
 import {
   pipe, groupBy, toPairs, sortBy, head, map, prop, last, reverse, equals, ifElse, always, whereEq,
   curry, insert, remove, reject, slice, reduce, partial, __, anyPass, gte, over, lensProp, when,
-  assoc, evolve, length, cond,
+  assoc, evolve, length, cond, identity,
 } from 'ramda';
 import {
   shortYear, plus, plusMinus, dash, slash, colon, dot, t, ms, s, mm, hh, hhmm, D, DD, M, MM, YY,
@@ -243,6 +243,7 @@ export default function parseDates(context) {
             value: timezoneValue.value,
           },
         })],
+        [always(true), identity],
       ])),
     })
   )(context);
