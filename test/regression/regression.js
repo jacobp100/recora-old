@@ -5,9 +5,11 @@ describe('regression', function() {
   this.slow(8);
 
   const recora = new Recora('en', {
-    currentYears: 1970,
-    currentMonths: 0,
-    currentDate: 1,
+    currentTime: {
+      years: 1970,
+      months: 0,
+      date: 1,
+    },
   });
 
   function shittyFixOutputUntilIIncludeRealNumberFormatting(resultToString) {

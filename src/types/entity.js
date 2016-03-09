@@ -188,11 +188,11 @@ export function convertComposite(context, unitArray, entity) {
     entity,
     unitArray
   );
-  return when(compositeEntity, value => ({
+  return when(notNil, value => ({
     type: 'COMPOSITE_ENTITY',
     entity,
     value,
-  }));
+  }), compositeEntity);
 }
 
 export function toSi(context, entity) {

@@ -1,4 +1,6 @@
-import { pipe, ifElse, nthArg, evolve, add, path, equals, values, keys, head, where } from 'ramda';
+import {
+  pipe, ifElse, nthArg, evolve, add, path, equals, values, keys, head, where, allPass,
+} from 'ramda';
 import { entity, percentage, color, datetime, empty, valueAssignment } from '../types';
 import { isEntity } from '../types/util';
 import { isNumber } from '../types/entity';
@@ -101,6 +103,11 @@ const createOperation = (valueMap) => (context, lhs, rhs) => {
   return fn ? fn(context, lhs, rhs) : null;
 };
 
+const validLhsAssignment = allPass([
+  isEntity,
+  where({ value: equals(1), symbols: pipe(values, equals([1])) }),
+]);
+
 export const ADD = createOperation(addValueMap);
 export const SUBTRACT = createOperation(subtractValueMap);
 export const MULTIPLY = createOperation(multiplyValueMap);
@@ -111,6 +118,6 @@ export const NEGATE = createOperation(negateValueMap);
 export const EXPONENT = createOperation(exponentValueMap);
 export const FACTORIAL = createOperation(factorialValueMap);
 export const EQUATE = (context, lhs, rhs) =>
-  (isEntity(lhs) && where({ value: equals(1), symbols: pipe(values, equals([1])) }, lhs))
+  (validLhsAssignment(lhs) && isEntity(rhs))
   ? ({ ...valueAssignment, key: firstKey(lhs.symbols), value: rhs })
   : null;

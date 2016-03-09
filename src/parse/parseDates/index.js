@@ -33,31 +33,23 @@ const isoDate = [YYYY, dash, MM, dash, DD];
 const isolikeDateDash = [YYYY, dash, M, dash, D];
 const isolikeDateSlash = [YYYY, slash, M, slash, D];
 
-const euroDateNoYearDash = [D, dash, MM];
-const euroDateNoYearSlash = [D, slash, MM];
-const euroDateShortYearDash = [...euroDateNoYearDash, dash, YY];
-const euroDateShortYearSlash = [...euroDateNoYearSlash, slash, YY];
-const euroDateLongYearDash = [...euroDateNoYearDash, dash, YYYY];
-const euroDateLongYearSlash = [...euroDateNoYearSlash, slash, YYYY];
+const euroDateShortYearDash = [D, dash, MM, dash, YY];
+const euroDateShortYearSlash = [D, dash, MM, slash, YY];
+const euroDateLongYearDash = [D, dash, MM, dash, YYYY];
+const euroDateLongYearSlash = [D, dash, MM, slash, YYYY];
 
-const americanDateNoYearDash = [MM, dash, D];
-const americanDateNoYearSlash = [MM, slash, D];
-const americanDateShortYearDash = [...americanDateNoYearDash, dash, YY];
-const americanDateShortYearSlash = [...americanDateNoYearSlash, slash, YY];
-const americanDateLongYearDash = [...americanDateNoYearDash, dash, YYYY];
-const americanDateLongYearSlash = [...americanDateNoYearSlash, slash, YYYY];
+const americanDateShortYearDash = [MM, dash, D, dash, YY];
+const americanDateShortYearSlash = [MM, slash, D, slash, YY];
+const americanDateLongYearDash = [MM, dash, D, dash, YYYY];
+const americanDateLongYearSlash = [MM, slash, D, slash, YYYY];
 
 
 const resolveIsoDate = tags =>
   ({ years: textNumber(tags[0]), months: textNumber(tags[2]) - 1, date: textNumber(tags[4]) });
-const resolveEuroNoYearDate = tags =>
-  ({ months: textNumber(tags[2]) - 1, date: textNumber(tags[4]) });
 const resolveEuroShortYearDate = tags =>
   ({ years: shortYear(tags[4]), months: textNumber(tags[2]) - 1, date: textNumber(tags[4]) });
 const resolveEuroLongYearDate = tags =>
   ({ years: textNumber(tags[4]), months: textNumber(tags[2]) - 1, date: textNumber(tags[0]) });
-const resolveAmericanNoYearDate = tags =>
-  ({ months: textNumber(tags[0]) - 1, date: textNumber(tags[2]) });
 const resolveAmericanShortYearDate = tags =>
   ({ years: shortYear(tags[4]), months: textNumber(tags[0]) - 1, date: textNumber(tags[2]) });
 const resolveAmericanLongYearDate = tags =>
@@ -68,14 +60,10 @@ const baseDateFormats = [
   { format: 'ISO_DATE', pattern: isoDate, resolve: resolveIsoDate },
   { format: 'DATE', pattern: isolikeDateDash, resolve: resolveIsoDate },
   { format: 'DATE', pattern: isolikeDateSlash, resolve: resolveIsoDate },
-  { format: 'DATE', pattern: euroDateNoYearDash, resolve: resolveEuroNoYearDate },
-  { format: 'DATE', pattern: euroDateNoYearSlash, resolve: resolveEuroNoYearDate },
   { format: 'DATE', pattern: euroDateShortYearDash, resolve: resolveEuroShortYearDate },
   { format: 'DATE', pattern: euroDateShortYearSlash, resolve: resolveEuroShortYearDate },
   { format: 'DATE', pattern: euroDateLongYearDash, resolve: resolveEuroLongYearDate },
   { format: 'DATE', pattern: euroDateLongYearSlash, resolve: resolveEuroLongYearDate },
-  { format: 'DATE', pattern: americanDateNoYearDash, resolve: resolveAmericanNoYearDate },
-  { format: 'DATE', pattern: americanDateNoYearSlash, resolve: resolveAmericanNoYearDate },
   { format: 'DATE', pattern: americanDateShortYearDash, resolve: resolveAmericanShortYearDate },
   { format: 'DATE', pattern: americanDateShortYearSlash, resolve: resolveAmericanShortYearDate },
   { format: 'DATE', pattern: americanDateLongYearDash, resolve: resolveAmericanLongYearDate },

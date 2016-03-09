@@ -10,8 +10,9 @@ import parseDates from './parseDates';
 import preprocessTags from './preprocessTags';
 import postprocessTags from './postprocessTags';
 import resolveTags from './resolveTags';
-import { entity, empty } from '../types';
+import { entity } from '../types';
 import { toString, convert, convertComposite } from '../types/types';
+import { isTimezone, isEmpty } from '../types/util';
 import { getFormattingHints } from '../environment';
 import resolve from '../resolve';
 import { notNil, objectNotEmpty } from '../util';
@@ -119,7 +120,8 @@ const entityWithSymbols = where({
 const resultIsNil = where({ result: isNil });
 const resultIsEntityWithSymbols = where({ result: entityWithSymbols });
 const irrelevantResults = anyPass([
-  whereEq({ type: empty.type }),
+  isEmpty,
+  isTimezone,
 ]);
 const resultIsIrrelevant = where({ result: irrelevantResults });
 
