@@ -1,6 +1,6 @@
 {
   "name": "recora",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "src/index.js",
   "scripts": {
@@ -26,8 +26,5 @@
     "eslint-plugin-react": "^4.1.0",
     "json-loader": "^0.5.2",
     "webpack": "^1.11.0"
-  },
-  "bin": {
-    "recora": "./recora.js"
   }
 }
