@@ -1,6 +1,6 @@
 # Recora
 
-![Recora Logo](https://github.com/jacobp100/recora-web/blob/master/design/icon-calculator-gradient.png?raw=true)
+![Recora Logo](https://github.com/jacobp100/recora-web/raw/gh-pages/design/icon-calculator-gradient.png?raw=true)
 
 Language processor for [Recora project](https://github.com/jacobp100/recora): a natural language calculator and spreadsheet replacement.
 
